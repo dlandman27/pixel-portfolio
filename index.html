@@ -9,16 +9,16 @@ and open the template in the editor.
         <title></title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
         <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
         <link rel="stylesheet" href = "../resources/css/style.css">
+        <link rel="stylesheet" href = "../resources/css/utilities.css">
         <script type='text/javascript' src='../resources/js/jquery.js'></script>
         <script type = "text/javascript" src="../resources/js/script.js"></script> 
             
         <link rel="shortcut icon" type="image/x-icon" href="../resources/images/logo icon/dl-logo.png" />
     </head>
-
-
 
     <body>
         <!-- AWWWARDS HONORABLE MENTION TAG -->
@@ -104,7 +104,7 @@ and open the template in the editor.
         </section>
 
         <!-- Achievements -->
-        <div class="nes-container with-title is-centered  achievement">
+        <div class="nes-container with-title is-centered position-absolute achievement" style="top: 8px">
             <p class="title">🏆Achievement Unlocked🏆</p>
             <p class="achievement-name">Backpack Collected</p>
             <p class="achievement-description"></p>
@@ -245,7 +245,7 @@ and open the template in the editor.
         </div>
 
         <!-- Social Media -->
-        <div onclick="toggleSocialMedia()" class="iphone-screen">
+        <!-- <div onclick="toggleSocialMedia()" class="iphone-screen">
             <a   target="blank" href="https://www.facebook.com/profile.php?id=100010323152514"><i class="nes-icon facebook is-large app col1 row1"></i></a>
             <a   target="blank" href="mailto: dylan@landmans.us"><i class="nes-icon gmail is-large app col1 row2"></i></a>
             <a   target="blank"href="https://www.instagram.com/designsbydjl/"><i class="nes-icon instagram is-large app col1 row3"></i></a>
@@ -254,7 +254,7 @@ and open the template in the editor.
             <a   target="blank"href="https://www.redbubble.com/people/dylanlandman/shop?asc=u"><i class="nes-icon redbubble is-large app col2 row3"></i></a>
             <a   onClick="openDoc(2)"><div class="nes-container mobile-resume"><p style="text-align: center;">Resume</p></div></a>
         </div>
-        <a onclick="toggleSocialMedia()" class="socialMedia-icon off"></a>
+        <a onclick="toggleSocialMedia()" class="socialMedia-icon off"></a> -->
         
 
         <!-- Settings for sound -->
@@ -264,6 +264,62 @@ and open the template in the editor.
             <div onclick="toggleMusic()" class="settings-icon music off"></div>
             <div onclick="toggleSFX()" class="settings-icon SFX off"></div>
         </div> -->
+
+        <div class="nes-container is-rounded is-dark d-flex gap-5 justify-content-center" style="position: fixed; z-index: 999; max-width: 800px; transform: translateX(-50%); bottom: 8px;  right: 0; width: 80%; left: 50%;">
+            <div class="nav-item d-flex flex-column align-items-center gap-2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 4H16V6H15V9H14V12H13V14H12V17H11V20H10V21H9V20H8V18H9V15H10V12H11V10H12V7H13V4H14V3H15V4Z" fill="white"/>
+                    <path d="M23 11V13H22V14H21V15H20V16H19V17H17V15H18V14H19V13H20V11H19V10H18V9H17V7H19V8H20V9H21V10H22V11H23Z" fill="white"/>
+                    <path d="M7 7V9H6V10H5V11H4V13H5V14H6V15H7V17H5V16H4V15H3V14H2V13H1V11H2V10H3V9H4V8H5V7H7Z" fill="white"/>
+                </svg>
+                <a href="#home">Code</a>
+            </div>
+            <div class="nav-item d-flex flex-column align-items-center gap-2">
+                <a class="d-flex flex-column " onclick="openMinimap()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 9V7H21V5H20V4H19V3H17V2H15V1H9V2H7V3H5V4H4V5H3V7H2V9H1V15H2V17H3V19H4V20H5V21H7V22H9V23H15V22H17V21H19V20H20V19H21V17H22V15H23V9H22ZM18 12V9H19V8H20V9H21V13H19V12H18ZM14 19V21H12V18H11V17H10V14H9V13H8V12H7V11H6V10H5V9H4V7H5V6H6V5H7V4H10V3H12V4H13V8H11V10H12V11H10V10H8V12H11V13H15V14H16V17H15V19H14Z" fill="white"/>
+                    </svg>
+                    <a>Map</a>
+                </a>
+            </div>
+            <div class="nav-item d-flex flex-column align-items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 9H6V5H7V3H8V2H10V1H14V2H16V3H17V5H18V9H17V11H16V12H14V13H10V12H8V11H7V9Z" fill="white"/>
+                    <path d="M22 19V22H21V23H3V22H2V19H3V18H4V17H5V16H7V15H17V16H19V17H20V18H21V19H22Z" fill="white"/>
+                </svg>
+                <a>About</a>
+            </div>
+            <div class="nav-item d-flex flex-column align-items-center gap-2">
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="nav-item d-flex flex-column align-items-center gap-2 position-relative">
+                <div class="position-absolute d-none" style="bottom: 64px">
+                    <div class="nes-container is-rounded is-dark d-flex flex-column gap-3">
+                        <div class="nav-item d-flex flex-column align-items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                <path d="M19 13H17V10H19V13Z" fill="white"/>
+                                <path d="M7 13H5V10H7V13Z" fill="white"/>
+                                <path d="M13 19H11V16H13V19Z" fill="white"/>
+                                <path d="M13 7H11V4H13V7Z" fill="white"/>
+                            </svg>
+                            <a href="#soccer">Soccer</a>
+                        </div>
+                        <div class="nav-item d-flex flex-column align-items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 100-16 8 8 0 000 16zm0-14a6 6 0 100 12 6 6 0 000-12zm0 12a4 4 0 100-8 4 4 0 000 8zm0-6a2 2 0 100 4 2 2 0 000-4zm0 4a2 2 0 100-4 2 2 0 000 4z" fill="white"/>
+                            </svg>
+                            <a href="#fishing">Fishing</a>
+                        </div>
+                    </div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 10H3V17H2V16H1V11H2V10Z" fill="white"/>
+                    <path d="M19 7H18V6H13V3H11V6H6V7H5V8H4V18H5V19H6V20H18V19H19V18H20V8H19V7ZM17 13H14V10H17V13ZM13 17H11V16H13V17ZM7 16H10V17H7V16ZM7 10H10V13H7V10ZM14 17V16H17V17H14Z" fill="white"/>
+                    <path d="M23 11V16H22V17H21V10H22V11H23Z" fill="white"/>
+                </svg>
+                <a href="#contact">Games</a>
+            </div>
+        </div>
 
         
         
@@ -498,7 +554,7 @@ and open the template in the editor.
             </div>            
             
             <!--Animated Character--> 
-            <div id="dylan" class="tooltip">    
+            <div id="dylan">    
                 <div class="nes-balloon from-left">
                     <p>HELLO WORLD</p>
                   </div>
@@ -704,7 +760,6 @@ and open the template in the editor.
             <a onClick="goFishing()"><div class="inventory-slot fishingRod"></div></a>
             <a onClick="openFishbook()"><div class="inventory-slot book"></div></a>
         </div>
-        <a onclick="openMinimap()"><div class="minimap-icon"></div></a>
         <!-- Loading Screen -->
         <div class="loading-screen">
             <div class="loading-screen loading-animation">
@@ -737,4 +792,5 @@ and open the template in the editor.
             
         </div>
     </body>
+    
 </html>

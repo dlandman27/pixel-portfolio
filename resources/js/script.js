@@ -345,7 +345,7 @@ function startGame() {
     $("#dylan").css("background-image", url + "/dylan-front-" + frame + ".png)");
     $("#dylan").css("top", top + "px");
 
-  }, 100);
+  }, 75);
 
 
   //if tree has already been cut down
@@ -1059,7 +1059,6 @@ function openResume(){
   $("#resume").css("display","block")
 }
 function dayCycle() {
-
 }
 function openDoc(location){
   if(inventory.resume || location== 2)
