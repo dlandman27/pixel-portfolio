@@ -172,7 +172,7 @@ var sitting = false;
 //URL Class holds file locations to images:
 class urlLabels{
   constructor() {
-    this.tag = "url(../resources/images";
+    this.tag = "url(resources/images";
     this.getAnimalTracks = () => this.tag + "/animal-tracks";
     this.getBonfire = () => this.tag + "/bonfire";
     this.getBuildings = () => this.tag + "/buildings";
@@ -208,48 +208,48 @@ function lazyLoad() {
 
   //URLS to Lazy Load
   var URLs = [
-    "../resources/images/characters/dylan/dylan-front-1.png",
-    "../resources/images/characters/dylan/dylan-front-2.png",
-    "../resources/images/characters/dylan/dylan-front-3.png",
-    "../resources/images/characters/dylan/dylan-front-4.png",
-    "../resources/images/characters/dylan/dylan-front-5.png",
-    "../resources/images/characters/dylan/dylan-front-6.png",
-    "../resources/images/characters/dylan/dylan-front-7.png",
-    "../resources/images/characters/dylan/dylan-back-1.png",
-    "../resources/images/characters/dylan/dylan-back-2.png",
-    "../resources/images/characters/dylan/dylan-back-3.png",
-    "../resources/images/characters/dylan/dylan-back-4.png",
-    "../resources/images/characters/dylan/dylan-back-5.png",
-    "../resources/images/characters/dylan/dylan-back-6.png",
-    "../resources/images/characters/dylan/dylan-back-7.png",
-    "../resources/images/characters/dylan/dylan-left-1.png",
-    "../resources/images/characters/dylan/dylan-left-2.png",
-    "../resources/images/characters/dylan/dylan-left-3.png",
-    "../resources/images/characters/dylan/dylan-left-4.png",
-    "../resources/images/characters/dylan/dylan-left-5.png",
-    "../resources/images/characters/dylan/dylan-left-6.png",
-    "../resources/images/characters/dylan/dylan-left-7.png",
-    "../resources/images/characters/dylan/dylan-right-1.png",
-    "../resources/images/characters/dylan/dylan-right-2.png",
-    "../resources/images/characters/dylan/dylan-right-3.png",
-    "../resources/images/characters/dylan/dylan-right-4.png",
-    "../resources/images/characters/dylan/dylan-right-5.png",
-    "../resources/images/characters/dylan/dylan-right-6.png",
-    "../resources/images/characters/dylan/dylan-right-7.png",
-    "../resources/images/characters/dylan/axe/chop/dylan-chop-1.png",
-    "../resources/images/characters/dylan/axe/chop/dylan-chop-2.png",
-    "../resources/images/characters/dylan/axe/chop/dylan-chop-3.png",
-    "../resources/images/characters/dylan/axe/chop/dylan-chop-4.png",
-    "../resources/images/characters/dylan/axe/pickup/dylan-axe-1.png",
-    "../resources/images/characters/dylan/axe/pickup/dylan-axe-2.png",
-    "../resources/images/characters/dylan/axe/pickup/dylan-axe-3.png",
-    "../resources/images/characters/dylan/axe/pickup/dylan-axe-4.png",
-    "../resources/images/nature/falling-tree/falling-tree-2.png",
-    "../resources/images/nature/falling-tree/falling-tree-3.png",
-    "../resources/images/nature/falling-tree/falling-tree-4.png",
-    "../resources/images/nature/falling-tree/falling-tree-5.png",
-    "../resources/images/nature/falling-tree/falling-tree-6.png",
-    "../resources/images/nature/falling-tree/falling-tree-7.png",
+    "resources/images/characters/dylan/dylan-front-1.png",
+    "resources/images/characters/dylan/dylan-front-2.png",
+    "resources/images/characters/dylan/dylan-front-3.png",
+    "resources/images/characters/dylan/dylan-front-4.png",
+    "resources/images/characters/dylan/dylan-front-5.png",
+    "resources/images/characters/dylan/dylan-front-6.png",
+    "resources/images/characters/dylan/dylan-front-7.png",
+    "resources/images/characters/dylan/dylan-back-1.png",
+    "resources/images/characters/dylan/dylan-back-2.png",
+    "resources/images/characters/dylan/dylan-back-3.png",
+    "resources/images/characters/dylan/dylan-back-4.png",
+    "resources/images/characters/dylan/dylan-back-5.png",
+    "resources/images/characters/dylan/dylan-back-6.png",
+    "resources/images/characters/dylan/dylan-back-7.png",
+    "resources/images/characters/dylan/dylan-left-1.png",
+    "resources/images/characters/dylan/dylan-left-2.png",
+    "resources/images/characters/dylan/dylan-left-3.png",
+    "resources/images/characters/dylan/dylan-left-4.png",
+    "resources/images/characters/dylan/dylan-left-5.png",
+    "resources/images/characters/dylan/dylan-left-6.png",
+    "resources/images/characters/dylan/dylan-left-7.png",
+    "resources/images/characters/dylan/dylan-right-1.png",
+    "resources/images/characters/dylan/dylan-right-2.png",
+    "resources/images/characters/dylan/dylan-right-3.png",
+    "resources/images/characters/dylan/dylan-right-4.png",
+    "resources/images/characters/dylan/dylan-right-5.png",
+    "resources/images/characters/dylan/dylan-right-6.png",
+    "resources/images/characters/dylan/dylan-right-7.png",
+    "resources/images/characters/dylan/axe/chop/dylan-chop-1.png",
+    "resources/images/characters/dylan/axe/chop/dylan-chop-2.png",
+    "resources/images/characters/dylan/axe/chop/dylan-chop-3.png",
+    "resources/images/characters/dylan/axe/chop/dylan-chop-4.png",
+    "resources/images/characters/dylan/axe/pickup/dylan-axe-1.png",
+    "resources/images/characters/dylan/axe/pickup/dylan-axe-2.png",
+    "resources/images/characters/dylan/axe/pickup/dylan-axe-3.png",
+    "resources/images/characters/dylan/axe/pickup/dylan-axe-4.png",
+    "resources/images/nature/falling-tree/falling-tree-2.png",
+    "resources/images/nature/falling-tree/falling-tree-3.png",
+    "resources/images/nature/falling-tree/falling-tree-4.png",
+    "resources/images/nature/falling-tree/falling-tree-5.png",
+    "resources/images/nature/falling-tree/falling-tree-6.png",
+    "resources/images/nature/falling-tree/falling-tree-7.png",
   ];
 
   $("body").append("<div class='lazyLoad'>IM LAZY YO</div>");
@@ -319,7 +319,7 @@ function startGame() {
 
   document.title="Dylan Landman";
 
-  var url = 'url(../resources/images/characters/dylan';
+  var url = 'url(resources/images/characters/dylan';
   var frame = 12;
   var top = 112;
   var speech;
@@ -1063,7 +1063,7 @@ function dayCycle() {
 }
 function openDoc(location){
   if(inventory.resume || location== 2)
-    window.open('../resources/resume/resume.pdf', '_blank');
+    window.open('resources/resume/resume.pdf', '_blank');
 }
 
 var onLog = false;
@@ -1256,7 +1256,7 @@ function openTent1(side){
       left: "192px",
       top: "152px",
       visibility: "visible",
-      backgroundImage: "url(../resources/images/characters/dylan/dylan-front-1.png)"
+      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
     }).hide().fadeIn();
 
     $("#map").css({
@@ -1269,7 +1269,7 @@ function openTent1(side){
       left: "156px",
       top: "-36px",
       visibility: "visible",
-      backgroundImage: "url(../resources/images/characters/dylan/dylan-front-1.png)"
+      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
     }).hide().fadeIn();
 
     $("#map").css({
@@ -1292,7 +1292,7 @@ function leaveTent1(dir){
       left: "292px",
       top: "648px",
       visibility: "visible",
-      backgroundImage: "url(../resources/images/characters/dylan/dylan-front-1.png)"
+      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
     });
     $("#map").css({
       marginLeft: "2064px",
@@ -1305,7 +1305,7 @@ function leaveTent1(dir){
       left: "260px",
       top: "584px",
       visibility: "visible",
-      backgroundImage: "url(../resources/images/characters/dylan/dylan-front-1.png)"
+      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
     });
     $("#map").css({
       marginLeft: "2160px",
@@ -1377,7 +1377,7 @@ function openTVScreen(){
   //   // left: "260px",
   //   top: "-4px",
   //   visibility: "visible",
-  //   backgroundImage: "url(../resources/images/characters/dylan/dylan-back-1.png)"
+  //   backgroundImage: "url(resources/images/characters/dylan/dylan-back-1.png)"
   // });
   // $("#map").css({
   //   // marginLeft: "2160px",
@@ -1395,7 +1395,7 @@ function sitOnCouch(){
       // left: "260px",
       top: "-4px",
       visibility: "visible",
-      backgroundImage: "url(../resources/images/characters/dylan/dylan-back-1.png)"
+      backgroundImage: "url(resources/images/characters/dylan/dylan-back-1.png)"
     });
     $("#map").css({
       // marginLeft: "2160px",
@@ -1408,7 +1408,7 @@ function sitOnCouch(){
     $("#dylan").css({
       top: "-8px",
       visibility: "visible",
-      backgroundImage: "url(../resources/images/characters/dylan/dylan-front-1.png)"
+      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
     });
     $("#map").css({
       // marginLeft: "2160px",
