@@ -2993,6 +2993,18 @@ body {
   min-width: 256px;
 }
 
+/* Global tutorial speech bubble overlay */
+.tutorial-bubble {
+  position: fixed;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000050; /* above most UI, below loader */
+  max-width: 320px;
+  text-align: center;
+  margin: 0; /* override default nes-balloon margin so it's truly centered */
+}
+
 .nes-container.key {
   width: 64px;
   aspect-ratio: 1/1;
@@ -3059,20 +3071,29 @@ i {
 .achievement {
   display: none;
   position: fixed;
-  inset: 0;
-  width: 80%;
-  aspect-ratio: 20/1;
-  z-index: 1199919191;
-  background-color: #3eb489;
-  overflow: visible;
-  min-width: 256px;
-  top: 32px;
-  margin: auto;
+  z-index: 10000020;
+  /* Toast-style placement: top-right on viewport */
+  top: 0;
+  right: 0;
+  left: 0;
   box-sizing: border-box;
+  overflow: visible;
+  animation: achievementSlideIn 0.25s ease-out;
 }
 
 .achievement-description {
   font-size: 0.6rem;
+}
+
+@keyframes achievementSlideIn {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .matchbox {
@@ -3088,11 +3109,14 @@ i {
 }
 
 .nes-balloon.from-left {
+  position: absolute;
   top: -50px;
   transform: scale(0.4);
   left: -68px;
   display: none;
   width: 16ch;
+  /* Ensure tutorial / hints are always above other UI layers */
+  z-index: 10000001;
 }
 
 .nes-balloon.from-left p {

@@ -172,7 +172,6 @@ function startGame() {
 
       if(getCookie("title-screen") != 'true'){
         openTutorial();
-        document.getElementById('dialog-default').showModal();
       }
       else{
         eventOccurence = false;
@@ -198,11 +197,18 @@ function startGame() {
 
 function openTutorial(){
   eventOccurence = true;
-  $(".tutorial").css("display", "block");
+  // Show a global speech bubble at the top of the screen instead of a full-screen modal
+  var $bubble = $("#tutorial-bubble");
+  $bubble.find("p").html(
+    "Use <b>WASD</b> or <b>arrow keys</b> to move.<br/>Click objects to interact."
+  );
+  $bubble.stop(true, true).fadeIn(200);
 }
 function closeTutorial(){
   eventOccurence = false;
-  $(".tutorial").css("display", "none");
+  // Remember that the tutorial has been shown once
+  setCookie("title-screen", true);
+  $("#tutorial-bubble").fadeOut(200);
 }
 
 //River Animation
@@ -332,6 +338,13 @@ $(document).keydown(function(e){
   if(isReelingIn){
     reelIn(e.keyCode);
   }
+
+  // If the tutorial has not been acknowledged yet, close it on first movement input
+  var moveKeys = [37, 38, 39, 40, 65, 68, 83, 87]; // arrows + WASD
+  if (getCookie("title-screen") != 'true' && moveKeys.indexOf(e.which) !== -1) {
+    closeTutorial();
+  }
+
   keysPressed[e.which] = true;
   move(e.keyCode);  
   // useItem(e.keyCode);
