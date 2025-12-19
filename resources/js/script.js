@@ -1226,12 +1226,11 @@ function sitOnCouch(){
 }
 
 function openPortfolio(){
-  if(parseInt($("#dylan").css("top")) <= 552 && parseInt($("#dylan").css("left")) >= 1472){
-    $(".portfolio-container").css("display","block");
-    eventOccurence = true;
-    $(".minimap-icon").css("display","none");
-    $(".joycon").css("display","none");
-  }
+  // Allow opening portfolio from anywhere (including global menu)
+  $(".portfolio-container").css("display","block");
+  eventOccurence = true;
+  $(".minimap-icon").css("display","none");
+  $(".joycon").css("display","none");
 }
 
 function closePortfolio(){
@@ -1539,10 +1538,9 @@ function putFishOnLine(){
 }
 
 function openFishbook(){
-  if(inventory.fishbook){
-    $(".fishbook").css("display","flex");
-    eventOccurence = true;
-  }
+  // Allow opening fishbook from anywhere (including global menu)
+  $(".fishbook").css("display","flex");
+  eventOccurence = true;
 }
 
 function closeFishbook(){
