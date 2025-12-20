@@ -123,12 +123,12 @@ $(window).load(function () {
      $('.loading-screen').fadeOut();  
   }, 2500);
 
+  // Center the map after the loader finishes
   setTimeout(function(){ 
-    //if()
-    $("#map").css({
-    left: (1.2*(window.innerWidth/2)), 
-    top: (700+(window.innerHeight/2))
-  });},2400);//CHANGE IN ZOOM MUST CHANGE VALUE (CURR 1.2)(VALUE = 1+(1-ZOOMLEVEL))
+    if (typeof WORLD !== "undefined" && typeof WORLD.centerMap === "function") {
+      WORLD.centerMap();
+    }
+  },2400);//CHANGE IN ZOOM MUST CHANGE VALUE (CURR 1.2)(VALUE = 1+(1-ZOOMLEVEL))
   //Starts the game
   setTimeout(startGame, 2800);
 
@@ -137,10 +137,9 @@ $(window).load(function () {
 });
 
 $(window).resize(function () {
-  $("#map").css({
-    left: (1.2*(window.innerWidth/2)), 
-    top: (700+(window.innerHeight/2))
-  });
+  if (typeof WORLD !== "undefined" && typeof WORLD.centerMap === "function") {
+    WORLD.centerMap();
+  }
 
   if(window.innerWidth <= 600 && inventory.backpack){
     $("#backpack-icon").css("visibility","hidden");
@@ -213,21 +212,9 @@ function closeTutorial(){
 
 //River Animation
 $(function () {
-  var x = 0;
-  setInterval(function () {
-    x += 1;
-    $('#wrapper').css('background-position', x + 'px 0');
-
-    $('.water.water_funnel').css('background-position', -x + 'px 0');
-    $('.pool.top').css('background-position', -.5*x + 'px 0');
-    $('.pool.middle').css('background-position', '0 '+ .5*x + 'px');
-    $('.pool.verticalFunnel').css('background-position', '0 '+ .5*x + 'px');
-    $('.water.waterfall1').css('background-position', -2*x + 'px 0');
-    $('.pool.verticalFunnel2').css('background-position', '0 '+ 2*x + 'px');
-    $('.pool.verticalFunnel3').css('background-position', '0 '+ 2*x + 'px');
-    $('.pool.verticalFunnel4').css('background-position', '0 '+ 2*x + 'px');
-  }, 75)
-
+  if (typeof WORLD !== "undefined" && typeof WORLD.startRiverAnimation === "function") {
+    WORLD.startRiverAnimation();
+  }
 })
 
 //Tells if the fire is on
@@ -302,31 +289,34 @@ function togglefire() {
   
 }
 
-//Keeps the interval for the animation
-var anim;
+// Movement state and key constants are now in WORLD
+// Access via WORLD.movement.* and WORLD.KEYS.*
+// Initialize movement system when DOM is ready
+$(function() {
+  if (typeof WORLD !== "undefined" && typeof WORLD.initMovement === "function") {
+    WORLD.initMovement();
+  }
+});
 
-//Used to determine which frame the animation is on
-var frame = 1;
+// Legacy aliases for backward compatibility (use WORLD.KEYS and WORLD.movement instead)
+var keyLeft = typeof WORLD !== "undefined" ? WORLD.KEYS.LEFT : 37;
+var keyUp = typeof WORLD !== "undefined" ? WORLD.KEYS.UP : 38;
+var keyRight = typeof WORLD !== "undefined" ? WORLD.KEYS.RIGHT : 39;
+var keyDown = typeof WORLD !== "undefined" ? WORLD.KEYS.DOWN : 40;
+var keyW = typeof WORLD !== "undefined" ? WORLD.KEYS.W : 87;
+var keyA = typeof WORLD !== "undefined" ? WORLD.KEYS.A : 65;
+var keyS = typeof WORLD !== "undefined" ? WORLD.KEYS.S : 83;
+var keyD = typeof WORLD !== "undefined" ? WORLD.KEYS.D : 68;
+var keyEnter = typeof WORLD !== "undefined" ? WORLD.KEYS.ENTER : 13;
+var keySpace = typeof WORLD !== "undefined" ? WORLD.KEYS.SPACE : 32;
 
-//determines if a key is pressed
-var keyPressed = false;
-
-//ASCII of Keys for animation and movement
-var keyLeft = 37;
-var keyUp = 38
-var keyRight = 39
-var keyDown = 40;
-var keyW = 87;
-var keyA = 65;
-var keyS = 83;
-var keyD = 68;
-var keyEnter = 13;
-var keySpace = 32;
-//Variables for Movement
-var dylan = $("#dylan"),
-  // maxValue = pane.width() - box.width(), //replace with collision function
-  keysPressed = {},
-  distancePerIteration = 4;
+// Movement state aliases
+var anim = typeof WORLD !== "undefined" ? WORLD.movement.anim : null;
+var frame = typeof WORLD !== "undefined" ? WORLD.movement.frame : 1;
+var keyPressed = typeof WORLD !== "undefined" ? WORLD.movement.keyPressed : false;
+var keysPressed = typeof WORLD !== "undefined" ? WORLD.movement.keysPressed : {};
+var distancePerIteration = typeof WORLD !== "undefined" ? WORLD.movement.distancePerIteration : 4;
+var dylan = typeof WORLD !== "undefined" && WORLD.movement.dylan ? WORLD.movement.dylan : $("#dylan");
 
 
 
@@ -345,7 +335,12 @@ $(document).keydown(function(e){
     closeTutorial();
   }
 
+  // Use WORLD.movement for state management
+  if (typeof WORLD !== "undefined" && WORLD.movement) {
+    WORLD.movement.keysPressed[e.which] = true;
+  } else {
   keysPressed[e.which] = true;
+  }
   move(e.keyCode);  
   // useItem(e.keyCode);
   
@@ -418,8 +413,12 @@ function move(keyCode) {
   
   
   //if an event is occuring
+  var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
   if (onLog || eventOccurence || sitting) {
-    clearInterval(anim);
+    clearInterval(animRef);
+    if (typeof WORLD !== "undefined" && WORLD.movement) {
+      WORLD.movement.anim = null;
+    }
     return;
   }
   else {
@@ -435,12 +434,27 @@ function move(keyCode) {
   var key = "";
   var personMoving = true;
 
-  if (!keyPressed) {
+  // Use WORLD.movement state if available
+  var keyPressedRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.keyPressed : keyPressed;
+  var frameRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
+
+  if (!keyPressedRef) {
+    if (typeof WORLD !== "undefined" && WORLD.movement) {
+      WORLD.movement.keyPressed = true;
+    } else {
     keyPressed = true;
-    anim = setInterval(function () {
+    }
+    var intervalFunc = function () {
+      // Use WORLD.movement state if available
+      var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
 
       //Frame Animation
-      frame++;
+      frameVar++;
+      if (typeof WORLD !== "undefined" && WORLD.movement) {
+        WORLD.movement.frame = frameVar;
+      } else {
+        frame = frameVar;
+      }
 
       //When enter key is pressed
       if(keyCode == keyEnter){
@@ -460,12 +474,19 @@ function move(keyCode) {
         // if(SFXOn){
         //   walking.play();
         // }
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
         if(key != "left")
-          frame = 1;
-        if (frame > 7)
-          frame = 2;
+          frameVar = 1;
+        if (frameVar > 7)
+          frameVar = 2;
+        if (typeof WORLD !== "undefined" && WORLD.movement) {
+          WORLD.movement.frame = frameVar;
+        } else {
+          frame = frameVar;
+        }
         key = "left";
-        $("#dylan").css("background-image", url + "/dylan-left-" + frame + ".png)");
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
+        $("#dylan").css("background-image", url + "/dylan-left-" + frameVar + ".png)");
       }
       else if (keyCode == keyUp || keyCode == keyW) {
         // if(SFXOn){
@@ -479,13 +500,19 @@ function move(keyCode) {
         //   walking.play();
         // }
         
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
         if(key != "up")
-          frame = 1;
-        if (frame > 7)
-          frame = 2;
+          frameVar = 1;
+        if (frameVar > 7)
+          frameVar = 2;
+        if (typeof WORLD !== "undefined" && WORLD.movement) {
+          WORLD.movement.frame = frameVar;
+        } else {
+          frame = frameVar;
+        }
         key = "up";
-
-        $("#dylan").css("background-image", url + "/dylan-back-" + frame + ".png)");
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
+        $("#dylan").css("background-image", url + "/dylan-back-" + frameVar + ".png)");
 
         //If the up key will bring you into tent 1
         if(parseInt($("#dylan").css("left")) >= 288 && parseInt($("#dylan").css("left")) <= 296){
@@ -508,13 +535,19 @@ function move(keyCode) {
         //   // }
         //   // // walking.play();
         // }
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
         if(key != "down")
-          frame = 1;
-        if (frame > 7)
-          frame = 2;
+          frameVar = 1;
+        if (frameVar > 7)
+          frameVar = 2;
+        if (typeof WORLD !== "undefined" && WORLD.movement) {
+          WORLD.movement.frame = frameVar;
+        } else {
+          frame = frameVar;
+        }
         key = "down";
-
-        $("#dylan").css("background-image", url + "/dylan-front-" + frame + ".png)");
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
+        $("#dylan").css("background-image", url + "/dylan-front-" + frameVar + ".png)");
 
         //If the up key will bring you into tent 1 from backyard
         if(!tentOpen && parseInt($("#dylan").css("left")) >= 248 && parseInt($("#dylan").css("left")) <= 340){
@@ -532,12 +565,19 @@ function move(keyCode) {
         // if(SFXOn){
         //   // walking.play();
         // }
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
         if(key != "right")
-          frame = 1;
-        if (frame > 7)
-          frame = 2;
+          frameVar = 1;
+        if (frameVar > 7)
+          frameVar = 2;
+        if (typeof WORLD !== "undefined" && WORLD.movement) {
+          WORLD.movement.frame = frameVar;
+        } else {
+          frame = frameVar;
+        }
         key = "right";
-        $("#dylan").css("background-image", url + "/dylan-right-" + frame + ".png)");
+        var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
+        $("#dylan").css("background-image", url + "/dylan-right-" + frameVar + ".png)");
       }
 
       //Movement on stair in firepit
@@ -744,7 +784,13 @@ function move(keyCode) {
 
 
       //CHANGE SPEED OF CHARACTER
-    }, 50)//5 fast //50 normal
+    };
+    var animId = setInterval(intervalFunc, 50); //5 fast //50 normal
+    if (typeof WORLD !== "undefined" && WORLD.movement) {
+      WORLD.movement.anim = animId;
+    } else {
+      anim = animId;
+    }
   }
 
   //Controls Doors for Tents
@@ -774,12 +820,20 @@ $(document).keyup(function (e) {
   // walkingSound2.pause();
   
   // $("#dylan").fadeIn();
-  if(isReelingIn && keysPressed[keySpace]){
+  var ks = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.keysPressed : keysPressed;
+  if(isReelingIn && ks[keySpace]){
     $("#dylan").css("background-image", URL.getDylan() + "/fishing/dylan-fishing-1.png)");
   }
-  clearInterval(anim);
+  var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
+  clearInterval(animRef);
+  if (typeof WORLD !== "undefined" && WORLD.movement) {
+    WORLD.movement.keyPressed = false;
+    WORLD.movement.keysPressed[e.which] = false;
+    WORLD.movement.anim = null;
+  } else {
   keyPressed = false;
   keysPressed[e.which] = false;
+  }
 })
 
 
@@ -1227,10 +1281,10 @@ function sitOnCouch(){
 
 function openPortfolio(){
   // Allow opening portfolio from anywhere (including global menu)
-  $(".portfolio-container").css("display","block");
-  eventOccurence = true;
-  $(".minimap-icon").css("display","none");
-  $(".joycon").css("display","none");
+    $(".portfolio-container").css("display","block");
+    eventOccurence = true;
+    $(".minimap-icon").css("display","none");
+    $(".joycon").css("display","none");
 }
 
 function closePortfolio(){
@@ -1539,8 +1593,8 @@ function putFishOnLine(){
 
 function openFishbook(){
   // Allow opening fishbook from anywhere (including global menu)
-  $(".fishbook").css("display","flex");
-  eventOccurence = true;
+    $(".fishbook").css("display","flex");
+    eventOccurence = true;
 }
 
 function closeFishbook(){
@@ -1749,1031 +1803,50 @@ function endSoccerGame(){
 //Calculates the new value of the key pressed
 //Collision Handler for main map
 function calculateNewValue(oldValue, keyCode1, keyCode2, elem) {
-  if (onLog) {
-    return parseInt(oldValue, 10);
+  // Use collision engine only
+  if (typeof CollisionEngine !== "undefined" && typeof COLLISION_CONFIG !== "undefined" && COLLISION_CONFIG.mainMap) {
+    return CollisionEngine.checkCollisions(COLLISION_CONFIG.mainMap, elem, keyCode1, keyCode2, oldValue);
   }
-
-  if (elem == "body-top" || elem == "body-left") {
-    distancePerIteration = -12;
-  }
-  else {
-    distancePerIteration = 4;
-  }
-
-  //window borders
-  if (elem == "body-top") {
-    if (parseInt($("#dylan").css("top")) < 204) {
-      return parseInt(oldValue, 10);
-    }
-  //   if (parseInt($("#dylan").css("top")) > 1972) {
-  //     return parseInt(oldValue, 10);
-  //   }
-  // }
-  // if (elem == "body-left") {
-  //   if (parseInt($("#dylan").css("left")) < 344) {
-  //     return parseInt(oldValue, 10);
-  //   }
-  //   if (parseInt($("#dylan").css("left")) > 1596) {
-  //     return parseInt(oldValue, 10);
-  //   }
-   }
-
-/*
- *  //////////////////////////////////////////
- *  //UP & DOWN COLLISION 
- *  //////////////////////////////////////////
-*/
-  if (elem == "dylan-top" || elem == "body-top") {
-
-    ////////////////////////////////////
-    //Tent1
-    ///////////////////////////////////
-    if(parseInt($("#dylan").css("top")) < 680){
-      $(".tent.t1").css("z-index", "51");
-    }
-    else{
-      $(".tent.t1").css("z-index", "48");
-    }
-    if((parseInt($("#dylan").css("left")) < 288 && parseInt($("#dylan").css("left")) > 200) || (parseInt($("#dylan").css("left")) <= 384 && parseInt($("#dylan").css("left")) > 296)){
-      if(parseInt($("#dylan").css("top")) == 680 && keysPressed[keyCode1]){
-        return parseInt(oldValue, 10);
-      }
-    }
-    
-
-    ///////////////////////////////////
-    ///FENCES
-    ///////////////////////////////////
-
-    //Top fence and bridge
-    if (parseInt($("#dylan").css("top")) < 348 && (((parseInt($("#dylan").css("left"))) < 948) || (parseInt($("#dylan").css("left"))) > 1016)) {
-      if (keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-    }
-    //bottom fence
-    if (parseInt($("#dylan").css("top")) == 1272 && (((parseInt($("#dylan").css("left"))) < 952) || (parseInt($("#dylan").css("left"))) > 1020)) {
-      if (keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    //Fence opposite of tent 1
-    if(parseInt($("#dylan").css("top")) == 796){
-      if(parseInt($("#dylan").css("left")) < 484){
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-    }
-    //Fence on Tent 1
-    if(parseInt($("#dylan").css("top")) == 648){
-      if(parseInt($("#dylan").css("left")) < 452){
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //bottom fence in backyard of tent 1
-    if(parseInt($("#dylan").css("top")) < 628){
-      $(".fence.tent1").css("z-index", "50");
-    }
-    else{
-      $(".fence.tent1").css("z-index", "10");
-    }
-    if(parseInt($("#dylan").css("top")) == 616){
-      if(parseInt($("#dylan").css("left")) <= 412){
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    ///////////////////////////////////
-    ///DOCK
-    ///////////////////////////////////
-    if (parseInt($("#dylan").css("top")) >= 1444) {
-      if (keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    
-    ///////////////////////////////////
-    ///DOORS
-    ///////////////////////////////////
-
-    //Cave door
-    if (parseInt($("#dylan").css("top")) <= 160) {
-      if (keysPressed[keyCode1] && (parseInt($("#dylan").css("left")) < 968 || parseInt($("#dylan").css("left")) > 992))
-        return parseInt(oldValue, 10);
-    }
-    if(parseInt($("#dylan").css("top")) == 108 && keysPressed[keyCode1]){
-      openTutorial();
-      return parseInt(oldValue, 10);
-    }
-
-    ///////////////////////////////////
-    ///Incline
-    ///////////////////////////////////
-
-    //Soccer Nets
-    if(parseInt($("#dylan").css("top")) > 456){
-      $(".soccer-goal").css("z-index", "48");
-    }
-    else{
-      $(".soccer-goal").css("z-index", "51");
-    }
-
-    if(parseInt($("#dylan").css("top")) > 456){
-      $(".soccer-goal.back").css("z-index", "48");
-    }
-    else{
-      $(".soccer-goal.back").css("z-index", "51");
-    }
-
-    //soccer-ball
-    if(parseInt($("#dylan").css("top")) > 560){
-      $(".soccer-ball").css("z-index", "48");
-    }
-    else{
-      $(".soccer-ball").css("z-index", "51");
-    }
-
-    //Bottom of incline
-    if(parseInt($("#dylan").css("top")) == 740){
-      if(parseInt($("#dylan").css("left")) < 1576 && parseInt($("#dylan").css("left")) > 1412){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-    //Right side with trees and staircase
-    if(parseInt($("#dylan").css("top")) > 716){
-      $(".curved-tree").css("z-index", "48");
-    }
-    else{
-      $(".curved-tree").css("z-index", "51");
-    }
-    if(parseInt($("#dylan").css("top")) == 756){
-      if(parseInt($("#dylan").css("left")) <= 1716 && parseInt($("#dylan").css("left")) >= 1640){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-    //left side of staircase bottom
-    if(parseInt($("#dylan").css("top")) == 756){
-      if(parseInt($("#dylan").css("left")) < 1608 && parseInt($("#dylan").css("left")) >= 1572){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //top top of cliff
-    if(parseInt($("#dylan").css("top")) == 396){
-      if(parseInt($("#dylan").css("left")) <= 1688 && parseInt($("#dylan").css("left")) >= 1472){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //BOTTOM of top of cliff
-    if(parseInt($("#dylan").css("top")) == 680){
-      if((parseInt($("#dylan").css("left")) < 1608 && parseInt($("#dylan").css("left")) >= 1472) || (parseInt($("#dylan").css("left")) <= 1688 && parseInt($("#dylan").css("left")) > 1636) ){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    if(parseInt($("#dylan").css("left")) >= 1608 && parseInt($("#dylan").css("left")) <= 1636 && parseInt($("#dylan").css("top")) < 756 && parseInt($("#dylan").css("top")) > 680){
-      if(elem == "dylan-top")
-        distancePerIteration = 8;
-      else  //window
-        distancePerIteration = -24;
-    }
-
-
-    ///////////////////////////////////
-    ///Pond
-    ///////////////////////////////////
-
-    //outer top
-    if(parseInt($("#dylan").css("top")) == 828){
-      if(parseInt($("#dylan").css("left")) <= 1716 && parseInt($("#dylan").css("left")) >= 1412){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //outer bottom
-    if(parseInt($("#dylan").css("top")) == 1212){
-      if(parseInt($("#dylan").css("left")) <= 1804 && parseInt($("#dylan").css("left")) >= 1412){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //outside bridge
-    if(parseInt($("#dylan").css("left")) >=1396 && parseInt($("#dylan").css("left")) <= 1412){
-      if(parseInt($("#dylan").css("top")) == 972 && keysPressed[keyCode2]){
-        return parseInt(oldValue, 10);
-      }
-      if(parseInt($("#dylan").css("top")) == 1040 && keysPressed[keyCode1]){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    //top of island
-    if(parseInt($("#dylan").css("top")) == 952){
-      if(keysPressed[keyCode1] && parseInt($("#dylan").css("left")) <= 1684 && parseInt($("#dylan").css("left")) >= 1548){
-        return parseInt(oldValue, 10);
-      }
-    }
-    //bottom of island
-    if(parseInt($("#dylan").css("top")) == 1100){
-      if(keysPressed[keyCode2] && parseInt($("#dylan").css("left")) <= 1684 && parseInt($("#dylan").css("left")) >= 1548){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    if(parseInt($("#dylan").css("top")) < 1028){
-      $(".fountain").css("z-index", "100");
-      $(".paper").css("z-index", "101");
-    }
-    else{
-      $(".fountain").css("z-index", "10");
-      $(".paper").css("z-index", "11");
-    }
-
-    //top and bottom of fountain
-    if(parseInt($("#dylan").css("left")) <= 1652 && parseInt($("#dylan").css("left")) >= 1572){
-      if(keysPressed[keyCode1] && parseInt($("#dylan").css("top")) == 1044){
-        return parseInt(oldValue, 10);
-      }
-      if(keysPressed[keyCode2] && parseInt($("#dylan").css("top")) == 992){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    ///////////////////////////////////
-    ///Fire Pit
-    ///////////////////////////////////
-
-    //top trees
-    if(parseInt($("#dylan").css("top")) < 1064){
-      $(".tall-tree.bottom").css("z-index", "100");
-      $(".characters").css("z-index", "101");
-      $(".special-thanks-sign").css("z-index", "101");
-      $(".tall-tree.right").css("z-index", "100");
-    }
-    else{
-      $(".tall-tree.bottom").css("z-index", "5");
-      $(".tall-tree.right").css("z-index", "5");
-      $(".characters").css("z-index", "6");
-      $(".special-thanks-sign").css("z-index", "6");
-    }
-
-    //inside of staircase 1
-    if(parseInt($("#dylan").css("left")) >= 972 && parseInt($("#dylan").css("left")) <= 1004 && parseInt($("#dylan").css("top")) < 624 && parseInt($("#dylan").css("top")) > 548){
-      if(elem == "dylan-top")
-        distancePerIteration = 8;
-      else  
-        distancePerIteration = -24;
-    }
-
-    //s
-    if(parseInt($("#dylan").css("top")) == 552){
-      if((parseInt($("#dylan").css("left")) < 972 && parseInt($("#dylan").css("left")) > 680) || (parseInt($("#dylan").css("left")) > 1004 && parseInt($("#dylan").css("left")) < 1292)){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //bottom cliff
-    if(parseInt($("#dylan").css("top")) == 984){
-      if((parseInt($("#dylan").css("left")) < 1180 && parseInt($("#dylan").css("left")) >= 788)){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //top cliff
-    if(parseInt($("#dylan").css("top")) == 628){
-      if((parseInt($("#dylan").css("left")) < 1180 && parseInt($("#dylan").css("left")) > 1004) || (parseInt($("#dylan").css("left")) > 784 && parseInt($("#dylan").css("left")) < 968)){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //bottom trees
-    if(parseInt($("#dylan").css("top")) == 1068){
-      if((parseInt($("#dylan").css("left")) > 680 && parseInt($("#dylan").css("left")) < 1292)){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-    //trees between stairs on left
-    if(parseInt($("#dylan").css("left")) <= 724 && parseInt($("#dylan").css("left")) >= 684){
-      if(parseInt($("#dylan").css("top")) == 876 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("top")) == 1016 && keysPressed[keyCode2])
-      return parseInt(oldValue, 10);
-    }
-
-    //bonfire
-    if(parseInt($("#dylan").css("top")) < 804){
-      $("#bonfire").css("z-index", "100");
-    }
-    else{
-      $("#bonfire").css("z-index", "10");
-    }
-    if(parseInt($("#dylan").css("top")) == 780){
-      if(parseInt($("#dylan").css("left")) < 1032 && parseInt($("#dylan").css("left")) > 936){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-    if(parseInt($("#dylan").css("top")) == 824){
-      if(parseInt($("#dylan").css("left")) < 1032 && parseInt($("#dylan").css("left")) > 936){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //firepit left staircase
-      if(parseInt($("#dylan").css("left")) >= 788 && parseInt($("#dylan").css("left")) < 820){
-        if(keysPressed[keyCode2] && parseInt($("#dylan").css("top")) == 900){
-          return parseInt(oldValue, 10);
-        }
-        if(keysPressed[keyCode1] && parseInt($("#dylan").css("top")) == 972){
-          return parseInt(oldValue, 10);
-        }
-      }
-
-    
-    
-    ///////////////////////////////////
-    ///Nature
-    ///////////////////////////////////
-
-    //bushes by bridge-top
-    if(parseInt($("#dylan").css("top")) < 448){
-      $(".shrub.pathway.topShrubs").css("z-index", "100");
-    }
-    else{
-      $(".shrub.pathway.topShrubs").css("z-index", "11");
-    }
-    if((parseInt($("#dylan").css("left")) > 896 && parseInt($("#dylan").css("left")) < 968) || (parseInt($("#dylan").css("left")) > 1008 && parseInt($("#dylan").css("left")) < 1068)){
-      if (parseInt($("#dylan").css("top")) == 320 && keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      if (parseInt($("#dylan").css("top")) == 448 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-    }
-
-    //Log Bench
-    if (parseInt($("#dylan").css("top")) < 740 || ((parseInt($("#dylan").css("top")) > 844) && parseInt($("#dylan").css("top")) < 900)) {
-      $(".bench").css("z-index", "100");
-    }
-    else {
-      $(".bench").css("z-index", "10");
-    }
-    if (parseInt($("#dylan").css("left")) > 900 && parseInt($("#dylan").css("left")) < 1064) {
-      if (parseInt($("#dylan").css("top")) == 740 || parseInt($("#dylan").css("top")) == 900) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-      if (parseInt($("#dylan").css("top")) == 704 || parseInt($("#dylan").css("top")) == 868) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //Wood Stumps (LR in Bonfire)
-    if (parseInt($("#dylan").css("top")) <= 796) {
-      $(".tree-stump").css("z-index", "100");
-    }
-    else {
-      $(".tree-stump").css("z-index", "10");
-    }
-    if ((parseInt($("#dylan").css("left")) > 1064 && parseInt($("#dylan").css("left")) < 1160) || (parseInt($("#dylan").css("left")) > 808 && parseInt($("#dylan").css("left")) < 904)) {
-      if (parseInt($("#dylan").css("top")) == 796) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-      if (parseInt($("#dylan").css("top")) == 836) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //stump with axe
-    if (parseInt($("#dylan").css("top")) <= 376) {
-      $("#stump").css("z-index", "100");
-    }
-    else {
-      $("#stump").css("z-index", "10");
-    }
-    if ((parseInt($("#dylan").css("left")) > 324 && parseInt($("#dylan").css("left")) < 412)) {
-      if (parseInt($("#dylan").css("top")) == 376) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-      if (parseInt($("#dylan").css("top")) == 412) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-
-    //tree
-    if (parseInt($("#dylan").css("top")) <= 448) {
-      $("#falling-tree").css("z-index", "100");
-    }
-    else {
-      $("#falling-tree").css("z-index", "10");
-    }
-
-    if (hitCount < 7) {
-
-      //tree standing
-      if (parseInt($("#dylan").css("top")) == 464) {
-        if (parseInt($("#dylan").css("left")) > 212 && parseInt($("#dylan").css("left")) < 272) {
-          if (keysPressed[keyCode1])
-            return parseInt(oldValue, 10);
-        }
-      }
-      if (parseInt($("#dylan").css("top")) == 448) {
-        if (parseInt($("#dylan").css("left")) > 212 && parseInt($("#dylan").css("left")) < 272) {
-          if (keysPressed[keyCode2])
-            return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    else {
-      //tree fallen
-      if (parseInt($("#dylan").css("top")) == 464) {
-        if (parseInt($("#dylan").css("left")) > 184 && parseInt($("#dylan").css("left")) < 376) {
-          if (keysPressed[keyCode1])
-            return parseInt(oldValue, 10);
-        }
-      }
-      if (parseInt($("#dylan").css("top")) == 448) {
-        if (parseInt($("#dylan").css("left")) > 184 && parseInt($("#dylan").css("left")) < 376) {
-          if (keysPressed[keyCode2])
-            return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //wood log when tree is chopped down
-    if (parseInt($("#dylan").css("top")) <= 472) {
-      $("#wood-log").css("z-index", "100");
-    }
-    else {
-      $("#wood-log").css("z-index", "10");
-    }
-
-    //Moss Log
-    if (parseInt($("#dylan").css("top")) <= 356) {
-      $(".moss-log").css("z-index", "100");
-    }
-    else {
-      $(".moss-log").css("z-index", "10");
-    }
-
-
-    if ((parseInt($("#dylan").css("left")) > 652 && parseInt($("#dylan").css("left")) < 780)) {
-      if (parseInt($("#dylan").css("top")) == 356) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-      if (parseInt($("#dylan").css("top")) == 384) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //z-index for signs
-    if(parseInt($("#dylan").css("top")) >= 668){
-      $(".s4").css("z-index", "40");
-    }
-    else{
-      $(".s4").css("z-index", "51");
-    }
-    if(parseInt($("#dylan").css("top")) >= 436){
-      $(".s2").css("z-index", "40");
-      $(".s3").css("z-index", "40");
-    }
-    else{
-      $(".s2").css("z-index", "51");
-      $(".s3").css("z-index", "51");
-    }
-    if(parseInt($("#dylan").css("top")) >= 956){
-      $(".s8").css("z-index", "40");
-    }
-    else{
-      $(".s8").css("z-index", "51");
-    }
-  }
-
-  //////////////////////////////////////////
-  //LEFT/RIGHT COLLISION 
-  //////////////////////////////////////////
-
-  if (elem == "dylan-left" || elem == "body-left") {
-    ///////////////
-    //Fences
-    //////////////
-
-    //Left fence
-    if (parseInt($("#dylan").css("left")) < 168 && (parseInt($("#dylan").css("top"))) >= 344) {
-      if (keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-    }
-    //Right Fence
-    if (parseInt($("#dylan").css("left")) > 1800) {
-      if (keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    //Backyard Fence
-    if(parseInt($("#dylan").css("left")) == 452){
-      if(parseInt($("#dylan").css("top")) <= 640){
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-    if(parseInt($("#dylan").css("left")) == 412){
-      if(parseInt($("#dylan").css("top")) <= 630){
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //bottom left fence by trees
-    if(parseInt($("#dylan").css("left")) == 484){
-      if(parseInt($("#dylan").css("top")) >= 800){
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    ///////////////////////////////////
-    ///DOCK
-    ///////////////////////////////////
-    if (parseInt($("#dylan").css("top")) > 1272) {
-      if (keysPressed[keyCode1] && parseInt($("#dylan").css("left")) <= 952)
-        return parseInt(oldValue, 10);
-      if (keysPressed[keyCode2] && parseInt($("#dylan").css("left")) >= 1020)
-        return parseInt(oldValue, 10);
-    }
-
-    /////////////////////
-    /////Tent 1
-    /////////////////////
-    if(parseInt($("#dylan").css("top")) >= 584 && parseInt($("#dylan").css("top")) <= 676){
-      if((parseInt($("#dylan").css("left")) == 384 || parseInt($("#dylan").css("left")) == 288) && keysPressed[keyCode1]){
-        return parseInt(oldValue, 10);
-      }
-      if((parseInt($("#dylan").css("left")) == 200 || parseInt($("#dylan").css("left")) == 296)&& keysPressed[keyCode2]){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    //////////
-    //Resume Island
-    /////////
-
-    //Left outside
-    if(parseInt($("#dylan").css("left")) == 1412){
-      if((parseInt($("#dylan").css("top")) <= 972 && parseInt($("#dylan").css("top")) > 828) || (parseInt($("#dylan").css("top")) < 1212 && parseInt($("#dylan").css("top")) >= 1040)){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-    
-    //bridge outsides
-    if((parseInt($("#dylan").css("top")) < 1040 && parseInt($("#dylan").css("top")) > 1020) || (parseInt($("#dylan").css("top")) < 1000 && parseInt($("#dylan").css("top")) > 972)){
-      if(keysPressed[keyCode2] && parseInt($("#dylan").css("left")) == 1392){
-        return parseInt(oldValue, 10);
-      }
-      if(keysPressed[keyCode1] && parseInt($("#dylan").css("left")) == 1548){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    //left side of pond inside
-    if(parseInt($("#dylan").css("left")) == 1548){
-      if(keysPressed[keyCode1] && ((parseInt($("#dylan").css("top")) > 1020 && parseInt($("#dylan").css("top")) < 1212) || (parseInt($("#dylan").css("top")) > 944 && parseInt($("#dylan").css("top")) < 996))){
-        return parseInt(oldValue, 10);
-      }
-    }
-    //right side of pond inside
-    if(parseInt($("#dylan").css("left")) == 1684){
-      if(keysPressed[keyCode2] && parseInt($("#dylan").css("top")) >= 944 && parseInt($("#dylan").css("top")) < 1548){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    if(parseInt($("#dylan").css("top")) < 1044 && parseInt($("#dylan").css("top")) > 992){
-      if(keysPressed[keyCode1] && parseInt($("#dylan").css("left")) == 1652){
-        return parseInt(oldValue, 10);
-      }
-      if(keysPressed[keyCode2] && parseInt($("#dylan").css("left")) == 1572){
-        return parseInt(oldValue, 10);
-      }
-    }
-
-    //////////
-    //Fire Pit
-    /////////
-
-    //bonfire
-    if(parseInt($("#dylan").css("left")) == 936){
-      if(parseInt($("#dylan").css("top")) < 824 && parseInt($("#dylan").css("top")) > 780){
-        if(keysPressed[keyCode2]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-    if(parseInt($("#dylan").css("left")) == 1032){
-      if(parseInt($("#dylan").css("top")) < 824 && parseInt($("#dylan").css("top")) > 780){
-        if(keysPressed[keyCode1]){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //left trees and right trees around fire pit
-    if(parseInt($("#dylan").css("top")) < 856){
-      $(".tall-tree.walls.left").css("z-index", "100");
-      $(".intro-portfolio.s5").css("z-index", "101");
-    }
-    else{
-      $(".tall-tree.walls.left").css("z-index", "10"); 
-      $(".intro-portfolio.s5").css("z-index", "11");
-    }
-    if(parseInt($("#dylan").css("top")) < 1068 && parseInt($("#dylan").css("top")) > 552){
-      if(parseInt($("#dylan").css("left")) == 1292 && keysPressed[keyCode1]){
-        return parseInt(oldValue, 10);
-      }
-      if(parseInt($("#dylan").css("left")) == 680 && keysPressed[keyCode2]){
-        if((parseInt($("#dylan").css("top")) > 556 && parseInt($("#dylan").css("top")) < 876) || (parseInt($("#dylan").css("top")) > 1012 && parseInt($("#dylan").css("top")) < 1068)){
-          return parseInt(oldValue, 10);
-        }
-      }
-    }
-
-    //staircase
-    if(parseInt($("#dylan").css("top")) < 624 && parseInt($("#dylan").css("top")) > 552){
-      if(parseInt($("#dylan").css("left")) == 972 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 1004 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-    //right cliff
-    if(parseInt($("#dylan").css("left")) == 1176){
-      if(parseInt($("#dylan").css("top")) >= 628 && parseInt($("#dylan").css("top")) <= 984 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    //left cliff
-    if(parseInt($("#dylan").css("left")) == 788){
-      if((parseInt($("#dylan").css("top")) >= 628 && parseInt($("#dylan").css("top")) <= 904) || (parseInt($("#dylan").css("top")) >= 936 && parseInt($("#dylan").css("top")) <= 1012))
-        if(keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-    }
-
-    //left cliff outside
-    if(parseInt($("#dylan").css("left")) == 724){
-      if((parseInt($("#dylan").css("top")) >= 684 && parseInt($("#dylan").css("top")) <= 904) || (parseInt($("#dylan").css("top")) >= 936 && parseInt($("#dylan").css("top")) <= 1016))
-        if(keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-    }
-
-    //staircase left 
-    if(parseInt($("#dylan").css("left")) == 820){
-      if((parseInt($("#dylan").css("top")) >= 904 && parseInt($("#dylan").css("top")) <= 924) || (parseInt($("#dylan").css("top")) >= 952 && parseInt($("#dylan").css("top")) <= 968))
-        if(keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-    }
-
-    //////////
-    //Inclined Surface
-    ///////////
-
-    //Left Cliff 
-    if(parseInt($("#dylan").css("left")) == 1412){
-      if(parseInt($("#dylan").css("top")) >= 344 && parseInt($("#dylan").css("top")) <= 736){
-        if(keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }  
-    }
-
-    //outside left staircase
-    if(parseInt($("#dylan").css("left")) == 1572){
-      if(parseInt($("#dylan").css("top")) >= 740 && parseInt($("#dylan").css("top")) <= 752){
-        if(keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }  
-    }
-
-    //Right side top
-    if(parseInt($("#dylan").css("left")) == 1688){
-      if(parseInt($("#dylan").css("top")) >= 360 && parseInt($("#dylan").css("top")) <= 680){
-        if(keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }  
-    }
-    //left side top
-    if(parseInt($("#dylan").css("left")) == 1472){
-      if(parseInt($("#dylan").css("top")) >= 360 && parseInt($("#dylan").css("top")) <= 680){
-        if(keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }  
-    }
-
-    //inside staircase left side
-    if(parseInt($("#dylan").css("left")) == 1608){
-      if(parseInt($("#dylan").css("top")) > 680 && parseInt($("#dylan").css("top")) < 756){
-        if(keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }  
-    }
-    //inside staircase right side
-    if(parseInt($("#dylan").css("left")) == 1636){
-      if(parseInt($("#dylan").css("top")) > 680 && parseInt($("#dylan").css("top")) < 756){
-        if(keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }  
-    }
-
-    //////////
-    //Pond
-    ///////////
-    if(parseInt($("#dylan").css("left")) == 1716){
-      if(parseInt($("#dylan").css("top")) >= 752 && parseInt($("#dylan").css("top")) <= 832){
-        if(keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }  
-    }
-
-    
-
-    //////////
-    //NATURE
-    ////////////
-
-    //Top Bushes
-    if(parseInt($("#dylan").css("top")) < 448 && parseInt($("#dylan").css("top")) > 320){
-      if(parseInt($("#dylan").css("left")) == 960 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 1008 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 1068 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 896 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    //Top Bridge
-    if (parseInt($("#dylan").css("top")) < 344) {
-      $("#arch").css("z-index", "100");
-      //left
-      if (keysPressed[keyCode1] && parseInt($("#dylan").css("left")) < 952)
-        return parseInt(oldValue, 10);
-      //right
-      if ((keysPressed[keyCode2] && parseInt($("#dylan").css("left")) > 1012)) {
-        return parseInt(oldValue, 10);
-      }
-
-      //cave door:
-      if (parseInt($("#dylan").css("top")) < 160) {
-        if (keysPressed[keyCode1] && parseInt($("#dylan").css("left")) <= 968)
-          return parseInt(oldValue, 10);
-        if (keysPressed[keyCode2] && parseInt($("#dylan").css("left")) >= 992)
-          return parseInt(oldValue, 10);
-      }
-    }
-    else {
-      $("#arch").css("z-index", "11");
-    }
-
-    //Log in Fireplace
-    if ((parseInt($("#dylan").css("top")) > 704 && parseInt($("#dylan").css("top")) < 740) || (parseInt($("#dylan").css("top")) > 864 && parseInt($("#dylan").css("top")) < 900)) {
-      if (parseInt($("#dylan").css("left")) == 900) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-
-      if (parseInt($("#dylan").css("left")) == 1064) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //Tree Stumps in Fireplace
-    if ((parseInt($("#dylan").css("top")) > 796 && parseInt($("#dylan").css("top")) < 836)) {
-      if (parseInt($("#dylan").css("left")) == 808 || parseInt($("#dylan").css("left")) == 1064) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-
-      if (parseInt($("#dylan").css("left")) == 904 || parseInt($("#dylan").css("left")) == 1160) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //Stump with axe
-    if ((parseInt($("#dylan").css("top")) > 376 && parseInt($("#dylan").css("top")) < 412)) {
-      if (parseInt($("#dylan").css("left")) == 324) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-
-      if (parseInt($("#dylan").css("left")) == 412) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //TREE chop
-    if (parseInt($("#dylan").css("top")) < 464 && parseInt($("#dylan").css("top")) > 448) {
-      if (hitCount < 7) {
-        if (keysPressed[keyCode2] && parseInt($("#dylan").css("left")) == 212)
-          return parseInt(oldValue, 10);
-        if (keysPressed[keyCode1] && parseInt($("#dylan").css("left")) == 272)
-          return parseInt(oldValue, 10);
-      }
-      else {
-        if (keysPressed[keyCode2] && parseInt($("#dylan").css("left")) == 184)
-          return parseInt(oldValue, 10);
-        if (keysPressed[keyCode1] && parseInt($("#dylan").css("left")) == 376)
-          return parseInt(oldValue, 10);
-      }
-    }
-
-    //Moss Log
-    if ((parseInt($("#dylan").css("top")) > 356 && parseInt($("#dylan").css("top")) < 384)) {
-      if (parseInt($("#dylan").css("left")) == 652) {
-        if (keysPressed[keyCode2])
-          return parseInt(oldValue, 10);
-      }
-      if (parseInt($("#dylan").css("left")) == 780) {
-        if (keysPressed[keyCode1])
-          return parseInt(oldValue, 10);
-      }
-    }
-    
-  }
-
   
-  //MOVEMENT FOR NO COLLISION
+  // Fallback if engine/config not available (shouldn't happen, but safety net)
+  console.warn("Collision engine not available, using basic fallback");
+  var ks = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.keysPressed : (typeof keysPressed !== "undefined" ? keysPressed : {});
+  var dist = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.distancePerIteration : (typeof distancePerIteration !== "undefined" ? distancePerIteration : 4);
   var newValue = parseInt(oldValue, 10)
-  - (keysPressed[keyCode1] ? distancePerIteration : 0)
-  + (keysPressed[keyCode2] ? distancePerIteration : 0);
-
-
+    - (ks[keyCode1] ? dist : 0)
+    + (ks[keyCode2] ? dist : 0);
   return newValue;
 }
 
 //Collision Handler for Tent1
 function calculateNewValueTent1(oldValue, keyCode1, keyCode2, elem) {
-  if(sitting){
-    return parseInt(oldValue, 10);
+  // Use collision engine only
+  if (typeof CollisionEngine !== "undefined" && typeof COLLISION_CONFIG !== "undefined" && COLLISION_CONFIG.tent1) {
+    return CollisionEngine.checkCollisions(COLLISION_CONFIG.tent1, elem, keyCode1, keyCode2, oldValue);
   }
-  if (elem == "body-top") {
-    distancePerIteration = -12;
-  }
-  else if (elem == "body-left") {
-    distancePerIteration = -12; //-6
-  }
-  else {
-    distancePerIteration = 4;
-  }
-  //////////////
-  //UP DOWN COLLISION
-  //////////////
-  if (elem == "dylan-top" || elem == "body-top") {
-
-    //bottom borders
-    if(parseInt($("#dylan").css("top")) == 176 && keysPressed[keyCode2]){
-      // leaveTent1(1);
-      return parseInt(oldValue, 10);
-    }
-    if(parseInt($("#dylan").css("top")) == 132 && keysPressed[keyCode2]){
-      if(parseInt($("#dylan").css("left")) <= 152 || parseInt($("#dylan").css("left")) >= 232)
-        return parseInt(oldValue, 10);
-    }
-
-    //TOP BORDERS
-    if(parseInt($("#dylan").css("top")) == -44 && keysPressed[keyCode1]){
-      return parseInt(oldValue, 10);
-    }
-    //border wall
-    if(parseInt($("#dylan").css("top")) == 52 && keysPressed[keyCode1]){
-      if(parseInt($("#dylan").css("left")) > 168 && parseInt($("#dylan").css("left")) < 264)
-        return parseInt(oldValue, 10);
-    }
-
-    //kitchenware
-    if(parseInt($("#dylan").css("left")) < 100 && parseInt($("#dylan").css("top")) == -32 && keysPressed[keyCode1]){
-        return parseInt(oldValue, 10);
-    }
-    //Kitchen table
-    if(parseInt($("#dylan").css("top")) <= -12){
-      $(".kitchen-table").css("z-index", "10000");
-      $(".matchbox").css("z-index", "10001");
-    }
-    else{
-      $(".kitchen-table").css("z-index", "9996");
-      $(".matchbox").css("z-index", "9997");
-    }
-    
-    if(parseInt($("#dylan").css("left")) < 120 && parseInt($("#dylan").css("left")) > 8){
-      if(parseInt($("#dylan").css("top")) == 32 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("top")) == -12 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    //couch
-    if(parseInt($("#dylan").css("top")) <= -4)
-      $(".couch").css("z-index", "10000");
-    else
-    $(".couch").css("z-index", "9996");
-    if(parseInt($("#dylan").css("left")) < 384 && parseInt($("#dylan").css("left")) > 268){
-      if(parseInt($("#dylan").css("top")) == 20 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("top")) == -4 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-  }
-
-  //////////////
-  //LEFT RIGHT COLLISION
-  //////////////
-
-  //left and right borders
-  if (elem == "dylan-left" || elem == "body-left") {
-    if(parseInt($("#dylan").css("left")) == 384 && keysPressed[keyCode2]){
-      return parseInt(oldValue, 10);
-    }
-    if(parseInt($("#dylan").css("left")) == 0 && keysPressed[keyCode1]){
-      return parseInt(oldValue, 10);
-    }
-
-    //border wall
-    if(parseInt($("#dylan").css("top")) < 52){
-      if(parseInt($("#dylan").css("left")) == 168 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 264 &&  keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-    }
-
-
-    //enterance walls
-    if(parseInt($("#dylan").css("top")) > 132){
-      if(parseInt($("#dylan").css("left")) == 160 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 224 &&  keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-
-    //kitchenware
-    if(parseInt($("#dylan").css("left")) == 96 && parseInt($("#dylan").css("top")) < -32 &&  keysPressed[keyCode1])
-      return parseInt(oldValue, 10);
-    //kitchen table
-    if(parseInt($("#dylan").css("top")) <= 32 && parseInt($("#dylan").css("top")) >= -12){
-      if(parseInt($("#dylan").css("left")) == 120 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 8 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-    }
-    //couch
-    if(parseInt($("#dylan").css("top")) < 20 && parseInt($("#dylan").css("top")) > -4){
-      if(parseInt($("#dylan").css("left")) == 264 && keysPressed[keyCode2])
-        return parseInt(oldValue, 10);
-      if(parseInt($("#dylan").css("left")) == 384 && keysPressed[keyCode1])
-        return parseInt(oldValue, 10);
-    }
-  }
-  //MOVEMENT FOR NO COLLISION
+  
+  // Fallback if engine/config not available (shouldn't happen, but safety net)
+  console.warn("Collision engine not available, using basic fallback");
+  var ks = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.keysPressed : (typeof keysPressed !== "undefined" ? keysPressed : {});
+  var dist = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.distancePerIteration : (typeof distancePerIteration !== "undefined" ? distancePerIteration : 4);
   var newValue = parseInt(oldValue, 10)
-    - (keysPressed[keyCode1] ? distancePerIteration : 0)
-    + (keysPressed[keyCode2] ? distancePerIteration : 0);
-
-
+    - (ks[keyCode1] ? dist : 0)
+    + (ks[keyCode2] ? dist : 0);
+  return newValue;
+}
+//Collision Handler for Tent1
+function calculateNewValueTent1(oldValue, keyCode1, keyCode2, elem) {
+  // Use collision engine only
+  if (typeof CollisionEngine !== "undefined" && typeof COLLISION_CONFIG !== "undefined" && COLLISION_CONFIG.tent1) {
+    return CollisionEngine.checkCollisions(COLLISION_CONFIG.tent1, elem, keyCode1, keyCode2, oldValue);
+  }
+  
+  // Fallback if engine/config not available (shouldn't happen, but safety net)
+  console.warn("Collision engine not available, using basic fallback");
+  var ks = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.keysPressed : (typeof keysPressed !== "undefined" ? keysPressed : {});
+  var dist = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.distancePerIteration : (typeof distancePerIteration !== "undefined" ? distancePerIteration : 4);
+  var newValue = parseInt(oldValue, 10)
+    - (ks[keyCode1] ? dist : 0)
+    + (ks[keyCode2] ? dist : 0);
   return newValue;
 }

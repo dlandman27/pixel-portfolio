@@ -100,8 +100,10 @@ $(function () {
         if (typeof openInventory === "function") openInventory();
         break;
       case "map":
-        // Center map or reset position if such a helper exists later
-        if (typeof centerMap === "function") centerMap();
+        // Center map using WORLD helper if available
+        if (typeof WORLD !== "undefined" && typeof WORLD.centerMap === "function") {
+          WORLD.centerMap();
+        }
         break;
       default:
         break;

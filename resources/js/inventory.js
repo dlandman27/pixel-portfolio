@@ -309,7 +309,6 @@ function openInventory() {
   var backpackURL = URL.getMisc();
   if (!openBag) {
     $("#backpack-icon").css("opacity", "1");
-
     $(".inventory-slot").css("visibility", "visible");
     $("#backpack-icon").css("background-image", backpackURL + "/x-icon.png)");
     openBag = true;
