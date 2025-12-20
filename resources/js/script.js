@@ -160,13 +160,22 @@ function startGame() {
 
   document.title="Dylan Landman";
 
-  var url = 'url(resources/images/characters/dylan';
+  // Initialize sprite manager
+  if (typeof SpriteManager !== "undefined") {
+    SpriteManager.init();
+  }
+
   var frame = 12;
   var top = 112;
   var speech;
   var start = setInterval(function () {
     if (top == 204) {//reached top location
-      $("#dylan").css("background-image", url + "/dylan-front-" + 1 + ".png)");
+      // Use frame 2 instead of 1 for front (frame 1 has wrong height)
+      if (typeof SpriteManager !== "undefined") {
+        SpriteManager.setSpriteFrame("front", 2);
+      } else {
+        $("#dylan").css("background-image", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      }
       clearInterval(start);
 
       if(getCookie("title-screen") != 'true'){
@@ -180,9 +189,17 @@ function startGame() {
     $("#dylan").css("visibility", "visible");
     top += 4;
     if (frame > 7) {
+      frame = 2; // Cycle back to 2, not 1
+    }
+    // Skip frame 1 for front direction
+    if (frame === 1) {
       frame = 2;
     }
-    $("#dylan").css("background-image", url + "/dylan-front-" + frame + ".png)");
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", frame);
+    } else {
+      $("#dylan").css("background-image", "url(resources/images/characters/dylan/dylan-front-" + frame + ".png)");
+    }
     $("#dylan").css("top", top + "px");
 
   }, 75);
@@ -363,6 +380,7 @@ function reelIn(code){
         marginLeft: "-="+(parseInt($(".fish-from-water").css("width"))/4)
       });
       isReelingIn = false;
+      // Fishing catch sprite - keep direct for now as it's not part of walking animation
       $("#dylan").css("background-image", URL.getDylan() + "/fishing/dylan-fishing-catch.png)");
       $(".information").text("NICE!, I caught a "+fish.getName()+"!!");
       $(".bio").css("display","block");
@@ -486,7 +504,11 @@ function move(keyCode) {
         }
         key = "left";
         var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
-        $("#dylan").css("background-image", url + "/dylan-left-" + frameVar + ".png)");
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("left", frameVar);
+        } else {
+          $("#dylan").css("background-image", url + "/dylan-left-" + frameVar + ".png)");
+        }
       }
       else if (keyCode == keyUp || keyCode == keyW) {
         // if(SFXOn){
@@ -512,7 +534,11 @@ function move(keyCode) {
         }
         key = "up";
         var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
-        $("#dylan").css("background-image", url + "/dylan-back-" + frameVar + ".png)");
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("back", frameVar);
+        } else {
+          $("#dylan").css("background-image", url + "/dylan-back-" + frameVar + ".png)");
+        }
 
         //If the up key will bring you into tent 1
         if(parseInt($("#dylan").css("left")) >= 288 && parseInt($("#dylan").css("left")) <= 296){
@@ -537,9 +563,13 @@ function move(keyCode) {
         // }
         var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
         if(key != "down")
-          frameVar = 1;
+          frameVar = 2; // Start at 2 instead of 1 for front (frame 1 has wrong height)
         if (frameVar > 7)
+          frameVar = 2; // Cycle back to 2, not 1
+        // Skip frame 1 for front direction
+        if (frameVar === 1) {
           frameVar = 2;
+        }
         if (typeof WORLD !== "undefined" && WORLD.movement) {
           WORLD.movement.frame = frameVar;
         } else {
@@ -547,7 +577,11 @@ function move(keyCode) {
         }
         key = "down";
         var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
-        $("#dylan").css("background-image", url + "/dylan-front-" + frameVar + ".png)");
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("front", frameVar);
+        } else {
+          $("#dylan").css("background-image", url + "/dylan-front-" + frameVar + ".png)");
+        }
 
         //If the up key will bring you into tent 1 from backyard
         if(!tentOpen && parseInt($("#dylan").css("left")) >= 248 && parseInt($("#dylan").css("left")) <= 340){
@@ -577,7 +611,11 @@ function move(keyCode) {
         }
         key = "right";
         var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
-        $("#dylan").css("background-image", url + "/dylan-right-" + frameVar + ".png)");
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("right", frameVar);
+        } else {
+          $("#dylan").css("background-image", url + "/dylan-right-" + frameVar + ".png)");
+        }
       }
 
       //Movement on stair in firepit
@@ -1254,9 +1292,13 @@ function sitOnCouch(){
     $("#dylan").css({
       // left: "260px",
       top: "-4px",
-      visibility: "visible",
-      backgroundImage: "url(resources/images/characters/dylan/dylan-back-1.png)"
+      visibility: "visible"
     });
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("back", 1);
+    } else {
+      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-back-1.png)");
+    }
     $("#map").css({
       // marginLeft: "2160px",
       marginTop: "-1356px"
@@ -1267,9 +1309,14 @@ function sitOnCouch(){
     sitting = false;
     $("#dylan").css({
       top: "-8px",
-      visibility: "visible",
-      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
+      visibility: "visible"
     });
+    // Use frame 2 instead of 1 for front (frame 1 has wrong height)
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", 2);
+    } else {
+      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+    }
     $("#map").css({
       // marginLeft: "2160px",
       marginTop: "-1360px"
