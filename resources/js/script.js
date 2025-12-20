@@ -1142,20 +1142,27 @@ function sitOnLog(location) {
 
 function openTent1(side){
   $('#dylan').remove(); 
-  $('#tent1').append("<div id='dylan' class='tooltip'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
+  // Remove tooltip class to prevent visibility issues - tooltip is only needed for speech bubbles
+  $('#tent1').append("<div id='dylan'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
 
   tentOpen = true;
 
-  $("#dylan").css("z-index","9999").css("display","block");
+  $("#dylan").css("z-index","9999").css("display","block").css("visibility","visible");
   $(".cover-screen.tent1").show();
 
   if(side == "front"){
     $("#dylan").css({
       left: "192px",
       top: "152px",
-      visibility: "visible",
-      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
-    }).hide().fadeIn();
+      visibility: "visible"
+    });
+    // Use frame 2 instead of 1 (frame 1 has wrong height)
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", 2);
+    } else {
+      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+    }
+    $("#dylan").fadeIn();
 
     $("#map").css({
       marginLeft: 0,
@@ -1166,9 +1173,15 @@ function openTent1(side){
     $("#dylan").css({
       left: "156px",
       top: "-36px",
-      visibility: "visible",
-      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
-    }).hide().fadeIn();
+      visibility: "visible"
+    });
+    // Use frame 2 instead of 1 (frame 1 has wrong height)
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", 2);
+    } else {
+      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+    }
+    $("#dylan").fadeIn();
 
     $("#map").css({
       marginLeft: 108+"px",
@@ -1181,17 +1194,23 @@ function openTent1(side){
 
 function leaveTent1(dir){
   $('#dylan').remove();
-  $('#map').append("<div id='dylan' class='tooltip'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
-  $("#dylan").css("z-index","9999").css("display","block");
+  // Remove tooltip class to prevent visibility issues - tooltip is only needed for speech bubbles
+  $('#map').append("<div id='dylan'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
+  $("#dylan").css("z-index","9999").css("display","block").css("visibility","visible");
   tentOpen = false;
   
   if(dir == 1){
     $("#dylan").css({
       left: "292px",
       top: "648px",
-      visibility: "visible",
-      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
+      visibility: "visible"
     });
+    // Use frame 2 instead of 1 (frame 1 has wrong height)
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", 2);
+    } else {
+      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+    }
     $("#map").css({
       marginLeft: "2064px",
       marginTop: "-1344px"
@@ -1202,9 +1221,14 @@ function leaveTent1(dir){
     $("#dylan").css({
       left: "260px",
       top: "584px",
-      visibility: "visible",
-      backgroundImage: "url(resources/images/characters/dylan/dylan-front-1.png)"
+      visibility: "visible"
     });
+    // Use frame 2 instead of 1 (frame 1 has wrong height)
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", 2);
+    } else {
+      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+    }
     $("#map").css({
       marginLeft: "2160px",
       marginTop: "-1164px"
