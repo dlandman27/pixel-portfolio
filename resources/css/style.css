@@ -3011,15 +3011,36 @@ body {
   top: 8px;
   right: 8px;
   z-index: 10000040; /* above overlays and map */
+  display: flex;
+  gap: 6px;
 }
 
 .game-menu-toggle {
   padding: 0.4rem;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.status-menu-toggle {
+  padding: 0.45rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-menu-icon {
+  width: 44px;
+  height: 44px;
+  /* Match the in‑map backpack icon (no square tile) */
+  background-image: url("../images/misc/backpack2.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .game-menu-icon {
@@ -3066,6 +3087,26 @@ body.game-menu-open .game-menu-panel {
   transform: translateX(0);
 }
 
+.status-menu-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease-out;
+  padding: 0.75rem;
+  background: #102d2a;
+  box-shadow: 0 8px 0 #000;
+  width: 260px;
+  z-index: 10000035;
+  display: flex;
+  flex-direction: column;
+}
+
+body.status-menu-open .status-menu-panel {
+  transform: translateX(0);
+}
+
 .game-menu-title {
   font-family: "Press Start 2P", monospace;
   font-size: 0.7rem;
@@ -3077,6 +3118,46 @@ body.game-menu-open .game-menu-panel {
   width: 100%;
   margin-bottom: 0.4rem;
   font-size: 0.6rem;
+  position: relative;
+  padding-left: 1.8rem;
+}
+
+/* Icon sprites for menu items */
+.game-menu-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.game-menu-item[data-menu-action="portfolio"]::before {
+  background-image: url("../images/logo icon/dl-logo.png");
+}
+
+.game-menu-item[data-menu-action="map"]::before {
+  background-image: url("../images/misc/map-icon.png");
+}
+
+.game-menu-item[data-menu-action="resume"]::before {
+  background-image: url("../images/misc/resume-icon-found.png");
+}
+
+.game-menu-item[data-menu-action="inventory"]::before {
+  /* Use same backpack art as the in‑map icon */
+  background-image: url("../images/misc/backpack2.png");
+}
+
+.game-menu-item[data-menu-action="fishbook"]::before {
+  background-image: url("../images/misc/fishbook-icon-found.png");
+}
+
+.game-menu-item[data-menu-action="tutorial"]::before {
+  background-image: url("../images/misc/paper.png");
 }
 
 .game-menu-awwwards {
@@ -3131,6 +3212,112 @@ body.game-menu-open .game-menu-panel {
   border-top: 2px solid rgba(255, 255, 255, 0.15);
 }
 
+/* Status / backpack panel */
+.status-menu-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.75rem;
+}
+
+.status-menu-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.status-menu-subtitle {
+  font-size: 0.55rem;
+  margin: 0.2rem 0 0;
+  color: #9bd4d7;
+}
+
+.status-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.6rem;
+  margin-bottom: 0.35rem;
+  color: rgba(255, 255, 255, 0.85);
+  position: relative;
+  padding-left: 1.6rem;
+}
+
+.status-item-name {
+  flex: 1;
+}
+
+.status-item-state {
+  font-size: 0.55rem;
+  margin-left: 0.5rem;
+}
+
+.status-item.owned .status-item-state {
+  color: #f7d51d;
+}
+
+.status-item.missing .status-item-state {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Icon sprites for status items */
+.status-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+.status-item.status-backpack::before {
+  background-image: url("../images/misc/backpack2.png");
+}
+
+.status-item.status-minimap::before {
+  background-image: url("../images/misc/map-icon.png");
+}
+
+.status-item.status-axe::before {
+  background-image: url("../images/misc/axe-icon-found.png");
+}
+
+.status-item.status-wood::before {
+  background-image: url("../images/misc/wood-icon-found.png");
+}
+
+.status-item.status-matches::before {
+  background-image: url("../images/misc/matchbox-icon-found.png");
+}
+
+.status-item.status-resume::before {
+  background-image: url("../images/misc/resume-icon-found.png");
+}
+
+.status-item.status-fishingRod::before {
+  background-image: url("../images/misc/fishing-rod-found.png");
+}
+
+.status-item.status-fishbook::before {
+  background-image: url("../images/misc/fishbook-icon-found.png");
+}
+
+/* Dim & desaturate icons when missing */
+.status-item.missing::before {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
 /* Backdrop behind side menu */
 .game-menu-backdrop {
   position: fixed;
@@ -3142,7 +3329,8 @@ body.game-menu-open .game-menu-panel {
   z-index: 10000030;
 }
 
-body.game-menu-open .game-menu-backdrop {
+body.game-menu-open .game-menu-backdrop,
+body.status-menu-open .game-menu-backdrop {
   opacity: 1;
   pointer-events: auto;
 }

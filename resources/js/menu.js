@@ -2,39 +2,85 @@
 // Depends on jQuery and existing global functions (openPortfolio, openFishbook, openDoc, openTutorial)
 
 $(function () {
-  var $toggle = $("#game-menu-toggle");
-  var $panel = $("#game-menu-panel");
+  var $navToggle = $("#game-menu-toggle");
+  var $navPanel = $("#game-menu-panel");
+  var $statusToggle = $("#status-menu-toggle");
+  var $statusPanel = $("#status-menu-panel");
+  var $backdrop = $(".game-menu-backdrop");
 
-  if ($toggle.length === 0 || $panel.length === 0) {
+  if ($navToggle.length === 0 || $navPanel.length === 0) {
     return;
   }
 
-  function closeMenu() {
+  function closeAllMenus() {
     document.body.classList.remove("game-menu-open");
+    document.body.classList.remove("status-menu-open");
   }
 
-  function openMenu() {
+  function openNavMenu() {
     document.body.classList.add("game-menu-open");
+    document.body.classList.remove("status-menu-open");
   }
 
-  // Toggle menu on hamburger click
-  $toggle.click(function (e) {
+  function openStatusMenu() {
+    document.body.classList.add("status-menu-open");
+    document.body.classList.remove("game-menu-open");
+    updateStatusPanel();
+  }
+
+  function updateStatusPanel() {
+    if (typeof inventory === "undefined") return;
+    var items = [
+      { key: "backpack", selector: ".status-item.status-backpack" },
+      { key: "minimap", selector: ".status-item.status-minimap" },
+      { key: "axe", selector: ".status-item.status-axe" },
+      { key: "wood", selector: ".status-item.status-wood" },
+      { key: "matchbox", selector: ".status-item.status-matches" },
+      { key: "resume", selector: ".status-item.status-resume" },
+      { key: "fishingRod", selector: ".status-item.status-fishingRod" },
+      { key: "fishbook", selector: ".status-item.status-fishbook" },
+    ];
+
+    items.forEach(function (item) {
+      var $row = $(item.selector);
+      if (!$row.length) return;
+      var hasItem = !!inventory[item.key];
+      $row.toggleClass("owned", hasItem);
+      $row.toggleClass("missing", !hasItem);
+      $row.find(".status-item-state").text(hasItem ? "Unlocked" : "Missing");
+    });
+  }
+
+  // Toggle main nav menu on hamburger click
+  $navToggle.click(function (e) {
     e.stopPropagation();
     if (document.body.classList.contains("game-menu-open")) {
-      closeMenu();
+      closeAllMenus();
     } else {
-      openMenu();
+      openNavMenu();
     }
   });
 
-  // Handle clicks inside the panel (including quicklink actions)
-  $panel.click(function (e) {
+  // Toggle status / backpack panel
+  if ($statusToggle.length) {
+    $statusToggle.click(function (e) {
+      e.stopPropagation();
+      if (document.body.classList.contains("status-menu-open")) {
+        closeAllMenus();
+      } else {
+        openStatusMenu();
+      }
+    });
+  }
+
+  // Handle clicks inside the nav panel (including quicklink actions)
+  $navPanel.click(function (e) {
     e.stopPropagation();
     var $target = $(e.target);
     var action = $target.attr("data-menu-action");
     if (!action) return;
 
-    closeMenu();
+    closeAllMenus();
 
     switch (action) {
       case "portfolio":
@@ -62,9 +108,15 @@ $(function () {
     }
   });
 
-  // Clicking anywhere else closes the menu
+  // Clicking backdrop or anywhere else closes menus
+  if ($backdrop.length) {
+    $backdrop.click(function () {
+      closeAllMenus();
+    });
+  }
+
   $(document).click(function () {
-    closeMenu();
+    closeAllMenus();
   });
 });
 
