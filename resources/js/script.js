@@ -185,11 +185,12 @@ function startGame() {
       }
       clearInterval(start);
 
+      // Always allow movement once walkout completes
+      eventOccurence = false;
+      
+      // Show tutorial if it hasn't been shown before
       if(getCookie("title-screen") != 'true'){
         openTutorial();
-      }
-      else{
-        eventOccurence = false;
       }
     }
     frame++;
@@ -219,16 +220,17 @@ function startGame() {
 }
 
 function openTutorial(){
-  eventOccurence = true;
+  // Don't block movement - tutorial is just informational
   // Show a global speech bubble at the top of the screen instead of a full-screen modal
   var $bubble = $("#tutorial-bubble");
-  $bubble.find("p").html(
-    "Use <b>WASD</b> or <b>arrow keys</b> to move.<br/>Click objects to interact."
-  );
+  var isMobile = window.innerWidth <= 600;
+  var message = isMobile 
+    ? "Use the <b>arrow buttons</b> at the bottom to move.<br/>Tap objects to interact."
+    : "Use <b>WASD</b> or <b>arrow keys</b> to move.<br/>Click objects to interact.";
+  $bubble.find("p").html(message);
   $bubble.stop(true, true).fadeIn(200);
 }
 function closeTutorial(){
-  eventOccurence = false;
   // Remember that the tutorial has been shown once
   setCookie("title-screen", true);
   $("#tutorial-bubble").fadeOut(200);
@@ -454,6 +456,10 @@ function move(keyCode) {
   }
   else {
     $(".tooltiptext").css("opacity", 0);
+    // Hide tutorial bubble when user starts moving
+    if ($("#tutorial-bubble").is(":visible")) {
+      closeTutorial();
+    }
   }
 
   
@@ -1420,6 +1426,11 @@ $(document).ready(function() {
 
   // Mobile controller handlers with touch support
   function startMovement(direction) {
+    // Hide tutorial bubble when user starts moving
+    if ($("#tutorial-bubble").is(":visible")) {
+      closeTutorial();
+    }
+    
     // Clear any existing movement
     var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
     clearInterval(animRef);
