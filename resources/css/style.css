@@ -442,6 +442,36 @@ body {
   z-index: 100;
 }
 
+/* Name Sign Above Cave */
+.cave-name-sign {
+  position: absolute;
+  left: 1000px;
+  top: 100px;
+  width: 200px;
+  text-align: center;
+  font-family: "Press Start 2P", cursive;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000;
+  z-index: 101;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  background-image: url("../images/signs/welcome-sign.png");
+  background-size: 200px;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 40px;
+}
+
+.cave-question-container {
+  position: absolute;
+  left: 1000px;
+  top: 150px;
+  z-index: 101;
+  display: flex;
+}
+
 .fence {
   width: 760px;
   height: 32px;
@@ -701,14 +731,14 @@ body {
     opacity: 1;
   } */
 .intro-portfolio {
-  background-size: 64px;
-  background-image: url("../images/portfolio/portfolio.png");
-  width: 64px;
-  height: 36px;
+  background-size: 80px;
+  background-image: url("../images/signs/games-sign.png");
+  width: 80px;
+  height: 40px;
   position: absolute;
   z-index: 6;
-  top: 568px;
-  left: 1468px;
+  top: 540px;
+  left: 1480px;
   background-repeat: no-repeat;
 }
 
@@ -1298,6 +1328,74 @@ body {
   left: 70px;
   top: 70px;
   display: none;
+}
+
+/* Minimap Widget - Top Left Corner */
+.minimap-widget {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 200px;
+  height: 200px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 4px solid #fff;
+  border-radius: 4px;
+  z-index: 10000;
+  display: none;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  image-rendering: pixelated;
+}
+
+.minimap-widget.active {
+  display: block;
+}
+
+.minimap-widget-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-origin: top left;
+  transform: scale(0.12);
+  pointer-events: none;
+}
+
+.minimap-widget-player {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #ff0000;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  z-index: 10001;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.9);
+  pointer-events: none;
+  transition: left 0.1s linear, top 0.1s linear;
+}
+
+.minimap-widget-title {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  font-family: "Press Start 2P", cursive;
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.minimap-widget-toggle-hint {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  font-family: "Press Start 2P", cursive;
+  font-size: 8px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .paper {
@@ -3294,6 +3392,36 @@ body.status-menu-open .status-menu-panel {
   margin-top: auto;
   padding-top: 0.5rem;
   border-top: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.game-menu-footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.game-menu-social-icons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-menu-social-link {
+  display: inline-block;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+
+.game-menu-social-link:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.game-menu-social-link .nes-icon {
+  font-size: 1.5rem;
 }
 
 /* Status / backpack panel */

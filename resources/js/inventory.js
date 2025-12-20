@@ -241,6 +241,13 @@ function setVariables() {
     inventory.minimap = true;
     $(".scroll").css("display", "none");
     $(".minimap-icon").css("display", "block");
+    
+    // Initialize minimap widget if map was already collected
+    if (typeof initMinimapWidget === "function") {
+      setTimeout(function() {
+        initMinimapWidget();
+      }, 100);
+    }
   }
 
   if (getCookie("fishing-rod") != "") {
@@ -526,6 +533,14 @@ function takeMap() {
     inventory.minimap = true;
     showItemPickupAnimation("minimap");
     setCookie("minimap", "true");
+    
+    // Initialize minimap widget (but don't show it yet)
+    if (typeof initMinimapWidget === "function") {
+      setTimeout(function() {
+        initMinimapWidget();
+      }, 100);
+    }
+    
     checkIfComplete();
   }
 }

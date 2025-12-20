@@ -46,7 +46,7 @@ and open the template in the editor.
         <span class="status-menu-icon"></span>
       </button>
       <button id="game-menu-toggle" class="nes-btn is-primary game-menu-toggle">
-        <span class="game-menu-icon">
+    <span class="game-menu-icon">
           <span></span>
           <span></span>
           <span></span>
@@ -122,13 +122,41 @@ and open the template in the editor.
         </div>
 
         <footer class="game-menu-footer">
-          <a
-            href="https://www.awwwards.com/sites/dylan-landman"
-            target="_blank"
-            class="game-menu-awwwards"
-          >
-            Awwwards Honorable Mention
-          </a>
+          <div class="game-menu-footer-content">
+            <div class="game-menu-social-icons">
+              <a
+                href="https://github.com/dylanlandman"
+                target="_blank"
+                class="game-menu-social-link"
+                title="GitHub"
+              >
+                <i class="nes-icon github"></i>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/dylanlandman"
+                target="_blank"
+                class="game-menu-social-link"
+                title="LinkedIn"
+              >
+                <i class="nes-icon linkedin"></i>
+              </a>
+              <a
+                href="https://twitter.com/dylanlandman"
+                target="_blank"
+                class="game-menu-social-link"
+                title="Twitter"
+              >
+                <i class="nes-icon twitter"></i>
+              </a>
+            </div>
+            <a
+              href="https://www.awwwards.com/sites/dylan-landman"
+              target="_blank"
+              class="game-menu-awwwards"
+            >
+              Awwwards Honorable Mention
+            </a>
+          </div>
         </footer>
       </div>
 
@@ -372,6 +400,14 @@ and open the template in the editor.
     <div id="portfolio"></div>
     <div id="map"></div>
     <div id="fishbook"></div>
+
+    <!-- Minimap Widget -->
+    <div id="minimap-widget" class="minimap-widget">
+      <div class="minimap-widget-title">Map</div>
+      <div class="minimap-widget-content" id="minimap-widget-content"></div>
+      <div class="minimap-widget-player" id="minimap-widget-player"></div>
+      <div class="minimap-widget-toggle-hint">Press M to toggle</div>
+    </div>
 
     <!-- Holds The Backpack Icon -->
     <div id="ui">

@@ -423,26 +423,9 @@ var COLLISION_CONFIG = {
       {
         zIndex: {
           selector: "#wood-log",
-          whenAbove: { top: { max: 472 }, zIndex: 100 },
+        whenAbove: { top: { max: 472 }, zIndex: 100 },
           whenBelow: { top: { min: 472 }, zIndex: 10 }
         }
-      },
-      {
-        zIndex: {
-          selector: ".moss-log",
-          whenAbove: { top: { max: 356 }, zIndex: 100 },
-          whenBelow: { top: { min: 356 }, zIndex: 10 }
-        }
-      },
-      {
-        position: { top: { exact: 356 }, left: { min: 652, max: 780 } },
-        blockKey: "keyCode2",
-        description: "Moss log top"
-      },
-      {
-        position: { top: { exact: 384 }, left: { min: 652, max: 780 } },
-        blockKey: "keyCode1",
-        description: "Moss log bottom"
       },
       {
         zIndex: {

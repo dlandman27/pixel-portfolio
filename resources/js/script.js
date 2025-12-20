@@ -134,6 +134,13 @@ $(window).load(function () {
 
   //Function to handle weather
   dayCycle();
+  
+  // Initialize minimap widget if map was already collected
+  if (typeof inventory !== "undefined" && inventory.minimap && typeof initMinimapWidget === "function") {
+    setTimeout(function() {
+      initMinimapWidget();
+    }, 3000);
+  }
 });
 
 $(window).resize(function () {
@@ -344,6 +351,12 @@ var doorOpen = false;
 $(document).keydown(function(e){
   if(isReelingIn){
     reelIn(e.keyCode);
+  }
+
+  // Toggle minimap widget with M key (77 is ASCII for M)
+  if (e.keyCode === 77 && inventory.minimap && !eventOccurence) {
+    toggleMinimapWidget();
+    return;
   }
 
   // If the tutorial has not been acknowledged yet, close it on first movement input
@@ -1521,6 +1534,145 @@ $("#minimap").live('click',function () {
     eventOccurence = false;
   }
 });
+
+// ----------------------
+// Minimap Widget System
+// ----------------------
+var minimapWidgetVisible = false;
+var minimapWidgetUpdateInterval = null;
+
+function initMinimapWidget() {
+  if (!inventory.minimap) {
+    return; // Don't show if minimap hasn't been collected
+  }
+
+  // Clone the map for the minimap widget (simplified version)
+  var $map = $("#map");
+  var $widgetContent = $("#minimap-widget-content");
+  
+  // Clear existing content
+  $widgetContent.empty();
+  
+  // Create a simplified map representation
+  // We'll use a canvas or simplified div structure
+  // For now, let's create a basic representation
+  var mapWidth = 2000; // Approximate map width
+  var mapHeight = 2000; // Approximate map height
+  
+  // Create a background representation
+  var $bg = $('<div></div>').css({
+    position: 'absolute',
+    width: mapWidth + 'px',
+    height: mapHeight + 'px',
+    background: 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)',
+    left: '0',
+    top: '0'
+  });
+  
+  $widgetContent.append($bg);
+  
+  // Start updating player position
+  updateMinimapWidgetPlayer();
+  if (minimapWidgetVisible) {
+    startMinimapWidgetUpdates();
+  }
+}
+
+function toggleMinimapWidget() {
+  if (!inventory.minimap) {
+    return;
+  }
+
+  minimapWidgetVisible = !minimapWidgetVisible;
+  var $widget = $("#minimap-widget");
+  
+  if (minimapWidgetVisible) {
+    $widget.addClass("active");
+    initMinimapWidget();
+    startMinimapWidgetUpdates();
+  } else {
+    $widget.removeClass("active");
+    stopMinimapWidgetUpdates();
+  }
+}
+
+function startMinimapWidgetUpdates() {
+  if (minimapWidgetUpdateInterval) {
+    clearInterval(minimapWidgetUpdateInterval);
+  }
+  minimapWidgetUpdateInterval = setInterval(function() {
+    updateMinimapWidgetPlayer();
+  }, 100); // Update 10 times per second
+}
+
+function stopMinimapWidgetUpdates() {
+  if (minimapWidgetUpdateInterval) {
+    clearInterval(minimapWidgetUpdateInterval);
+    minimapWidgetUpdateInterval = null;
+  }
+}
+
+function updateMinimapWidgetPlayer() {
+  if (!minimapWidgetVisible || !inventory.minimap) {
+    return;
+  }
+
+  var $player = $("#minimap-widget-player");
+  var $dylan = $("#dylan");
+  var $map = $("#map");
+  
+  // Get player position on screen
+  var playerLeft = parseInt($dylan.css("left")) || 0;
+  var playerTop = parseInt($dylan.css("top")) || 0;
+  
+  // Get map offset (how much the map has moved)
+  var mapLeft = parseInt($map.css("margin-left")) || 0;
+  var mapTop = parseInt($map.css("margin-top")) || 0;
+  
+  // Get map center position
+  var mapCenterLeft = parseInt($map.css("left")) || 0;
+  var mapCenterTop = parseInt($map.css("top")) || 0;
+  
+  // Calculate absolute position on the map
+  // The map center is at (mapCenterLeft, mapCenterTop)
+  // Player screen position is (playerLeft, playerTop)
+  // Map offset is (mapLeft, mapTop)
+  // So absolute map position is: center - offset + player screen position
+  
+  var absoluteMapLeft = mapCenterLeft - mapLeft + playerLeft;
+  var absoluteMapTop = mapCenterTop - mapTop + playerTop;
+  
+  // Map dimensions (approximate - you may need to adjust these)
+  var mapWidth = 2000;
+  var mapHeight = 2000;
+  
+  // Widget dimensions
+  var widgetWidth = 200;
+  var widgetHeight = 200;
+  var scale = 0.12;
+  
+  // Calculate position in minimap (0,0 is top-left of map)
+  // Map center is at (mapWidth/2, mapHeight/2) in absolute coordinates
+  var mapOriginLeft = mapCenterLeft - (mapWidth / 2);
+  var mapOriginTop = mapCenterTop - (mapHeight / 2);
+  
+  // Player position relative to map origin
+  var relativeLeft = absoluteMapLeft - mapOriginLeft;
+  var relativeTop = absoluteMapTop - mapOriginTop;
+  
+  // Scale to minimap widget size
+  var minimapLeft = relativeLeft * scale;
+  var minimapTop = relativeTop * scale;
+  
+  // Clamp to widget bounds (with padding for player dot)
+  minimapLeft = Math.max(6, Math.min(widgetWidth - 6, minimapLeft));
+  minimapTop = Math.max(6, Math.min(widgetHeight - 6, minimapTop));
+  
+  $player.css({
+    left: minimapLeft + 'px',
+    top: minimapTop + 'px'
+  });
+}
 
 ///////////////////////
 //Functions for Fishing
