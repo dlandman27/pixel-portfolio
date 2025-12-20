@@ -801,17 +801,18 @@ body {
 }
 
 .intro-portfolio.s2 {
-  top: 266px;
+  top: 160px;
   left: 1076px;
-  z-index: 47;
-  background-image: url("../images/portfolio/front-sign-right.png");
+  background-size: 80px;
+  z-index: 20!important;
+  background-image: url("../images/signs/logos-sign.png");
 }
 
 .intro-portfolio.s3 {
   top: 266px;
   left: 860px;
   z-index: 47;
-  background-image: url("../images/portfolio/front-sign-left.png");
+  background-image: url("../images/signs/logos-sign.png");
 }
 
 .intro-portfolio.s4 {
@@ -3087,78 +3088,65 @@ body {
   }
 }
 
-.joycon {
+/* Mobile Controller with NES Buttons */
+.mobile-controller {
   position: fixed;
-  inset: 0;
-  margin: auto;
-  width: 256px;
-  height: 256px;
-  background: url("../images/joycon/joycon-base.png");
-  background-size: 256px;
-  margin-top: auto;
-  margin-bottom: 64px;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10000000;
   display: none;
-}
-.joycon.enter {
-  position: absolute;
-  width: 128px;
-  height: 128px;
-  background: url("../images/joycon/button-enter.png");
-  background-size: 128px;
-  margin-top: auto;
-  margin-bottom: auto;
-  z-index: 10000001;
+  gap: 20px;
+  align-items: center;
+  pointer-events: none;
 }
 
-.joycon.arrow {
-  background-image: url("../images/joycon/arrow.png");
-  background-size: 64px;
-  width: 64px;
-  background-repeat: no-repeat;
-  height: 42px;
-  z-index: 10000001;
-  position: absolute;
-  margin-top: auto;
-  margin-bottom: auto;
-  margin-left: auto;
-  margin-right: auto;
+.mobile-controller-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
 }
 
-.joycon.arrow.left {
+.mobile-controller-row {
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.mobile-btn {
+  pointer-events: all;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: manipulation;
+  min-width: 60px;
+  min-height: 60px;
+  font-size: 24px;
+  padding: 8px;
+  font-family: "Press Start 2P", cursive;
+}
+
+.mobile-btn-up,
+.mobile-btn-down,
+.mobile-btn-left,
+.mobile-btn-right {
+  width: 60px;
+  height: 60px;
+}
+
+.mobile-btn-left {
   transform: rotate(-90deg);
-  margin-left: 4px;
-}
-.joycon.arrow.up {
-  margin-top: 14px;
-}
-.joycon.arrow.down {
-  transform: rotate(180deg);
-  margin-bottom: 14px;
-}
-.joycon.arrow.right {
-  transform: rotate(90deg);
-  margin-right: 4px;
 }
 
-.joycon.arrow:active,
-.joycon.enter:active {
-  opacity: 0.5;
+.mobile-btn-right {
+  transform: rotate(90deg);
 }
 
 @media only screen and (max-width: 600px) {
-  .joycon {
-    position: fixed;
-    inset: 0;
-    margin: auto;
-    width: 256px;
-    height: 256px;
-    background: url("../images/joycon/joycon-base.png");
-    background-size: 256px;
-    margin-top: auto;
-    margin-bottom: 64px;
-    z-index: 10000000;
-    display: block;
+  .mobile-controller {
+    display: flex !important;
   }
 }
 

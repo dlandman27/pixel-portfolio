@@ -1305,7 +1305,7 @@ function toggleSocialMedia(){
 function openTVScreen(){
   $(".socialMedia-icon").css("display","none");
   $(".minimap-icon").css("display","none");
-  $(".joycon").css("display","none");
+  $(".mobile-controller").css("display","none");
   // sitting = true;
   // $(".couch").css("z-index", "10000");
   // $("#dylan").css({
@@ -1368,7 +1368,18 @@ function openPortfolio(){
     $(".portfolio-container").css("display","block");
     eventOccurence = true;
     $(".minimap-icon").css("display","none");
-    $(".joycon").css("display","none");
+    $(".mobile-controller").css("display","none");
+}
+
+function openPortfolioWithLogoFilter(){
+  // Open portfolio and filter to show only logos
+  openPortfolio();
+  // Small delay to ensure portfolio modal is loaded
+  setTimeout(function() {
+    if (typeof filterSelection === "function") {
+      filterSelection('.logo');
+    }
+  }, 100);
 }
 
 function closePortfolio(){
@@ -1377,7 +1388,7 @@ function closePortfolio(){
   if(inventory.minimap)
     $(".minimap-icon").css("display","block");
   if(window.innerWidth <= 600)
-    $(".joycon").css("display","block");
+    $(".mobile-controller").css("display","flex");
 }
 
 function turnOffTV(){
@@ -1387,7 +1398,7 @@ function turnOffTV(){
   if(inventory.minimap)
     $(".minimap-icon").css("display","block");
   if(window.innerWidth <= 600)
-    $(".joycon").css("display","block");
+    $(".mobile-controller").css("display","flex");
 }
 
 function toggleJoycon(e){
@@ -1407,59 +1418,124 @@ function toggleJoycon(e){
 var setint  = '';
 $(document).ready(function() {
 
-  $('.joycon.arrow.up').live('click',function (e) {
-    clearInterval(setint);
-    if(!keyPressed){
-      setint = setInterval(function () {
-        keysPressed[38] = true;
-        keysPressed[37] = false;
-        keysPressed[39] = false;
-        keysPressed[40] = false;
-        move(38);     
-      },1);
+  // Mobile controller handlers with touch support
+  function startMovement(direction) {
+    // Clear any existing movement
+    var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
+    clearInterval(animRef);
+    if (typeof WORLD !== "undefined" && WORLD.movement) {
+      WORLD.movement.anim = null;
+      WORLD.movement.keyPressed = false;
+    } else {
+      keyPressed = false;
     }
     
-  });
+    // Set the key as pressed
+    keysPressed[direction] = true;
+    keysPressed[37] = false;
+    keysPressed[38] = false;
+    keysPressed[39] = false;
+    keysPressed[40] = false;
+    keysPressed[direction] = true;
+    
+    // Call move immediately to turn character and start movement
+    move(direction);
+  }
 
-  $('.joycon.arrow.down').live('click',function (e) {
-    clearInterval(setint);
-    if(!keyPressed){
-      setint = setInterval(function () {
-        keysPressed[40] = true;
-        keysPressed[37] = false;
-        keysPressed[39] = false;
-        keysPressed[38] = false;
-        move(40);
-      },1);
-    }
-  });
-
-  $('.joycon.arrow.left').live('click',function (e) {
-    clearInterval(setint);
-    if(!keyPressed){
-      setint = setInterval(function () {
-        keysPressed[37] = true;
-        keysPressed[38] = false;
-        keysPressed[39] = false;
-        keysPressed[40] = false;
-        move(37);
-      },1);
+  function stopMovement() {
+    // Clear the animation interval
+    var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
+    clearInterval(animRef);
+    if (typeof WORLD !== "undefined" && WORLD.movement) {
+      WORLD.movement.keyPressed = false;
+      WORLD.movement.anim = null;
+    } else {
+      keyPressed = false;
     }
     
+    // Clear all direction keys
+    keysPressed[37] = false;
+    keysPressed[38] = false;
+    keysPressed[39] = false;
+    keysPressed[40] = false;
+  }
+
+  // Up button
+  $('.mobile-btn-up').live('touchstart', function(e) {
+    e.preventDefault();
+    startMovement(38);
+  });
+  $('.mobile-btn-up').live('touchend touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-up').live('mousedown', function(e) {
+    e.preventDefault();
+    startMovement(38);
+  });
+  $('.mobile-btn-up').live('mouseup mouseleave', function(e) {
+    e.preventDefault();
+    stopMovement();
   });
 
-  $('.joycon.arrow.right').live('click',function (e) {
-    clearInterval(setint);
-    if(!keyPressed){
-      setint = setInterval(function () {
-        keysPressed[39] = true;
-        keysPressed[37] = false;
-        keysPressed[38] = false;
-        keysPressed[40] = false;
-        move(39); 
-      },1);
-    }
-    
+  // Down button
+  $('.mobile-btn-down').live('touchstart', function(e) {
+    e.preventDefault();
+    startMovement(40);
+  });
+  $('.mobile-btn-down').live('touchend touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-down').live('mousedown', function(e) {
+    e.preventDefault();
+    startMovement(40);
+  });
+  $('.mobile-btn-down').live('mouseup mouseleave', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+
+  // Left button
+  $('.mobile-btn-left').live('touchstart', function(e) {
+    e.preventDefault();
+    startMovement(37);
+  });
+  $('.mobile-btn-left').live('touchend touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-left').live('mousedown', function(e) {
+    e.preventDefault();
+    startMovement(37);
+  });
+  $('.mobile-btn-left').live('mouseup mouseleave', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+
+  // Right button
+  $('.mobile-btn-right').live('touchstart', function(e) {
+    e.preventDefault();
+    startMovement(39);
+  });
+  $('.mobile-btn-right').live('touchend touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-right').live('mousedown', function(e) {
+    e.preventDefault();
+    startMovement(39);
+  });
+  $('.mobile-btn-right').live('mouseup mouseleave', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+
+  // Logo Gallery Click Handlers
+  $('.logo-item').live('click', function(e) {
+    e.stopPropagation();
+    openPortfolioWithLogoFilter();
   });
 
   // $('.joycon.arrow.right').live("mouseleave mouseup", function () {
@@ -1470,18 +1546,6 @@ $(document).ready(function() {
   //   keyPressed = false;
   // });
 
-  $('.joycon.enter').live('click',function (e) {
-    clearInterval(setint);
-    clearInterval(anim);
-    move(13);
-    keysPressed[13] = false;
-    keysPressed[37] = false;
-    keysPressed[38] = false;
-    keysPressed[39] = false;
-    keysPressed[40] = false;
-    clearInterval(anim);
-    keyPressed = false;
-  });
 });
 
 function showContent(id){
