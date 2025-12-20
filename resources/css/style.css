@@ -3010,7 +3010,7 @@ body {
   position: fixed;
   top: 8px;
   right: 8px;
-  z-index: 10000030;
+  z-index: 10000040; /* above overlays and map */
 }
 
 .game-menu-toggle {
@@ -3043,19 +3043,27 @@ body {
 .game-menu-icon span:nth-child(3) { top: 10px; }
 
 .game-menu-panel {
-  position: absolute;
-  top: 110%;
+  position: fixed;
+  top: 0;
   right: 0;
-  display: none;
+  height: 100vh;
+  transform: translateX(100%);
+  transition: transform 0.25s ease-out;
   padding: 0.75rem;
-  background: #0f172a;
-  border: 4px solid #fff;
+  background: #102d2a;
+  /* Subtle lighter right border to give an elevated edge */
+  border: none;
+  border-right: 4px solid #18403c;
   box-shadow: 0 8px 0 #000;
-  width: 220px;
+  width: 320px;
+  z-index: 10000035;
+  display: flex;
+  flex-direction: column;
 }
 
-.game-menu-panel.is-open {
-  display: block;
+/* Slide-in when menu is open */
+body.game-menu-open .game-menu-panel {
+  transform: translateX(0);
 }
 
 .game-menu-title {
@@ -3085,10 +3093,63 @@ body {
   opacity: 1;
 }
 
+/* New menu layout pieces */
+.game-menu-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.75rem;
+}
+
+.game-menu-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.75rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.game-menu-role {
+  font-size: 0.55rem;
+  margin: 0.2rem 0 0;
+  color: #9bd4d7;
+}
+
+.game-menu-section {
+  margin-bottom: 0.9rem;
+}
+
+.game-menu-section-title {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.4rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.game-menu-footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Backdrop behind side menu */
+.game-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out;
+  z-index: 10000030;
+}
+
+body.game-menu-open .game-menu-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (max-width: 600px) {
   .game-menu-panel {
-    width: 80vw;
-    right: 0;
+    width: 90vw;
   }
 }
 

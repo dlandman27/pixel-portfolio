@@ -10,35 +10,30 @@ $(function () {
   }
 
   function closeMenu() {
-    $panel.removeClass("is-open");
+    document.body.classList.remove("game-menu-open");
   }
 
   function openMenu() {
-    $panel.addClass("is-open");
+    document.body.classList.add("game-menu-open");
   }
 
-  $toggle.on("click", function (e) {
+  // Toggle menu on hamburger click
+  $toggle.click(function (e) {
     e.stopPropagation();
-    if ($panel.hasClass("is-open")) {
+    if (document.body.classList.contains("game-menu-open")) {
       closeMenu();
     } else {
       openMenu();
     }
   });
 
-  // Clicks inside the panel should not close it
-  $panel.on("click", function (e) {
+  // Handle clicks inside the panel (including quicklink actions)
+  $panel.click(function (e) {
     e.stopPropagation();
-  });
+    var $target = $(e.target);
+    var action = $target.attr("data-menu-action");
+    if (!action) return;
 
-  // Clicking anywhere else closes the menu
-  $(document).on("click", function () {
-    closeMenu();
-  });
-
-  // Handle quicklink actions
-  $panel.on("click", "[data-menu-action]", function () {
-    var action = $(this).attr("data-menu-action");
     closeMenu();
 
     switch (action) {
@@ -58,9 +53,18 @@ $(function () {
       case "inventory":
         if (typeof openInventory === "function") openInventory();
         break;
+      case "map":
+        // Center map or reset position if such a helper exists later
+        if (typeof centerMap === "function") centerMap();
+        break;
       default:
         break;
     }
+  });
+
+  // Clicking anywhere else closes the menu
+  $(document).click(function () {
+    closeMenu();
   });
 });
 
