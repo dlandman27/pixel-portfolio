@@ -358,13 +358,7 @@ function takeBook() {
         "background-image",
         URL.getMisc() + "/fishbook-icon-found.png)"
       );
-      $(".achievement").css("background-color", "#3EB489");
-      $(".achievement").css("display", "block").fadeIn();
-      $(".achievement-name").text("What will we catch?");
-      $(".achievement-description").text("Collect the Fish Collection Book");
-      setTimeout(function () {
-        $(".achievement").fadeOut();
-      }, 3000);
+      showItemPickupAnimation("fishbook");
       checkIfComplete();
     } else if (!inventory.fishbook) {
       $(".nes-balloon.from-left p").text(
@@ -392,12 +386,7 @@ function takeMatchbox() {
         "background-image",
         URL.getMisc() + "/matchbox-icon-found.png)"
       );
-      $(".achievement").css("display", "block").fadeIn();
-      $(".achievement-name").text("It's a Match!");
-      $(".achievement-description").text("Pick up the matchbox");
-      setTimeout(function () {
-        $(".achievement").fadeOut().css("display", "block");
-      }, 3000);
+      showItemPickupAnimation("matchbox");
       checkIfComplete();
     } else if (!inventory.matchbox) {
       $(".nes-balloon.from-left p").text(
@@ -420,17 +409,11 @@ function takeFishingRod() {
       inventory.fishingRod = true;
       setCookie("fishing-rod", true);
       $(".fishing-rod").css("display", "none");
-      $(".achievement").css("background-color", "#3EB489");
       $(".inventory-slot.fishingRod").css(
         "background-image",
         URL.getMisc() + "/fishing-rod-found.png)"
       );
-      $(".achievement").css("display", "block").fadeIn();
-      $(".achievement-name").text("Lets Fish!");
-      $(".achievement-description").text("Pick up the fishing rod");
-      setTimeout(function () {
-        $(".achievement").fadeOut();
-      }, 3000);
+      showItemPickupAnimation("fishingRod");
       checkIfComplete();
     } else if (!inventory.fishingRod) {
       $(".nes-balloon.from-left p").text(
@@ -469,15 +452,9 @@ function takeAxe() {
       var wait = 0;
       var grabAxe = setInterval(function () {
         if (i > 3) {
-          $(".achievement").css("background-color", "#3EB489");
           $("#stump").css("background-image", url + "/stump-without-axe.png)");
           $("#dylan").css("background-size", "40px").css("width", "40px");
-          $(".achievement").css("display", "block").fadeIn();
-          $(".achievement-name").text("Axe to Grind");
-          $(".achievement-description").text("Grab the Axe");
-          setTimeout(function () {
-            $(".achievement").fadeOut();
-          }, 3000);
+          showItemPickupAnimation("axe");
         }
         if (i > 6) {
           eventOccurence = false;
@@ -533,13 +510,7 @@ function takeWood() {
     "background-image",
     URL.getMisc() + "/wood-icon-found.png)"
   );
-  $(".achievement").css("background-color", "#3EB489");
-  $(".achievement").css("display", "block").fadeIn();
-  $(".achievement-name").text("Woodn'nt that be nice");
-  $(".achievement-description").text("Collect Firewood");
-  setTimeout(function () {
-    $(".achievement").fadeOut();
-  }, 3000);
+  showItemPickupAnimation("wood");
   checkIfComplete();
 }
 
@@ -553,14 +524,7 @@ function takeMap() {
     $(".minimap-icon").css("display", "block");
     $(".scroll").css("display", "none");
     inventory.minimap = true;
-    $(".achievement").css("background-color", "#3EB489");
-    $(".achievement").css("display", "block").fadeIn();
-    $(".achievement-name").text("Mind the Map");
-    $(".achievement-description").text("Collect the Map");
-    setTimeout(function () {
-      $(".achievement").fadeOut();
-    }, 3000);
-
+    showItemPickupAnimation("minimap");
     setCookie("minimap", "true");
     checkIfComplete();
   }
@@ -581,13 +545,7 @@ function takeResume() {
         "background-image",
         URL.getMisc() + "/resume-icon-found.png)"
       );
-      $(".achievement").css("background-color", "#3EB489");
-      $(".achievement").css("display", "block").fadeIn();
-      $(".achievement-name").text("Who am I?");
-      $(".achievement-description").text("Collect my Resume");
-      setTimeout(function () {
-        $(".achievement").fadeOut();
-      }, 3000);
+      showItemPickupAnimation("resume");
       checkIfComplete();
     } else if (!inventory.resume) {
       $(".nes-balloon.from-left p").text(
@@ -612,16 +570,236 @@ function enableBackpack() {
     inventory.backpack = true;
     setCookie("backpack", true);
     $("#backpack").css("opacity", "0");
-    $(".achievement").css("background-color", "#3EB489");
     if (window.innerWidth > 600)
       $("#backpack-icon").css("visibility", "visible");
-    $(".achievement").css("display", "block").fadeIn();
-    $(".achievement-name").text("Extra Baggage");
-    $(".achievement-description").text("Pick up Backpack");
-    setTimeout(function () {
-      $(".achievement").fadeOut().css("display", "block");
-    }, 3000);
+    showItemPickupAnimation("backpack");
   }
+}
+
+// ----------------------
+// Item pickup animation (Totem of Undying style)
+// ----------------------
+function showItemPickupAnimation(itemType) {
+  console.log('showItemPickupAnimation called with:', itemType);
+  
+  // Map item types to their icon URLs (using map item images, not inventory icons)
+  // inventory slot selectors, and display names
+  var itemMap = {
+    "axe": {
+      icon: URL.getNature() + "/stump-with-axe.png)",
+      slot: ".inventory-slot.axe",
+      name: "Axe"
+    },
+    "wood": {
+      icon: URL.getNature() + "/wood-log.png)",
+      slot: ".inventory-slot.wood",
+      name: "Wood"
+    },
+    "matchbox": {
+      icon: URL.getMisc() + "/matchbox.png)",
+      slot: ".inventory-slot.matches",
+      name: "Matchbox"
+    },
+    "resume": {
+      icon: URL.getMisc() + "/paper.png)",
+      slot: ".inventory-slot.resume",
+      name: "Resume"
+    },
+    "minimap": {
+      icon: URL.getMisc() + "/map-icon.png)",
+      slot: ".inventory-slot.minimap",
+      name: "Map"
+    },
+    "fishingRod": {
+      icon: URL.getFishing() + "/fishing-rod.png)",
+      slot: ".inventory-slot.fishingRod",
+      name: "Fishing Rod"
+    },
+    "fishbook": {
+      icon: URL.getMisc() + "/fishbook.png)",
+      slot: ".inventory-slot.book",
+      name: "Fishbook"
+    },
+    "backpack": {
+      icon: URL.getMisc() + "/backpack.png)",
+      slot: "#backpack-icon",
+      name: "Backpack"
+    }
+  };
+
+  var item = itemMap[itemType];
+  if (!item) {
+    console.log('Item not found in map:', itemType);
+    return;
+  }
+  
+  console.log('Item found:', item);
+
+  // Get target position (inventory slot or backpack icon)
+  var $target = $(item.slot);
+  if ($target.length === 0) {
+    // Fallback to backpack icon if slot not found
+    $target = $("#backpack-icon");
+  }
+
+  // Get target position - try multiple methods
+  var targetOffset = $target.offset();
+  
+  // If element is hidden or offset() returns null, calculate position manually
+  if (!targetOffset || $target.css('visibility') === 'hidden' || $target.css('display') === 'none') {
+    // For fixed elements, use position() or calculate from viewport
+    var position = $target.position();
+    if (position && (position.left !== 0 || position.top !== 0)) {
+      targetOffset = {
+        left: position.left,
+        top: position.top
+      };
+    } else {
+      // Default to top-right corner (where backpack usually is)
+      targetOffset = {
+        left: window.innerWidth - 150,
+        top: 20
+      };
+    }
+  }
+
+  // Create the animated icon element using img tag for better compatibility
+  var imageUrl = item.icon;
+  // Extract the actual path from CSS url() format
+  // URL format is: "url(resources/images/misc/icon.png)"
+  // We need: "resources/images/misc/icon.png"
+  var cleanUrl = imageUrl.replace(/^url\(/, '').replace(/\)$/, '');
+  
+  var $icon = $('<img class="item-pickup-animation" src="' + cleanUrl + '" />');
+  
+  $icon.css({
+    position: 'fixed',
+    width: '256px',
+    height: '256px',
+    objectFit: 'contain',
+    left: '50%',
+    top: '50%',
+    marginLeft: '-128px',
+    marginTop: '-128px',
+    zIndex: 10000000,
+    pointerEvents: 'none',
+    opacity: 1,
+    display: 'block',
+    visibility: 'visible'
+  });
+
+  // Create dark overlay for the screen
+  var $overlay = $('<div class="item-pickup-overlay"></div>');
+  $overlay.css({
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    zIndex: 9999999,
+    pointerEvents: 'none',
+    opacity: 0,
+    transition: 'opacity 0.3s ease-in'
+  });
+
+  // Create text label for the item
+  var $label = $('<div class="item-pickup-label">' + item.name + ' found</div>');
+  $label.css({
+    position: 'fixed',
+    left: '50%',
+    top: 'calc(50% + 150px)', // Position below the icon
+    transform: 'translateX(-50%)',
+    zIndex: 10000001,
+    pointerEvents: 'none',
+    fontFamily: '"Press Start 2P", cursive',
+    fontSize: '16px',
+    color: '#fff',
+    textShadow: '2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000',
+    opacity: 0,
+    display: 'block',
+    whiteSpace: 'nowrap'
+  });
+
+  $('body').append($overlay);
+  $('body').append($icon);
+  $('body').append($label);
+  console.log('Icon element appended, image URL:', imageUrl);
+
+  // Force a reflow to ensure element is rendered before animation
+  void $icon[0].offsetHeight;
+  void $label[0].offsetHeight;
+
+  // Small delay to ensure DOM is ready, then start shake animation
+  setTimeout(function() {
+    // Fade in the overlay and label
+    $overlay.css('opacity', 1);
+    $label.css({
+      opacity: 1,
+      transition: 'opacity 0.3s ease-in'
+    });
+    
+    // Phase 1: Shake animation (0.8 seconds)
+    $icon.addClass('item-pickup-shake');
+    
+    // After shake completes (800ms), fly to backpack
+    setTimeout(function() {
+      // Fade out the overlay and label before flying
+      $overlay.css({
+        opacity: 0,
+        transition: 'opacity 0.3s ease-out'
+      });
+      $label.css({
+        opacity: 0,
+        transition: 'opacity 0.2s ease-out'
+      });
+      
+      // Remove shake class and reset transform for smooth transition
+      $icon.removeClass('item-pickup-shake');
+      $icon.css('transform', 'translate(0, 0) scale(1) rotate(0deg)');
+      
+      // Remove overlay and label after fade out
+      setTimeout(function() {
+        $overlay.remove();
+        $label.remove();
+      }, 300);
+      
+      // Small delay to ensure transform reset
+      setTimeout(function() {
+        // Phase 2: Fly to backpack (0.6 seconds)
+        var endLeft = targetOffset.left;
+        var endTop = targetOffset.top;
+        
+        // Adjust for icon size difference (target is 128px, we're animating 256px)
+        endLeft = endLeft - 64;
+        endTop = endTop - 64;
+        
+        $icon.css({
+          left: endLeft + 'px',
+          top: endTop + 'px',
+          marginLeft: '0',
+          marginTop: '0',
+          width: '128px',
+          height: '128px',
+          transform: 'translate(0, 0) scale(1) rotate(0deg)',
+          transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        });
+
+        // Phase 3: Fade out and remove (after 600ms flight)
+        setTimeout(function() {
+          $icon.css({
+            opacity: 0,
+            transform: 'scale(0.5)',
+            transition: 'all 0.3s ease-out'
+          });
+          
+          setTimeout(function() {
+            $icon.remove();
+          }, 300);
+        }, 600);
+      }, 50);
+    }, 800);
+  }, 10);
 }
 
 // ----------------------
@@ -629,6 +807,7 @@ function enableBackpack() {
 // ----------------------
 function checkIfComplete() {
   if (!Object.values(inventory).includes(false)) {
+    // Use achievement for completion since it's special
     $(".achievement").css("background-color", "goldenrod");
     $(".achievement").css("display", "block").fadeIn();
     $(".achievement-name").text("Strapped Up");
@@ -637,4 +816,133 @@ function checkIfComplete() {
       $(".achievement").fadeOut();
     }, 5000);
   }
+}
+
+// ----------------------
+// Reset all items function
+// ----------------------
+function deleteCookie(cname) {
+  document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+function resetAllItems() {
+  // List of all inventory-related cookies to delete
+  var cookiesToDelete = [
+    "backpack",
+    "axe",
+    "matchbox",
+    "resume",
+    "minimap",
+    "fishing-rod",
+    "tree-fallen",
+    "wood",
+    "fishbook",
+    // Fish collection cookies
+    "shark",
+    "whale",
+    "turtle",
+    "sunfish",
+    "blowfish",
+    "blobfish",
+    "clownfish",
+    "bettafish",
+    "guinneafish",
+    "surgeonfish"
+  ];
+
+  // Delete all cookies
+  cookiesToDelete.forEach(function(cookieName) {
+    deleteCookie(cookieName);
+  });
+
+  // Reset inventory object
+  inventory = {
+    axe: false,
+    wood: false,
+    minimap: false,
+    backpack: false,
+    matchbox: false,
+    resume: false,
+    fishingRod: false,
+    fishbook: false,
+  };
+
+  // Reset fish collection
+  FISHREP.collection = {
+    shark: false,
+    clownfish: false,
+    guinneafish: false,
+    blobfish: false,
+    whale: false,
+    turtle: false,
+    blowfish: false,
+    surgeonfish: false,
+    bettafish: false,
+    sunfish: false,
+  };
+
+  // Reset UI elements
+  $("#backpack").css("opacity", "1");
+  $("#backpack-icon").css("visibility", "hidden");
+  $(".inventory-slot").css("visibility", "hidden");
+  $(".inventory-slot").css({
+    "background-image": "url(" + URL.getMisc() + "/inventory-slot-empty.png)"
+  });
+
+  // Reset world state
+  $("#stump").css(
+    "background-image",
+    URL.getNature() + "/stump-with-axe.png)"
+  );
+  $(".matchbox").css("display", "block");
+  $(".paper").css("display", "block").css("visibility", "visible");
+  $(".scroll").css("display", "block");
+  $(".minimap-icon").css("display", "none");
+  $(".fishing-rod").css("display", "block");
+  $(".book-item").css("display", "block").css("visibility", "visible");
+  
+  // Reset tree state
+  if (typeof hitCount !== "undefined") {
+    hitCount = 1;
+  }
+  $("#falling-tree").css("width", "0");
+  $("#falling-tree").css("background-image", "");
+  $("#wood-log").css("visibility", "hidden").css("display", "block");
+
+  // Reset bonfire state if it exists
+  if (typeof woodOnFire !== "undefined") {
+    woodOnFire = false;
+  }
+  $("#bonfire").css('background-image', URL.getBonfire() + '/bonfire-no-wood.png)');
+
+  // Reset fish collection UI
+  var fishNames = [
+    "shark", "whale", "turtle", "sunfish", "blowfish",
+    "blobfish", "clownfish", "bettafish", "guinneafish", "surgeonfish"
+  ];
+  fishNames.forEach(function(fishName) {
+    $(".fish." + fishName).css(
+      "background-image",
+      FISHREP.getFish(fishName).getImageNotFound()
+    );
+  });
+
+  // Close inventory if open
+  if (openBag) {
+    openInventory();
+  }
+
+  // Show confirmation
+  $(".achievement").css("background-color", "#3EB489");
+  $(".achievement").css("display", "block").fadeIn();
+  $(".achievement-name").text("Items Reset");
+  $(".achievement-description").text("All items have been reset");
+  setTimeout(function () {
+    $(".achievement").fadeOut();
+  }, 3000);
+
+  // Reload page to fully reset state
+  setTimeout(function() {
+    location.reload();
+  }, 1000);
 }

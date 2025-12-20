@@ -105,6 +105,14 @@ $(function () {
           WORLD.centerMap();
         }
         break;
+      case "reset-items":
+        if (typeof resetAllItems === "function") {
+          // Show confirmation dialog
+          if (confirm("Are you sure you want to reset all items? This will clear your progress and reload the page.")) {
+            resetAllItems();
+          }
+        }
+        break;
       default:
         break;
     }
