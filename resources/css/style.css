@@ -4198,3 +4198,478 @@ element.blue {
 .try-again {
   display: none;
 }
+
+/* Day/Night Cycle Overlay */
+#day-night-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #0f0f1e 100%);
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 2s ease-in-out;
+}
+
+/* Stars for Night Time */
+#stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Time-of-day body classes for additional styling */
+body.night {
+  background-color: #0a0a14;
+}
+
+body.dawn,
+body.dusk {
+  background-color: #2a1a3d;
+}
+
+body.day {
+  background-color: #3EB489;
+}
+
+/* Unified Panel System */
+.unified-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000050;
+  display: none;
+  pointer-events: none;
+}
+
+.unified-panel.active {
+  display: block !important;
+  pointer-events: all;
+}
+
+.unified-panel:not(.active) {
+  display: none !important;
+}
+
+.unified-panel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+.unified-panel-tabs-row {
+  top: 18px;
+  right: 5%;
+  z-index: 3;
+  gap: 0.25rem;
+  display: flex;
+  flex-wrap: nowrap;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.unified-panel-container {
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  z-index: 2;
+  height: 85vh;
+  display: flex;
+  overflow: hidden;
+  max-width: 1200px;
+  max-height: 900px;
+  position: absolute;
+  background: #102d2a;
+  border: 4px solid #fff;
+  flex-direction: column;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 0 #000, 0 0 0 4px #000;
+}
+
+.unified-panel-close {
+  padding: 0;
+  width: 50px;
+  color: #fff;
+  height: 50px;
+  display: flex;
+  line-height: 1;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: 1.5rem;
+  z-index: 10000060;
+  position: relative;
+  align-items: center;
+  margin-left: 0.25rem;
+  border: 2px solid #fff;
+  justify-content: center;
+  box-shadow: 0 4px 0 #000;
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+.unified-panel-close:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #000;
+}
+
+.unified-panel-tabs {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.unified-panel-tab {
+  padding: 0;
+  width: 50px;
+  color: #fff;
+  height: 50px;
+  display: flex;
+  cursor: pointer;
+  margin-bottom: 2;
+  box-shadow: none;
+  position: relative;
+  align-items: center;
+  background: #374151;
+  transition: borderWidth 0.2s;
+  justify-content: center;
+  border: 2px solid #9ca3af;
+  /* border-bottom-width: 0; */
+  font-family: "Press Start 2P", monospace;
+}
+
+.unified-panel-tab::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  /* background: linear-gradient(to bottom, transparent, rgba(255, 165, 0, 0.3), rgba(147, 51, 234, 0.3), transparent); */
+  pointer-events: none;
+}
+
+.unified-panel-tab:last-of-type::after {
+  display: none;
+}
+
+.unified-panel-tab:hover:not(.active) {
+  background: #4b5563;
+  /* transform: translateY(-2px); */
+  border-bottom-width: 4px;
+}
+
+.unified-panel-tab.active {
+  background: #0a1f1d;
+  border-color: #fff;
+  border-width: 2px;
+  border-bottom-width: 0;
+  box-shadow: 0 8px 0 #0a1f1d, inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.unified-panel-tab .tab-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: brightness(0.9);
+  image-rendering: pixelated;
+}
+
+.unified-panel-tab.active .tab-icon {
+  filter: brightness(1.2);
+}
+
+.unified-panel-tab[data-tab="home"] .tab-icon {
+  background-image: url("../images/misc/backpack-icon.png"); /* Placeholder - replace with home icon */
+  filter: brightness(1.2);
+}
+
+.unified-panel-tab[data-tab="backpack"] .tab-icon {
+  background-image: url("../images/misc/backpack-icon.png");
+}
+
+.unified-panel-tab[data-tab="fishbook"] .tab-icon {
+  background-image: url("../images/misc/fishbook-icon-found.png");
+}
+
+.unified-panel-tab[data-tab="achievements"] .tab-icon {
+  background-image: url("../images/misc/resume-icon-found.png"); /* Placeholder */
+}
+
+.unified-panel-tab[data-tab="games"] .tab-icon {
+  background-image: url("../images/misc/map-icon-found.png"); /* Placeholder */
+}
+
+.unified-panel-tab[data-tab="settings"] .tab-icon {
+  background-image: url("../images/misc/settings_bar.png");
+}
+
+.unified-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #0a1f1d;
+}
+
+.tab-content-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.tab-content-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  color: #fff;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+/* Backpack/Inventory Content */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.inventory-item {
+  background: #18403c;
+  border: 2px solid #fff;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.inventory-item.owned {
+  border-color: #4ade80;
+  box-shadow: 0 4px 0 #22c55e;
+}
+
+.inventory-item.missing {
+  border-color: #6b7280;
+  opacity: 0.6;
+}
+
+.inventory-item-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 0.5rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.inventory-item-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.inventory-item-status {
+  font-size: 0.5rem;
+  color: #9bd4d7;
+}
+
+/* Games Content */
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.game-button {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.game-icon {
+  font-size: 2rem;
+}
+
+.game-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+}
+
+/* Settings Content */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.settings-button {
+  width: 100%;
+  padding: 1rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+}
+
+/* Home Content */
+.home-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem;
+}
+
+.home-intro {
+  text-align: center;
+  max-width: 600px;
+}
+
+.home-greeting {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.5rem;
+  color: #fff;
+  margin: 0 0 1rem 0;
+}
+
+.home-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  color: #9bd4d7;
+  margin: 0 0 2rem 0;
+}
+
+.home-description {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #fff;
+  line-height: 1.8;
+  margin: 0 0 2rem 0;
+}
+
+.coin-progress {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #18403c;
+  border: 2px solid #fff;
+  border-radius: 4px;
+}
+
+.coin-progress-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  color: #9bd4d7;
+  margin: 0 0 0.5rem 0;
+}
+
+.coin-progress-count {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8rem;
+  color: #fff;
+  margin: 0;
+}
+
+.coin-complete {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  color: #4ade80;
+  margin: 0.5rem 0 0 0;
+}
+
+/* Coin items on map */
+.coin-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: coinFloat 2s ease-in-out infinite;
+}
+
+.coin-item .nes-icon.coin {
+  font-size: 0.8rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  display: block;
+}
+
+@keyframes coinFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.coin-notification {
+  pointer-events: none;
+}
+
+/* Achievements Content */
+.achievements-list {
+  padding: 1rem 0;
+}
+
+/* Scrollbar styling for panel content */
+.unified-panel-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.unified-panel-content::-webkit-scrollbar-track {
+  background: #0a1f1d;
+}
+
+.unified-panel-content::-webkit-scrollbar-thumb {
+  background: #18403c;
+  border: 2px solid #0a1f1d;
+}
+
+.unified-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #2a5a55;
+}
+
+/* Prevent body scroll when panel is open */
+body.unified-panel-open {
+  overflow: hidden;
+}

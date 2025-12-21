@@ -484,6 +484,7 @@ function move(keyCode) {
     var intervalFunc = function () {
       // Use WORLD.movement state if available
       var frameVar = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.frame : frame;
+      var ks = (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) ? WORLD.movement.keysPressed : keysPressed;
 
       //Frame Animation
       frameVar++;
@@ -506,7 +507,8 @@ function move(keyCode) {
           }
         }
       }
-      else if (keyCode == keyLeft || keyCode == keyA) {
+      // Check keysPressed dynamically instead of just keyCode for sprite animation
+      else if ((keyCode == keyLeft || keyCode == keyA) && (ks[keyLeft] || ks[keyA])) {
 
         // if(SFXOn){
         //   walking.play();
@@ -529,7 +531,7 @@ function move(keyCode) {
           $("#dylan").css("background-image", url + "/dylan-left-" + frameVar + ".png)");
         }
       }
-      else if (keyCode == keyUp || keyCode == keyW) {
+      else if ((keyCode == keyUp || keyCode == keyW) && (ks[keyUp] || ks[keyW])) {
         // if(SFXOn){
         //   walking.pause();
         //   if(parseInt($("#dylan").css("top")) < 320){
@@ -569,7 +571,7 @@ function move(keyCode) {
           leaveTent1(2);
         }
       }
-      else if (keyCode == keyDown || keyCode == keyS) {
+      else if ((keyCode == keyDown || keyCode == keyS) && (ks[keyDown] || ks[keyS])) {
         // if(SFXOn){
         //   // walking.pause();
         //   // if(parseInt($("#dylan").css("top")) < 320){
@@ -613,7 +615,7 @@ function move(keyCode) {
         }
         
       }
-      else if (keyCode == keyRight || keyCode == keyD) {
+      else if ((keyCode == keyRight || keyCode == keyD) && (ks[keyRight] || ks[keyD])) {
 
         // if(SFXOn){
         //   // walking.play();
@@ -841,6 +843,11 @@ function move(keyCode) {
 
 
       //CHANGE SPEED OF CHARACTER
+      
+      // Check for coin collection
+      if (typeof checkCoinCollection === "function") {
+        checkCoinCollection();
+      }
     };
     var animId = setInterval(intervalFunc, 50); //5 fast //50 normal
     if (typeof WORLD !== "undefined" && WORLD.movement) {
@@ -976,7 +983,128 @@ function moveWood() {
 function openResume(){
   $("#resume").css("display","block")
 }
+// Test mode: set to 'dawn', 'day', 'dusk', or 'night' to force a time state
+// Set to null to use real-world time
+var DAY_CYCLE_TEST_MODE = 'day'; // Change this to test different times: 'dawn', 'day', 'dusk', 'night', or null
+
 function dayCycle() {
+  var timeState = '';
+  var brightness = 1;
+  var overlayOpacity = 0;
+  
+  // Use test mode if set, otherwise use real time
+  if (DAY_CYCLE_TEST_MODE) {
+    // Force test mode
+    timeState = DAY_CYCLE_TEST_MODE;
+  } else {
+    // Get current time
+    var now = new Date();
+    var hour = now.getHours();
+    var minute = now.getMinutes();
+    var timeOfDay = hour + (minute / 60); // Convert to decimal hours for easier comparison
+    
+    // Define time ranges (in decimal hours)
+    // Dawn: 5:00 - 7:00 (5.0 - 7.0)
+    // Day: 7:00 - 18:00 (7.0 - 18.0)
+    // Dusk: 18:00 - 20:00 (18.0 - 20.0)
+    // Night: 20:00 - 5:00 (20.0 - 29.0, wraps to 0.0 - 5.0)
+    
+    if (timeOfDay >= 5.0 && timeOfDay < 7.0) {
+      // Dawn (5 AM - 7 AM)
+      timeState = 'dawn';
+    } else if (timeOfDay >= 7.0 && timeOfDay < 18.0) {
+      // Day (7 AM - 6 PM)
+      timeState = 'day';
+    } else if (timeOfDay >= 18.0 && timeOfDay < 20.0) {
+      // Dusk (6 PM - 8 PM)
+      timeState = 'dusk';
+    } else {
+      // Night (8 PM - 5 AM)
+      timeState = 'night';
+    }
+  }
+  
+  // Set visual properties based on time state
+  switch(timeState) {
+    case 'dawn':
+      brightness = 0.85;
+      overlayOpacity = 0.15;
+      break;
+    case 'day':
+      brightness = 1;
+      overlayOpacity = 0;
+      break;
+    case 'dusk':
+      brightness = 0.7;
+      overlayOpacity = 0.3;
+      break;
+    case 'night':
+      brightness = 0.35;
+      overlayOpacity = 0.7;
+      break;
+  }
+  
+  // Remove any existing time-of-day classes
+  $('body').removeClass('dawn day dusk night');
+  // Add current time state class
+  $('body').addClass(timeState);
+  
+  // Apply brightness filter to the map
+  $('#map').css({
+    'filter': 'brightness(' + brightness + ')',
+    '-webkit-filter': 'brightness(' + brightness + ')'
+  });
+  
+  // Create or update night overlay for darkness effect
+  var $overlay = $('#day-night-overlay');
+  if ($overlay.length === 0) {
+    $overlay = $('<div id="day-night-overlay"></div>');
+    $('body').append($overlay);
+  }
+  
+  $overlay.css({
+    'opacity': overlayOpacity,
+    'transition': 'opacity 2s ease-in-out'
+  });
+  
+  // Add stars for night time
+  if (timeState === 'night') {
+    createStars();
+  } else {
+    removeStars();
+  }
+  
+  // Log current state for debugging
+  console.log('Day/Night Cycle:', timeState, 'Brightness:', brightness, 'Overlay:', overlayOpacity);
+  
+  // Schedule next update (check every minute, or every 5 seconds in test mode)
+  var updateInterval = DAY_CYCLE_TEST_MODE ? 5000 : 60000;
+  setTimeout(dayCycle, updateInterval);
+}
+
+function createStars() {
+  // Remove existing stars if any
+  removeStars();
+  
+  var $starsContainer = $('<div id="stars-container"></div>');
+  $('body').append($starsContainer);
+  
+  // Create 50-100 stars randomly positioned
+  var starCount = 50 + Math.floor(Math.random() * 50);
+  for (var i = 0; i < starCount; i++) {
+    var $star = $('<div class="star"></div>');
+    $star.css({
+      'left': Math.random() * 100 + '%',
+      'top': Math.random() * 100 + '%',
+      'animation-delay': Math.random() * 3 + 's',
+      'opacity': 0.3 + Math.random() * 0.7
+    });
+    $starsContainer.append($star);
+  }
+}
+
+function removeStars() {
+  $('#stars-container').remove();
 }
 function openDoc(location){
   if(inventory.resume || location== 2)
@@ -1441,13 +1569,23 @@ $(document).ready(function() {
       keyPressed = false;
     }
     
-    // Set the key as pressed
+    // Set the key as pressed in both keysPressed objects
     keysPressed[direction] = true;
     keysPressed[37] = false;
     keysPressed[38] = false;
     keysPressed[39] = false;
     keysPressed[40] = false;
     keysPressed[direction] = true;
+    
+    // Also update WORLD.movement.keysPressed if it exists
+    if (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) {
+      WORLD.movement.keysPressed[direction] = true;
+      WORLD.movement.keysPressed[37] = false;
+      WORLD.movement.keysPressed[38] = false;
+      WORLD.movement.keysPressed[39] = false;
+      WORLD.movement.keysPressed[40] = false;
+      WORLD.movement.keysPressed[direction] = true;
+    }
     
     // Call move immediately to turn character and start movement
     move(direction);
@@ -1464,11 +1602,19 @@ $(document).ready(function() {
       keyPressed = false;
     }
     
-    // Clear all direction keys
+    // Clear all direction keys in both keysPressed objects
     keysPressed[37] = false;
     keysPressed[38] = false;
     keysPressed[39] = false;
     keysPressed[40] = false;
+    
+    // Also clear WORLD.movement.keysPressed if it exists
+    if (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) {
+      WORLD.movement.keysPressed[37] = false;
+      WORLD.movement.keysPressed[38] = false;
+      WORLD.movement.keysPressed[39] = false;
+      WORLD.movement.keysPressed[40] = false;
+    }
   }
 
   // Up button

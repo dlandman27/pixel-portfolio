@@ -26,12 +26,14 @@ and open the template in the editor.
     <script type="text/javascript" src="resources/js/world.js"></script>
     <script type="text/javascript" src="resources/js/sprite-manager.js"></script>
     <script type="text/javascript" src="resources/js/config/collisions.js"></script>
+    <script type="text/javascript" src="resources/js/config/coins.js"></script>
     <script type="text/javascript" src="resources/js/collision-engine.js"></script>
     <script type="text/javascript" src="resources/js/cloud-manager.js"></script>
     <script type="text/javascript" src="resources/js/script.js"></script>
     <script type="text/javascript" src="resources/js/inventory.js"></script>
     <script type="text/javascript" src="resources/js/helpers.js"></script>
     <script type="text/javascript" src="resources/js/menu.js"></script>
+    <script type="text/javascript" src="resources/js/unified-panel.js"></script>
     <link
       rel="shortcut icon"
       type="image/x-icon"
@@ -42,9 +44,6 @@ and open the template in the editor.
   <body>
     <!-- Global game menu buttons + sliding panels -->
     <div id="game-menu">
-      <button id="status-menu-toggle" class="nes-btn status-menu-toggle is-dark">
-        <span class="status-menu-icon"></span>
-      </button>
       <button id="game-menu-toggle" class="nes-btn is-primary game-menu-toggle">
     <span class="game-menu-icon">
           <span></span>
@@ -160,47 +159,6 @@ and open the template in the editor.
         </footer>
       </div>
 
-      <div id="status-menu-panel" class="status-menu-panel">
-        <header class="status-menu-header">
-          <p class="status-menu-title">Backpack</p>
-          <p class="status-menu-subtitle">Progress & items</p>
-        </header>
-
-        <ul class="status-list">
-          <li class="status-item status-backpack">
-            <span class="status-item-name">Backpack</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-minimap">
-            <span class="status-item-name">Minimap</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-axe">
-            <span class="status-item-name">Axe</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-wood">
-            <span class="status-item-name">Wood</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-matches">
-            <span class="status-item-name">Matches</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-resume">
-            <span class="status-item-name">Resume</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-fishingRod">
-            <span class="status-item-name">Fishing Rod</span>
-            <span class="status-item-state"></span>
-          </li>
-          <li class="status-item status-fishbook">
-            <span class="status-item-name">Fishing Book</span>
-            <span class="status-item-state"></span>
-          </li>
-        </ul>
-      </div>
     </div>
     <!-- Soccer Start Screen -->
     <section>
@@ -394,16 +352,8 @@ and open the template in the editor.
       <div class="minimap-widget-toggle-hint">Press M to toggle</div>
     </div>
 
-    <!-- Holds The Backpack Icon -->
-    <div id="ui">
-      <a onclick="openInventory()" id="backpack-icon"></a>
-      <div class="inventory-slot axe"></div>
-      <div class="inventory-slot wood"></div>
-      <div class="inventory-slot matches"></div>
-      <div class="inventory-slot minimap"></div>
-      <a onClick="openDoc(1)"><div class="inventory-slot resume"></div></a>
-      <a onClick="goFishing()"><div class="inventory-slot fishingRod"></div></a>
-      <a onClick="openFishbook()"><div class="inventory-slot book"></div></a>
+    <!-- Inventory slots removed - now in unified panel -->
+    <div id="ui" style="display: none;">
     </div>
     <!-- Loading Screen -->
     <div class="loading-screen">

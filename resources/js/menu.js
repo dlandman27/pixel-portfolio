@@ -51,13 +51,20 @@ $(function () {
     });
   }
 
-  // Toggle main nav menu on hamburger click
+  // Toggle unified panel on hamburger click
   $navToggle.click(function (e) {
     e.stopPropagation();
-    if (document.body.classList.contains("game-menu-open")) {
-      closeAllMenus();
+    if (typeof UnifiedPanel !== "undefined" && UnifiedPanel.isOpen()) {
+      UnifiedPanel.close();
+    } else if (typeof UnifiedPanel !== "undefined") {
+      UnifiedPanel.open('home'); // Default to home tab
     } else {
-      openNavMenu();
+      // Fallback to old menu if unified panel not available
+      if (document.body.classList.contains("game-menu-open")) {
+        closeAllMenus();
+      } else {
+        openNavMenu();
+      }
     }
   });
 
@@ -87,7 +94,12 @@ $(function () {
         if (typeof openPortfolio === "function") openPortfolio();
         break;
       case "fishbook":
-        if (typeof openFishbook === "function") openFishbook();
+        // Open unified panel with fishbook tab
+        if (typeof UnifiedPanel !== "undefined") {
+          UnifiedPanel.open('fishbook');
+        } else if (typeof openFishbook === "function") {
+          openFishbook();
+        }
         break;
       case "resume":
         // Use location=2 to bypass in-world resume gate for quick menu
@@ -97,7 +109,12 @@ $(function () {
         if (typeof openTutorial === "function") openTutorial();
         break;
       case "inventory":
-        if (typeof openInventory === "function") openInventory();
+        // Open unified panel with backpack tab
+        if (typeof UnifiedPanel !== "undefined") {
+          UnifiedPanel.open('backpack');
+        } else if (typeof openInventory === "function") {
+          openInventory();
+        }
         break;
       case "map":
         // Center map using WORLD helper if available
@@ -106,7 +123,10 @@ $(function () {
         }
         break;
       case "reset-items":
-        if (typeof resetAllItems === "function") {
+        // Open unified panel with settings tab
+        if (typeof UnifiedPanel !== "undefined") {
+          UnifiedPanel.open('settings');
+        } else if (typeof resetAllItems === "function") {
           // Show confirmation dialog
           if (confirm("Are you sure you want to reset all items? This will clear your progress and reload the page.")) {
             resetAllItems();

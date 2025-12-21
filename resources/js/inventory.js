@@ -41,6 +41,8 @@ let inventory = {
   resume: false,
   fishingRod: false,
   fishbook: false,
+  coins: [], // Array of collected coin IDs
+  coinCount: 0 // Total coins collected
 };
 
 // ----------------------
@@ -305,6 +307,202 @@ function setVariables() {
     $(".fish." + x).css("background-image", FISHREP.getFish(x).getImage());
     FISHREP.collection[x] = true;
   }
+  
+  // Restore collected coins
+  var coinsCookie = getCookie("coins");
+  if (coinsCookie != "") {
+    try {
+      inventory.coins = JSON.parse(coinsCookie);
+      inventory.coinCount = inventory.coins.length;
+    } catch (e) {
+      inventory.coins = [];
+      inventory.coinCount = 0;
+    }
+  }
+  
+  // Initialize coins on the map
+  if (typeof COIN_CONFIG !== "undefined") {
+    initCoins();
+  }
+}
+
+// ----------------------
+// Coin System
+// ----------------------
+function initCoins() {
+  if (typeof COIN_CONFIG === "undefined" || !COIN_CONFIG.coins) {
+    return;
+  }
+  
+  var $map = $("#map");
+  if ($map.length === 0) {
+    return;
+  }
+  
+  // Create coin elements
+  COIN_CONFIG.coins.forEach(function(coin) {
+    // Skip if coin already collected
+    if (inventory.coins.indexOf(coin.id) !== -1) {
+      return;
+    }
+    
+    var $coin = $('<div class="coin-item" data-coin-id="' + coin.id + '">' +
+      '<i class="nes-icon coin is-small"></i>' +
+      '</div>');
+    
+    $coin.css({
+      zIndex: 1000,
+      width: '16px',
+      height: '16px',
+      cursor: 'pointer',
+      position: 'absolute',
+      top: coin.top + 'px',
+      pointerEvents: 'auto',
+      left: coin.left + 'px',
+    });
+    
+    $map.append($coin);
+  });
+}
+
+function checkCoinCollection() {
+  if (typeof COIN_CONFIG === "undefined" || !COIN_CONFIG.coins) {
+    return;
+  }
+  
+  // Get Dylan's position relative to the map container
+  var $dylan = $("#dylan");
+  var $map = $("#map");
+  
+  if ($dylan.length === 0 || $map.length === 0) {
+    return;
+  }
+  
+  // Get Dylan's position (relative to map container)
+  var dylanLeft = parseInt($dylan.css("left")) || 0;
+  var dylanTop = parseInt($dylan.css("top")) || 0;
+  
+  // Dylan is 32px wide, so center is at left + 16
+  var dylanCenterX = dylanLeft + 16;
+  var dylanCenterY = dylanTop + 16;
+  
+  // Check each coin
+  $(".coin-item").each(function() {
+    var $coin = $(this);
+    var coinId = $coin.attr("data-coin-id");
+    
+    // Skip if already collected
+    if (inventory.coins.indexOf(coinId) !== -1) {
+      return;
+    }
+    
+    // Get coin position (absolute within map)
+    var coinLeft = parseInt($coin.css("left")) || 0;
+    var coinTop = parseInt($coin.css("top")) || 0;
+    
+    // Coin center (8px for 16px coin)
+    var coinCenterX = coinLeft + 8;
+    var coinCenterY = coinTop + 8;
+    
+    // Calculate distance between centers
+    var distance = Math.sqrt(
+      Math.pow(dylanCenterX - coinCenterX, 2) + 
+      Math.pow(dylanCenterY - coinCenterY, 2)
+    );
+    
+    // Collection radius: 40px (more forgiving)
+    if (distance < 40) {
+      collectCoin(coinId, $coin);
+    }
+  });
+}
+
+function collectCoin(coinId, $coin) {
+  // Add to inventory
+  if (inventory.coins.indexOf(coinId) === -1) {
+    inventory.coins.push(coinId);
+    inventory.coinCount = inventory.coins.length;
+    
+    // Save to cookie
+    setCookie("coins", JSON.stringify(inventory.coins));
+    
+    // Show collection animation
+    $coin.fadeOut(300, function() {
+      $coin.remove();
+    });
+    
+    // Show notification
+    showCoinCollectedNotification();
+    
+    // Check if all coins collected
+    if (typeof COIN_CONFIG !== "undefined" && 
+        inventory.coinCount >= COIN_CONFIG.totalCoins) {
+      showAllCoinsCollected();
+    }
+  }
+}
+
+function showCoinCollectedNotification() {
+  // Create a simple notification
+  var $notification = $('<div class="coin-notification">Coin Collected! (' + 
+    inventory.coinCount + '/' + 
+    (typeof COIN_CONFIG !== "undefined" ? COIN_CONFIG.totalCoins : '?') + 
+    ')</div>');
+  
+  $notification.css({
+    position: 'fixed',
+    top: '100px',
+    right: '20px',
+    background: '#18403c',
+    border: '2px solid #fff',
+    padding: '0.5rem 1rem',
+    fontFamily: '"Press Start 2P", monospace',
+    fontSize: '0.6rem',
+    color: '#fff',
+    zIndex: 10000000,
+    opacity: 0,
+    transition: 'opacity 0.3s'
+  });
+  
+  $('body').append($notification);
+  
+  setTimeout(function() {
+    $notification.css('opacity', 1);
+  }, 10);
+  
+  setTimeout(function() {
+    $notification.fadeOut(300, function() {
+      $notification.remove();
+    });
+  }, 2000);
+}
+
+function showAllCoinsCollected() {
+  var $notification = $('<div class="coin-notification achievement">🎉 All Coins Collected! 🎉</div>');
+  
+  $notification.css({
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    background: '#18403c',
+    border: '4px solid #fff',
+    padding: '1rem 2rem',
+    fontFamily: '"Press Start 2P", monospace',
+    fontSize: '0.8rem',
+    color: '#fff',
+    zIndex: 10000000,
+    textAlign: 'center',
+    boxShadow: '0 8px 0 #000'
+  });
+  
+  $('body').append($notification);
+  
+  setTimeout(function() {
+    $notification.fadeOut(500, function() {
+      $notification.remove();
+    });
+  }, 3000);
 }
 
 // ----------------------
@@ -313,6 +511,13 @@ function setVariables() {
 var openBag = false;
 
 function openInventory() {
+  // Open unified panel with backpack tab if available
+  if (typeof UnifiedPanel !== "undefined") {
+    UnifiedPanel.open('backpack');
+    return;
+  }
+  
+  // Fallback to old inventory modal if unified panel not available
   var backpackURL = URL.getMisc();
   if (!openBag) {
     $("#backpack-icon").css("opacity", "1");
@@ -880,7 +1085,20 @@ function resetAllItems() {
     resume: false,
     fishingRod: false,
     fishbook: false,
+    coins: [],
+    coinCount: 0
   };
+  
+  // Clear coins cookie
+  setCookie("coins", "");
+  
+  // Remove all coin elements
+  $(".coin-item").remove();
+  
+  // Reinitialize coins
+  if (typeof COIN_CONFIG !== "undefined") {
+    initCoins();
+  }
 
   // Reset fish collection
   FISHREP.collection = {
