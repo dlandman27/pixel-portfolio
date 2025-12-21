@@ -16,8 +16,13 @@ and open the template in the editor.
       crossorigin="anonymous"
     />
     <link
-      href="https://fonts.googleapis.com/css?family=Press+Start+2P"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Press+Start+2P"
+    />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="resources/images/logo icon/dl-logo.png"
     />
     <link href="resources/css/nes.css" rel="stylesheet" />
     <link rel="stylesheet" href="resources/css/style.css" />
@@ -34,11 +39,6 @@ and open the template in the editor.
     <script type="text/javascript" src="resources/js/helpers.js"></script>
     <script type="text/javascript" src="resources/js/menu.js"></script>
     <script type="text/javascript" src="resources/js/unified-panel.js"></script>
-    <link
-      rel="shortcut icon"
-      type="image/x-icon"
-      href="resources/images/logo icon/dl-logo.png"
-    />
   </head>
 
   <body>
@@ -260,6 +260,9 @@ and open the template in the editor.
     <!-- Achievements -->
     <div id="achievement"></div>
 
+    <!-- Unified Panel root (shell is loaded from resources/components/unified-panel.html) -->
+    <div id="unified-panel-root"></div>
+
     <!-- Global tutorial speech bubble (not attached to sprite) -->
     <div
       id="tutorial-bubble"
@@ -353,8 +356,7 @@ and open the template in the editor.
     </div>
 
     <!-- Inventory slots removed - now in unified panel -->
-    <div id="ui" style="display: none;">
-    </div>
+    <div id="ui" style="display: none;"></div>
     <!-- Loading Screen -->
     <div class="loading-screen">
       <div class="loader-grid">

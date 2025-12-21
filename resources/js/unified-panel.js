@@ -1,434 +1,602 @@
 // Unified Panel System - Single tabbed interface for all game features
 // Consolidates: Backpack, Fishbook, Achievements, Games, Settings, etc.
 
-var UnifiedPanel = (function() {
-  var currentTab = 'home';
+var UnifiedPanel = (function () {
+  var currentTab = "home";
   var isOpen = false;
-  
-  // Tab definitions with icons and content
-  var tabs = {
-    home: {
-      name: 'Home',
-      icon: 'home',
-      content: null
-    },
-    backpack: {
-      name: 'Backpack',
-      icon: 'backpack',
-      content: null // Will be populated dynamically
-    },
-    achievements: {
-      name: 'Achievements',
-      icon: 'trophy',
-      content: null
-    },
-    settings: {
-      name: 'Settings',
-      icon: 'settings',
-      content: null
-    }
+  var eventsBound = false;
+
+  // Cache loaded tab templates as DocumentFragments
+  var tabTemplates = {};
+
+  // Simple cache-busting suffix so HTML changes to components always show up
+  // Bump this value whenever component HTML changes.
+  var TEMPLATE_VERSION = "v=3";
+
+  var tabTemplatePaths = {
+    home: "resources/components/unified-panel-home.html?" + TEMPLATE_VERSION,
+    backpack:
+      "resources/components/unified-panel-backpack.html?" + TEMPLATE_VERSION,
+    fishbook:
+      "resources/components/unified-panel-fishbook.html?" + TEMPLATE_VERSION,
+    achievements:
+      "resources/components/unified-panel-achievements.html?" +
+      TEMPLATE_VERSION,
+    games: "resources/components/unified-panel-games.html?" + TEMPLATE_VERSION,
+    settings:
+      "resources/components/unified-panel-settings.html?" + TEMPLATE_VERSION,
   };
-  
+
+  var tabs = {
+    home: { name: "Home" },
+    backpack: { name: "Backpack" },
+    fishbook: { name: "Fishbook" },
+    achievements: { name: "Achievements" },
+    games: { name: "Games" },
+    settings: { name: "Settings" },
+  };
+
   /**
-   * Initialize the unified panel
+   * Ensure the unified panel shell HTML exists in the DOM.
+   * Loads it from resources/components/unified-panel.html on first use.
+   */
+  function ensurePanelShell(onReady) {
+    var $existing = $("#unified-panel");
+    if ($existing.length) {
+      if (typeof onReady === "function") {
+        onReady($existing);
+      }
+      return;
+    }
+
+    var root = document.getElementById("unified-panel-root");
+    if (!root) {
+      console.error("Unified panel root element #unified-panel-root not found");
+      return;
+    }
+
+    $.get("resources/components/unified-panel.html?" + TEMPLATE_VERSION)
+      .done(function (markup) {
+        // Parse the static HTML into DOM nodes without building strings here
+        var temp = document.createElement("div");
+        temp.innerHTML = markup;
+
+        while (temp.firstChild) {
+          root.appendChild(temp.firstChild);
+        }
+
+        var $panel = $("#unified-panel");
+        if (!$panel.length) {
+          console.error("Unified panel shell failed to load");
+          return;
+        }
+
+        setupEventListeners();
+        if (typeof onReady === "function") {
+          onReady($panel);
+        }
+      })
+      .fail(function (err) {
+        console.error("Failed to load unified panel shell", err);
+      });
+  }
+
+  /**
+   * Initialize the unified panel.
+   * Called once on DOM ready.
    */
   function init() {
-    createPanel();
-    setupEventListeners();
-    loadTabContent('backpack');
-  }
-  
-  /**
-   * Create the panel HTML structure
-   */
-  function createPanel() {
-    // Remove existing panel if it exists
-    $('#unified-panel').remove();
-    
-    var $panel = $('<div id="unified-panel" class="unified-panel"></div>');
-    var $overlay = $('<div class="unified-panel-overlay"></div>');
-    var $tabsRow = $('<div class="unified-panel-tabs-row"></div>');
-    var $container = $('<div class="unified-panel-container"></div>');
-    var $content = $('<div class="unified-panel-content"></div>');
-    var $closeBtn = $('<button class="unified-panel-close nes-btn is-error" type="button">×</button>');
-    
-    // Attach close handler directly to button (using .click() for older jQuery)
-    $closeBtn.click(function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      console.log('Close button clicked');
-      // Force close directly using the close function
-      close();
-      return false;
+    ensurePanelShell(function () {
+      // Default to home on first load
+      updateActiveTab("home");
+      loadTabContent("home");
     });
-    
-    // Create tabs
-    for (var tabKey in tabs) {
-      var tab = tabs[tabKey];
-      var $tab = $('<button class="unified-panel-tab" data-tab="' + tabKey + '" title="' + tab.name + '" type="button">' +
-        '<span class="tab-icon nes-avatar"></span>' +
-        '</button>');
-      $tabsRow.append($tab);
-    }
-    
-    // Add close button to tabs row
-    $tabsRow.append($closeBtn);
-    
-    $container.append($content);
-    $panel.append($overlay);
-    $panel.append($tabsRow);
-    $panel.append($container);
-    
-    $('body').append($panel);
-    
-    // Set initial active tab
-    updateActiveTab('home');
   }
-  
+
   /**
-   * Setup event listeners
+   * Setup event listeners (bound once).
    */
   function setupEventListeners() {
-    // Close button - use event delegation with .live() for older jQuery
-    $('.unified-panel-close').live('click', function(e) {
+    if (eventsBound) return;
+    eventsBound = true;
+
+    // Close button - use .live for older jQuery support
+    $(".unified-panel-close").live("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      e.stopImmediatePropagation();
       close();
       return false;
     });
-    
+
     // Overlay click
-    $('.unified-panel-overlay').live('click', function(e) {
+    $(".unified-panel-overlay").live("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
       close();
       return false;
     });
-    
+
     // Tab clicks
-    $('.unified-panel-tab').live('click', function(e) {
+    $(".unified-panel-tab").live("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      var tabKey = $(this).attr('data-tab');
+      var tabKey = $(this).attr("data-tab");
       switchTab(tabKey);
       return false;
     });
-    
-    // ESC key to close
-    $(document).keydown(function(e) {
-      if (e.keyCode === 27 && isOpen) { // ESC key
-        e.preventDefault();
-        close();
-        return false;
-      }
-    });
-    
+
     // Prevent clicks inside container from closing
-    $('.unified-panel-container').live('click', function(e) {
+    $(".unified-panel-container").live("click", function (e) {
       e.stopPropagation();
     });
+
+    // ESC key to close
+    $(document).keydown(function (e) {
+      if (e.keyCode === 27 && isOpen) {
+        e.preventDefault();
+        close();
+      }
+    });
   }
-  
+
   /**
    * Open the panel
    */
   function open(tabKey) {
-    // Ensure panel exists
-    var $panel = $('#unified-panel');
-    if ($panel.length === 0) {
-      console.log('Panel not found, initializing...');
-      init();
-      $panel = $('#unified-panel');
-    }
-    
-    if ($panel.length) {
-      if (tabKey) {
-        switchTab(tabKey);
-      } else {
-        // Default to home if no tab specified
-        switchTab('home');
+    ensurePanelShell(function () {
+      var $panel = $("#unified-panel");
+      if (!$panel.length) {
+        console.error("Unified panel element not found after shell init");
+        return;
       }
-      $panel.addClass('active');
-      $('body').addClass('unified-panel-open');
+
+      var targetTab = tabKey || "home";
+      switchTab(targetTab);
+
+      $panel.addClass("active").attr("aria-hidden", "false");
+      $("body").addClass("unified-panel-open");
       isOpen = true;
-    } else {
-      console.error('Failed to create panel!');
-    }
+    });
   }
-  
+
   /**
    * Close the panel
    */
   function close() {
-    console.log('Closing unified panel');
-    var $panel = $('#unified-panel');
-    
-    if ($panel.length === 0) {
-      console.warn('Panel element not found, but continuing to close anyway');
-      // Still try to remove classes from body
-      $('body').removeClass('unified-panel-open');
+    var $panel = $("#unified-panel");
+
+    if (!$panel.length) {
+      $("body").removeClass("unified-panel-open");
       isOpen = false;
       return;
     }
-    
-    $panel.removeClass('active');
-    $('body').removeClass('unified-panel-open');
+
+    $panel.removeClass("active").attr("aria-hidden", "true");
+    $("body").removeClass("unified-panel-open");
     isOpen = false;
-    console.log('Panel closed successfully');
   }
-  
+
   /**
    * Switch to a different tab
    */
   function switchTab(tabKey) {
     if (!tabs[tabKey]) {
-      console.warn('Tab not found:', tabKey);
+      console.warn("UnifiedPanel: Tab not found:", tabKey);
       return;
     }
-    
+
     currentTab = tabKey;
     updateActiveTab(tabKey);
     loadTabContent(tabKey);
   }
-  
+
   /**
-   * Update active tab styling
+   * Update active tab styling and ARIA attributes
    */
   function updateActiveTab(tabKey) {
-    $('.unified-panel-tab').removeClass('active');
-    $('.unified-panel-tab[data-tab="' + tabKey + '"]').addClass('active');
-  }
-  
-  /**
-   * Load content for a specific tab
-   */
-  function loadTabContent(tabKey) {
-    var $content = $('.unified-panel-content');
-    $content.empty();
-    
-    switch(tabKey) {
-      case 'home':
-        loadHomeContent($content);
-        break;
-      case 'backpack':
-        loadBackpackContent($content);
-        break;
-      case 'fishbook':
-        loadFishbookContent($content);
-        break;
-      case 'achievements':
-        loadAchievementsContent($content);
-        break;
-      case 'games':
-        loadGamesContent($content);
-        break;
-      case 'settings':
-        loadSettingsContent($content);
-        break;
+    var $tabs = $(".unified-panel-tab");
+    $tabs.removeClass("active").attr("aria-selected", "false");
+
+    var $active = $('.unified-panel-tab[data-tab="' + tabKey + '"]');
+    $active.addClass("active").attr("aria-selected", "true");
+
+    var $tabpanel = $("#unified-panel-tabpanel");
+    if ($tabpanel.length && $active.length) {
+      var id = $active.attr("id");
+      if (id) {
+        $tabpanel.attr("aria-labelledby", id);
+      }
     }
   }
-  
+
   /**
-   * Load home/intro content
+   * Load the static HTML partial for a tab as a DocumentFragment.
    */
-  function loadHomeContent($container) {
-    var $wrapper = $('<div class="tab-content-wrapper home-content"></div>');
-    
-    var $intro = $('<div class="home-intro"></div>');
-    var $greeting = $('<h1 class="home-greeting">Hello!</h1>');
-    var $name = $('<h2 class="home-name">My name is Dylan Landman</h2>');
-    var coinCount = (typeof inventory !== "undefined" && inventory.coinCount) ? inventory.coinCount : 0;
-    var totalCoins = (typeof COIN_CONFIG !== "undefined" && COIN_CONFIG.totalCoins) ? COIN_CONFIG.totalCoins : 0;
-    
-    var $description = $('<p class="home-description">' +
-      'Welcome to my pixel portfolio! Explore the map, collect items, play games, ' +
-      'and discover my projects. Use the tabs above to navigate through different sections. ' +
-      'Enjoy your visit!' +
-      '</p>');
-    
-    var $coinProgress = $('<div class="coin-progress"></div>');
-    $coinProgress.append('<p class="coin-progress-title">💰 Coins Collected</p>');
-    $coinProgress.append('<p class="coin-progress-count">' + coinCount + ' / ' + totalCoins + '</p>');
-    
-    if (coinCount >= totalCoins && totalCoins > 0) {
-      $coinProgress.append('<p class="coin-complete">🎉 All coins found!</p>');
-    }
-    
-    $intro.append($greeting);
-    $intro.append($name);
-    $intro.append($description);
-    $intro.append($coinProgress);
-    $wrapper.append($intro);
-    
-    $container.append($wrapper);
-  }
-  
-  /**
-   * Load backpack/inventory content
-   */
-  function loadBackpackContent($container) {
-    if (typeof inventory === 'undefined') {
-      $container.html('<p>Inventory not available</p>');
+  function getTabTemplate(tabKey, callback) {
+    if (!tabTemplatePaths[tabKey]) {
+      console.warn("UnifiedPanel: No template path configured for tab", tabKey);
+      callback(null);
       return;
     }
-    
-    var $wrapper = $('<div class="tab-content-wrapper backpack-content"></div>');
-    var $title = $('<h2 class="tab-content-title">Inventory</h2>');
-    $wrapper.append($title);
-    
-    var items = [
-      { key: 'backpack', name: 'Backpack', icon: 'backpack-icon.png' },
-      { key: 'axe', name: 'Axe', icon: 'axe-icon-found.png' },
-      { key: 'wood', name: 'Wood', icon: 'wood-icon-found.png' },
-      { key: 'matchbox', name: 'Matches', icon: 'matchbox-icon-found.png' },
-      { key: 'minimap', name: 'Map', icon: 'map-icon-found.png' },
-      { key: 'resume', name: 'Resume', icon: 'resume-icon-found.png' },
-      { key: 'fishingRod', name: 'Fishing Rod', icon: 'fishing-rod-found.png' },
-      { key: 'fishbook', name: 'Fishbook', icon: 'fishbook-icon-found.png' }
-    ];
-    
-    var $grid = $('<div class="inventory-grid"></div>');
-    
-    items.forEach(function(item) {
-      var hasItem = !!inventory[item.key];
-      var $item = $('<div class="inventory-item ' + (hasItem ? 'owned' : 'missing') + '">' +
-        '<div class="inventory-item-icon"></div>' +
-        '<div class="inventory-item-name">' + item.name + '</div>' +
-        `<a href="#" class="nes-badge">
-            <span class="is-success is-icon">FOUND</span>
-            </a>` +
-        '<div class="inventory-item-status">' + (hasItem ? '✓ Owned' : '✗ Missing') + '</div>' +
-        '</div>');
-      
-      if (hasItem) {
-        $item.find('.inventory-item-icon').css({
-          'background-image': 'url(resources/images/misc/' + item.icon + ')',
-          'background-size': 'contain',
-          'background-repeat': 'no-repeat',
-          'background-position': 'center',
-          'width': '64px',
-          'height': '64px'
-        });
-      }
-      
-      $grid.append($item);
-    });
-    
-    $wrapper.append($grid);
-    $container.append($wrapper);
-  }
-  
-  /**
-   * Load fishbook content
-   */
-  function loadFishbookContent($container) {
-    var $wrapper = $('<div class="tab-content-wrapper fishbook-content"></div>');
-    
-    if (typeof openFishbook === 'function') {
-      // Use existing fishbook modal content if available
-      // For now, create a placeholder
-      $wrapper.html('<h2 class="tab-content-title">Fish Collection</h2><p>Fishbook content will go here</p>');
-    } else {
-      $wrapper.html('<h2 class="tab-content-title">Fish Collection</h2><p>Fishbook not available</p>');
+
+    if (tabTemplates[tabKey]) {
+      // Clone existing fragment so each render gets fresh nodes
+      var clone = tabTemplates[tabKey].cloneNode(true);
+      callback(clone);
+      return;
     }
-    
-    $container.append($wrapper);
+
+    $.get(tabTemplatePaths[tabKey])
+      .done(function (markup) {
+        var temp = document.createElement("div");
+        temp.innerHTML = markup;
+
+        var fragment = document.createDocumentFragment();
+        while (temp.firstChild) {
+          fragment.appendChild(temp.firstChild);
+        }
+
+        tabTemplates[tabKey] = fragment;
+
+        var clone = fragment.cloneNode(true);
+        callback(clone);
+      })
+      .fail(function (err) {
+        console.error("UnifiedPanel: Failed to load tab template", tabKey, err);
+        callback(null);
+      });
   }
-  
+
   /**
-   * Load achievements content
+   * Load content for a specific tab
+   * Always ensures the shell exists before trying to render.
    */
-  function loadAchievementsContent($container) {
-    var $wrapper = $('<div class="tab-content-wrapper achievements-content"></div>');
-    var $title = $('<h2 class="tab-content-title">Achievements & Challenges</h2>');
-    $wrapper.append($title);
-    
-    // Placeholder for now - will be populated with actual achievements
-    var $list = $('<div class="achievements-list"></div>');
-    $list.html('<p>Achievement system coming soon!</p>');
-    $wrapper.append($list);
-    
-    $container.append($wrapper);
+  function loadTabContent(tabKey) {
+    ensurePanelShell(function () {
+      var contentEl =
+        document.getElementById("unified-panel-tabpanel") ||
+        document.querySelector(".unified-panel-content");
+
+      // If the shell loaded without a content container for some reason,
+      // create one programmatically so tabs always have somewhere to render.
+      if (!contentEl) {
+        var panelEl = document.getElementById("unified-panel");
+        if (!panelEl) {
+          console.error("UnifiedPanel: panel element not found");
+          return;
+        }
+
+        var container = document.createElement("div");
+        container.className = "unified-panel-container";
+
+        contentEl = document.createElement("div");
+        contentEl.className = "unified-panel-content";
+        contentEl.id = "unified-panel-tabpanel";
+        contentEl.setAttribute("role", "tabpanel");
+
+        container.appendChild(contentEl);
+        panelEl.appendChild(container);
+      }
+
+      var $content = $(contentEl);
+      $content.empty();
+
+      getTabTemplate(tabKey, function (fragment) {
+        if (!fragment) return;
+
+        // Only render if this is still the active tab
+        if (tabKey !== currentTab) return;
+
+        $content.append(fragment);
+        hydrateTab(tabKey, contentEl);
+      });
+    });
   }
-  
+
   /**
-   * Load games content
+   * Attach dynamic behavior and state to a rendered tab.
    */
-  function loadGamesContent($container) {
-    var $wrapper = $('<div class="tab-content-wrapper games-content"></div>');
-    var $title = $('<h2 class="tab-content-title">Games</h2>');
-    $wrapper.append($title);
-    
-    var $gamesList = $('<div class="games-list"></div>');
-    
-    // Fishing game
-    var $fishingBtn = $('<button class="nes-btn is-primary game-button">' +
-      '<span class="game-icon">🎣</span>' +
-      '<span class="game-name">Fishing</span>' +
-      '</button>');
-    $fishingBtn.click(function() {
-      if (typeof goFishing === 'function') {
+  function hydrateTab(tabKey, rootEl) {
+    switch (tabKey) {
+      case "home":
+        hydrateHomeTab(rootEl);
+        break;
+      case "backpack":
+        hydrateBackpackTab(rootEl);
+        break;
+      case "fishbook":
+        hydrateFishbookTab(rootEl);
+        break;
+      case "achievements":
+        hydrateAchievementsTab(rootEl);
+        break;
+      case "games":
+        hydrateGamesTab(rootEl);
+        break;
+      case "settings":
+        hydrateSettingsTab(rootEl);
+        break;
+    }
+  }
+
+  function hydrateHomeTab(rootEl) {
+    var coinCount =
+      typeof inventory !== "undefined" && inventory && inventory.coinCount
+        ? inventory.coinCount
+        : 0;
+    var totalCoins =
+      typeof COIN_CONFIG !== "undefined" && COIN_CONFIG && COIN_CONFIG.totalCoins
+        ? COIN_CONFIG.totalCoins
+        : 0;
+
+    var countEl = rootEl.querySelector('[data-role="coin-count"]');
+    if (countEl) {
+      countEl.textContent = coinCount + " / " + totalCoins;
+    }
+
+    var completeEl = rootEl.querySelector('[data-role="coin-complete"]');
+    if (completeEl) {
+      var showComplete = totalCoins > 0 && coinCount >= totalCoins;
+      completeEl.style.display = showComplete ? "block" : "none";
+    }
+  }
+
+  function hydrateBackpackTab(rootEl) {
+    if (typeof inventory === "undefined") {
+      rootEl.textContent = "Inventory not available";
+      return;
+    }
+
+    var items = rootEl.querySelectorAll(".inventory-item");
+
+    var detailRoot = rootEl.querySelector('[data-role="item-detail"]');
+    var detailImage = detailRoot
+      ? detailRoot.querySelector('[data-role="detail-image"]')
+      : null;
+    var detailTitle = detailRoot
+      ? detailRoot.querySelector('[data-role="detail-title"]')
+      : null;
+    var detailDescription = detailRoot
+      ? detailRoot.querySelector('[data-role="detail-description"]')
+      : null;
+    var detailStatus = detailRoot
+      ? detailRoot.querySelector('[data-role="detail-status"]')
+      : null;
+
+    function selectItem(itemEl) {
+      if (!detailRoot || !itemEl) return;
+
+      // Clear previous selection
+      for (var j = 0; j < items.length; j++) {
+        items[j].classList.remove("selected");
+      }
+      itemEl.classList.add("selected");
+
+      var title =
+        itemEl.getAttribute("data-item-title") ||
+        itemEl.querySelector(".inventory-item-name").textContent;
+      var description =
+        itemEl.getAttribute("data-item-description") || "";
+      var statusTextEl = itemEl.querySelector(".inventory-item-status");
+
+      if (detailTitle) {
+        detailTitle.textContent = title;
+      }
+      if (detailDescription) {
+        detailDescription.textContent = description;
+      }
+      if (detailStatus && statusTextEl) {
+        detailStatus.textContent = statusTextEl.textContent;
+      }
+
+      if (detailImage) {
+        var iconEl = itemEl.querySelector(".inventory-item-icon");
+        var bg = iconEl
+          ? iconEl.style.backgroundImage || ""
+          : "";
+        detailImage.style.backgroundImage = bg;
+      }
+    }
+
+    for (var i = 0; i < items.length; i++) {
+      var itemEl = items[i];
+      var key = itemEl.getAttribute("data-item-key");
+      var icon = itemEl.getAttribute("data-icon");
+
+      var hasItem = !!(inventory && key && inventory[key]);
+
+      itemEl.classList.remove("owned", "missing");
+      itemEl.classList.add(hasItem ? "owned" : "missing");
+
+      var statusEl = itemEl.querySelector(".inventory-item-status");
+      if (statusEl) {
+        statusEl.textContent = hasItem ? "✓ Owned" : "✗ Missing";
+      }
+
+      var badgeEl = itemEl.querySelector(".inventory-item-badge");
+      if (badgeEl) {
+        badgeEl.style.display = hasItem ? "inline-block" : "none";
+      }
+
+      var iconEl = itemEl.querySelector(".inventory-item-icon");
+      if (iconEl && hasItem && icon) {
+        iconEl.style.backgroundImage =
+          "url(resources/images/misc/" + icon + ")";
+        iconEl.style.backgroundSize = "contain";
+        iconEl.style.backgroundRepeat = "no-repeat";
+        iconEl.style.backgroundPosition = "center";
+        iconEl.style.width = "64px";
+        iconEl.style.height = "64px";
+      }
+
+      // Bind selection handler
+      itemEl.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        selectItem(this);
+      });
+    }
+
+    // Auto-select first owned item, or first item if none owned
+    if (items.length && detailRoot) {
+      var firstOwned = rootEl.querySelector(".inventory-item.owned");
+      selectItem(firstOwned || items[0]);
+    }
+  }
+
+  function hydrateFishbookTab(rootEl) {
+    var btn = rootEl.querySelector('[data-role="open-fishbook-modal"]');
+    if (!btn) return;
+
+    btn.addEventListener("click", function () {
+      if (typeof openFishbook === "function") {
         close();
-        goFishing();
+        openFishbook();
       }
     });
-    
-    // Soccer game
-    var $soccerBtn = $('<button class="nes-btn is-primary game-button">' +
-      '<span class="game-icon">⚽</span>' +
-      '<span class="game-name">Soccer</span>' +
-      '</button>');
-    $soccerBtn.click(function() {
-      if (typeof choosePlayers === 'function') {
-        close();
-        choosePlayers();
-      }
-    });
-    
-    $gamesList.append($fishingBtn);
-    $gamesList.append($soccerBtn);
-    $wrapper.append($gamesList);
-    $container.append($wrapper);
   }
-  
-  /**
-   * Load settings content
-   */
-  function loadSettingsContent($container) {
-    var $wrapper = $('<div class="tab-content-wrapper settings-content"></div>');
-    var $title = $('<h2 class="tab-content-title">Settings</h2>');
-    $wrapper.append($title);
-    
-    var $settingsList = $('<div class="settings-list"></div>');
-    
-    // Reset items button
-    var $resetBtn = $('<button class="nes-btn is-error settings-button">Reset All Items</button>');
-    $resetBtn.click(function() {
-      if (confirm('Are you sure you want to reset all items? This will clear your progress and reload the page.')) {
-        if (typeof resetAllItems === 'function') {
+
+  function hydrateGamesTab(rootEl) {
+    var fishingBtn = rootEl.querySelector('[data-role="launch-fishing"]');
+    if (fishingBtn) {
+      fishingBtn.addEventListener("click", function () {
+        if (typeof goFishing === "function") {
+          close();
+          goFishing();
+        }
+      });
+    }
+
+    var soccerBtn = rootEl.querySelector('[data-role="launch-soccer"]');
+    if (soccerBtn) {
+      soccerBtn.addEventListener("click", function () {
+        if (typeof choosePlayers === "function") {
+          close();
+          choosePlayers();
+        }
+      });
+    }
+
+    // Populate high scores if available
+    var scoreEls = rootEl.querySelectorAll('[data-role="game-score"]');
+    for (var i = 0; i < scoreEls.length; i++) {
+      var el = scoreEls[i];
+      var game = el.getAttribute("data-game");
+      if (!game) continue;
+
+      if (game === "soccer") {
+        var val = 0;
+        if (typeof getCookie === "function") {
+          var cookieVal = getCookie("soccer-high-score");
+          if (cookieVal !== "") {
+            var parsed = parseInt(cookieVal, 10);
+            if (!isNaN(parsed)) {
+              val = parsed;
+            }
+          }
+        }
+        el.textContent = val;
+      } else if (game === "fishing") {
+        // No explicit high score yet; show dash by default.
+        el.textContent = "—";
+      }
+    }
+  }
+
+  function hydrateAchievementsTab(rootEl) {
+    var metrics = rootEl.querySelectorAll(".achievement-metric");
+    if (!metrics.length) return;
+
+    var totalCoins =
+      typeof COIN_CONFIG !== "undefined" && COIN_CONFIG && COIN_CONFIG.totalCoins
+        ? COIN_CONFIG.totalCoins
+        : 0;
+    var coinCount =
+      typeof inventory !== "undefined" && inventory && inventory.coinCount
+        ? inventory.coinCount
+        : 0;
+
+    var fishCollection =
+      typeof FISHREP !== "undefined" && FISHREP && FISHREP.collection
+        ? FISHREP.collection
+        : null;
+    var totalFish = fishCollection ? Object.keys(fishCollection).length : 0;
+    var caughtFish = fishCollection
+      ? Object.values(fishCollection).filter(function (x) {
+          return !!x;
+        }).length
+      : 0;
+
+    var itemKeys = ["backpack", "minimap", "resume", "fishingRod", "fishbook"];
+    var ownedItems = 0;
+    var totalItems = itemKeys.length;
+    if (typeof inventory !== "undefined" && inventory) {
+      for (var i = 0; i < itemKeys.length; i++) {
+        if (inventory[itemKeys[i]]) {
+          ownedItems++;
+        }
+      }
+    }
+
+    function applyMetric(metricEl, current, max) {
+      var summaryEl = metricEl.querySelector('[data-role="metric-summary"]');
+      var barEl = metricEl.querySelector('[data-role="metric-bar"]');
+      max = max || 0;
+
+      if (summaryEl) {
+        summaryEl.textContent = max > 0 ? current + " / " + max : "" + current;
+      }
+
+      if (barEl) {
+        var pct = max > 0 ? Math.min(100, (current / max) * 100) : 0;
+        barEl.style.width = pct + "%";
+      }
+    }
+
+    for (var idx = 0; idx < metrics.length; idx++) {
+      var metric = metrics[idx];
+      var type = metric.getAttribute("data-metric");
+      if (type === "coins") {
+        applyMetric(metric, coinCount, totalCoins);
+      } else if (type === "fish") {
+        applyMetric(metric, caughtFish, totalFish);
+      } else if (type === "items") {
+        applyMetric(metric, ownedItems, totalItems);
+      }
+    }
+  }
+
+  function hydrateSettingsTab(rootEl) {
+    var resetBtn = rootEl.querySelector('[data-role="reset-items"]');
+    if (!resetBtn) return;
+
+    resetBtn.addEventListener("click", function () {
+      if (
+        window.confirm(
+          "Are you sure you want to reset all items? This will clear your progress and reload the page."
+        )
+      ) {
+        if (typeof resetAllItems === "function") {
           resetAllItems();
         }
       }
     });
-    
-    $settingsList.append($resetBtn);
-    $wrapper.append($settingsList);
-    $container.append($wrapper);
   }
-  
+
   return {
     init: init,
     open: open,
     close: close,
     switchTab: switchTab,
-    isOpen: function() { return isOpen; }
+    isOpen: function () {
+      return isOpen;
+    },
   };
 })();
 
 // Initialize when DOM is ready
-$(function() {
+$(function () {
   UnifiedPanel.init();
 });
+
 

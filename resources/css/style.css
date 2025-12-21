@@ -4291,34 +4291,44 @@ body.day {
 }
 
 .unified-panel-tabs-row {
-  top: 18px;
-  right: 5%;
-  z-index: 3;
-  gap: 0.25rem;
-  display: flex;
-  flex-wrap: nowrap;
   position: absolute;
+  inset: 0 auto auto 50%;
+  transform: translateX(-50%);
+  top: 5%;
+  z-index: 3;
+  display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
   background: transparent;
 }
 
 .unified-panel-container {
+  position: absolute;
   top: 50%;
   left: 50%;
   width: 90%;
-  z-index: 2;
-  height: 85vh;
-  display: flex;
-  overflow: hidden;
   max-width: 1200px;
-  max-height: 900px;
-  position: absolute;
-  background: #102d2a;
-  border: 4px solid #fff;
+  height: 78vh;
+  max-height: 820px;
+  z-index: 2;
+  display: flex;
   flex-direction: column;
+  overflow: hidden;
+  padding: 0.75rem 0.75rem 1rem;
+  /* NES-style wood frame */
+  background-color: #6b4226;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #7b4f2f 0,
+    #7b4f2f 12px,
+    #6b4226 12px,
+    #6b4226 24px
+  );
+  border: 4px solid #f5d6a1;
   transform: translate(-50%, -50%);
-  box-shadow: 0 8px 0 #000, 0 0 0 4px #000;
+  box-shadow: 0 10px 0 #000, 0 0 0 4px #000;
 }
 
 .unified-panel-close {
@@ -4356,10 +4366,14 @@ body.day {
   align-items: center;
 }
 
+.unified-panel-close {
+  margin-left: 0.5rem;
+}
+
 .unified-panel-tab {
   padding: 0;
   width: 50px;
-  color: #fff;
+  color: #fef3c7;
   height: 50px;
   display: flex;
   cursor: pointer;
@@ -4367,10 +4381,10 @@ body.day {
   box-shadow: none;
   position: relative;
   align-items: center;
-  background: #374151;
+  background: #8b5a2b;
   transition: borderWidth 0.2s;
   justify-content: center;
-  border: 2px solid #9ca3af;
+  border: 2px solid #f5d6a1;
   /* border-bottom-width: 0; */
   font-family: "Press Start 2P", monospace;
 }
@@ -4391,64 +4405,70 @@ body.day {
 }
 
 .unified-panel-tab:hover:not(.active) {
-  background: #4b5563;
+  background: #a0642f;
   /* transform: translateY(-2px); */
   border-bottom-width: 4px;
 }
 
 .unified-panel-tab.active {
-  background: #0a1f1d;
-  border-color: #fff;
+  background: #f5d6a1;
+  color: #1f2933;
+  border-color: #fef3c7;
   border-width: 2px;
   border-bottom-width: 0;
-  box-shadow: 0 8px 0 #0a1f1d, inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 0 #6b4226, inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .unified-panel-tab .tab-icon {
   width: 28px;
   height: 28px;
-  display: inline-block;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  filter: brightness(0.9);
-  image-rendering: pixelated;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.unified-panel-tab.active .tab-icon {
-  filter: brightness(1.2);
-}
-
-.unified-panel-tab[data-tab="home"] .tab-icon {
-  background-image: url("../images/misc/backpack-icon.png"); /* Placeholder - replace with home icon */
-  filter: brightness(1.2);
-}
-
-.unified-panel-tab[data-tab="backpack"] .tab-icon {
-  background-image: url("../images/misc/backpack-icon.png");
-}
-
-.unified-panel-tab[data-tab="fishbook"] .tab-icon {
-  background-image: url("../images/misc/fishbook-icon-found.png");
-}
-
-.unified-panel-tab[data-tab="achievements"] .tab-icon {
-  background-image: url("../images/misc/resume-icon-found.png"); /* Placeholder */
-}
-
-.unified-panel-tab[data-tab="games"] .tab-icon {
-  background-image: url("../images/misc/map-icon-found.png"); /* Placeholder */
-}
-
-.unified-panel-tab[data-tab="settings"] .tab-icon {
-  background-image: url("../images/misc/settings_bar.png");
+.unified-panel-tab svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
 }
 
 .unified-panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
-  background: #0a1f1d;
+  padding: 1.5rem 1.75rem 2rem;
+  background: radial-gradient(circle at top left, #1f2933 0, #0a0f13 55%, #05070a 100%);
+  border: 4px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226;
+}
+
+@media (max-width: 900px) {
+  .unified-panel-tabs-row {
+    top: 12px;
+  }
+
+  .unified-panel-container {
+    width: 96%;
+    height: 85vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .unified-panel-tabs-row {
+    top: 8px;
+    transform: translateX(-50%) scale(0.85);
+  }
+
+  .unified-panel-container {
+    top: 54%;
+    width: 96%;
+    height: 88vh;
+    max-height: none;
+  }
+
+  .unified-panel-content {
+    padding: 1rem 1rem 1.5rem;
+  }
 }
 
 .tab-content-wrapper {
@@ -4465,29 +4485,97 @@ body.day {
 }
 
 /* Backpack/Inventory Content */
-.inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  padding: 1rem 0;
+.backpack-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+  flex: 1;
+}
+
+.backpack-detail {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.backpack-detail-image {
+  width: 96px;
+  height: 96px;
+  border: 3px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226, 0 6px 0 #000;
+  background-color: #111827;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.backpack-detail-text {
+  flex: 1;
+}
+
+.backpack-detail-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8rem;
+  color: #fef3c7;
+  margin: 0 0 0.5rem 0;
+}
+
+.backpack-detail-description {
+  font-size: 0.6rem;
+  color: #e5e7eb;
+  line-height: 1.6;
+  margin: 0 0 0.35rem 0;
+}
+
+.backpack-detail-status {
+  font-size: 0.6rem;
+  color: #9bd4d7;
+  margin: 0;
+}
+
+.backpack-strip-wrapper {
+  margin-top: auto; /* push strip to bottom of layout */
+}
+
+.inventory-strip {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem 0.25rem 0.25rem;
+  overflow-x: auto;
+}
+
+.inventory-strip::-webkit-scrollbar {
+  height: 8px;
+}
+
+.inventory-strip::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+.inventory-strip::-webkit-scrollbar-thumb {
+  background: #4b5563;
 }
 
 .inventory-item {
-  background: #18403c;
-  border: 2px solid #fff;
-  padding: 1rem;
+  background: #3b2414;
+  border: 2px solid #f5d6a1;
+  padding: 0.75rem;
   text-align: center;
   transition: all 0.2s;
+  box-shadow: inset 0 0 0 2px #6b4226;
+  min-width: 110px;
 }
 
 .inventory-item.owned {
-  border-color: #4ade80;
-  box-shadow: 0 4px 0 #22c55e;
+  border-color: #facc6b;
+  box-shadow: 0 4px 0 #b45309;
 }
 
 .inventory-item.missing {
-  border-color: #6b7280;
-  opacity: 0.6;
+  border-color: #4b5563;
+  opacity: 0.55;
 }
 
 .inventory-item-icon {
@@ -4649,6 +4737,200 @@ body.day {
 /* Achievements Content */
 .achievements-list {
   padding: 1rem 0;
+}
+
+/* Shared tab headers */
+.tab-header-with-subtitle {
+  margin-bottom: 1rem;
+}
+
+.tab-header-with-subtitle .tab-content-title {
+  margin-bottom: 0.5rem;
+}
+
+.tab-subtitle {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  color: #fef3c7;
+  opacity: 0.9;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Home split layout */
+.home-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-scene {
+  flex: 0 0 260px;
+  max-width: 260px;
+}
+
+.home-scene-inner {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, #f97316 0, #b91c1c 40%, #1f2933 100%);
+  box-shadow: 0 0 0 4px #f5d6a1, 0 0 0 8px #6b4226, 0 10px 0 #000;
+  overflow: hidden;
+}
+
+.home-scene-ring {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+}
+
+.home-scene-ground {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 14%;
+  height: 26%;
+  background: radial-gradient(circle at 50% 0, #facc6b 0, #92400e 60%);
+  box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.35);
+  border-radius: 50%;
+}
+
+.home-scene-tree,
+.home-scene-bench,
+.home-scene-car {
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.home-scene-tree {
+  left: 16%;
+  bottom: 26%;
+  width: 32%;
+  height: 46%;
+  background-image: url("../images/nature/puffy-tree.png");
+}
+
+.home-scene-bench {
+  left: 50%;
+  bottom: 24%;
+  width: 28%;
+  height: 22%;
+  background-image: url("../images/nature/wood-bench.png");
+}
+
+.home-scene-car {
+  left: 32%;
+  bottom: 18%;
+  width: 34%;
+  height: 26%;
+  background-image: url("../images/portfolio/bonfire-sign.png");
+  opacity: 0.9;
+}
+
+.home-intro {
+  max-width: 520px;
+  text-align: left;
+}
+
+@media (max-width: 800px) {
+  .home-layout {
+    flex-direction: column;
+  }
+
+  .home-intro {
+    text-align: center;
+  }
+}
+
+/* Games tab extra meta */
+.game-meta {
+  width: 100%;
+  font-size: 0.6rem;
+  opacity: 0.85;
+  margin-top: 0.25rem;
+}
+
+/* Achievements metrics */
+.achievement-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.achievement-metric {
+  background: #1f2933;
+  border: 2px solid #f5d6a1;
+  padding: 0.75rem;
+}
+
+.achievement-metric-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #fef3c7;
+  margin: 0 0 0.25rem 0;
+}
+
+.achievement-metric-description {
+  font-size: 0.6rem;
+  color: #e5e7eb;
+  margin: 0 0 0.35rem 0;
+}
+
+.achievement-metric-summary {
+  font-size: 0.6rem;
+  color: #fef3c7;
+  margin: 0 0 0.3rem 0;
+}
+
+.achievement-progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #111827;
+  border: 2px solid #6b4226;
+  box-shadow: inset 0 0 0 2px #000;
+}
+
+.achievement-progress-bar-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(to right, #facc6b, #f97316);
+  transition: width 0.3s ease-out;
+}
+
+/* Settings rows */
+.settings-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.settings-copy {
+  flex: 1;
+}
+
+.settings-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  margin: 0 0 0.25rem 0;
+  color: #fef3c7;
+}
+
+.settings-description {
+  font-size: 0.6rem;
+  color: #e5e7eb;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* Scrollbar styling for panel content */
