@@ -11,7 +11,7 @@ var UnifiedPanel = (function () {
 
   // Simple cache-busting suffix so HTML changes to components always show up
   // Bump this value whenever component HTML changes.
-  var TEMPLATE_VERSION = "v=3";
+  var TEMPLATE_VERSION = "v=4";
 
   var tabTemplatePaths = {
     home: "resources/components/unified-panel-home.html?" + TEMPLATE_VERSION,
@@ -377,7 +377,10 @@ var UnifiedPanel = (function () {
         itemEl.querySelector(".inventory-item-name").textContent;
       var description =
         itemEl.getAttribute("data-item-description") || "";
+      var missingDescription =
+        itemEl.getAttribute("data-item-missing") || "";
       var statusTextEl = itemEl.querySelector(".inventory-item-status");
+      var isOwned = itemEl.classList.contains("owned");
 
       if (detailTitle) {
         detailTitle.textContent = title;
@@ -386,7 +389,20 @@ var UnifiedPanel = (function () {
         detailDescription.textContent = description;
       }
       if (detailStatus && statusTextEl) {
-        detailStatus.textContent = statusTextEl.textContent;
+        detailStatus.className = detailStatus.className
+          .replace(/\bowned\b/g, "")
+          .replace(/\bmissing\b/g, "");
+
+        if (isOwned) {
+          detailStatus.className += " owned";
+          detailStatus.textContent =
+            "In your pack · " + statusTextEl.textContent;
+        } else {
+          detailStatus.className += " missing";
+          detailStatus.textContent =
+            (statusTextEl.textContent || "Not found yet") +
+            (missingDescription ? " · " + missingDescription : "");
+        }
       }
 
       if (detailImage) {
@@ -395,6 +411,14 @@ var UnifiedPanel = (function () {
           ? iconEl.style.backgroundImage || ""
           : "";
         detailImage.style.backgroundImage = bg;
+        if (isOwned) {
+          detailImage.className = detailImage.className.replace(
+            /\bmissing\b/g,
+            ""
+          );
+        } else if (detailImage.className.indexOf("missing") === -1) {
+          detailImage.className += " missing";
+        }
       }
     }
 
@@ -410,7 +434,7 @@ var UnifiedPanel = (function () {
 
       var statusEl = itemEl.querySelector(".inventory-item-status");
       if (statusEl) {
-        statusEl.textContent = hasItem ? "✓ Owned" : "✗ Missing";
+        statusEl.textContent = hasItem ? "Owned" : "Missing";
       }
 
       var badgeEl = itemEl.querySelector(".inventory-item-badge");
@@ -419,9 +443,9 @@ var UnifiedPanel = (function () {
       }
 
       var iconEl = itemEl.querySelector(".inventory-item-icon");
-      if (iconEl && hasItem && icon) {
-        iconEl.style.backgroundImage =
-          "url(resources/images/misc/" + icon + ")";
+      if (iconEl && icon) {
+        // data-icon now contains a path under resources/images (e.g. 'misc/backpack2.png')
+        iconEl.style.backgroundImage = "url(resources/images/" + icon + ")";
         iconEl.style.backgroundSize = "contain";
         iconEl.style.backgroundRepeat = "no-repeat";
         iconEl.style.backgroundPosition = "center";

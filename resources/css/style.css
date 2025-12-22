@@ -4294,7 +4294,7 @@ body.day {
   position: absolute;
   inset: 0 auto auto 50%;
   transform: translateX(-50%);
-  top: 5%;
+  top: -56px;
   z-index: 3;
   display: flex;
   align-items: center;
@@ -4315,7 +4315,6 @@ body.day {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   padding: 0.75rem 0.75rem 1rem;
   /* NES-style wood frame */
   background-color: #6b4226;
@@ -4345,7 +4344,7 @@ body.day {
   position: relative;
   align-items: center;
   margin-left: 0.25rem;
-  border: 2px solid #fff;
+  border: 2px solid #f97373;
   justify-content: center;
   box-shadow: 0 4px 0 #000;
   background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -4360,7 +4359,7 @@ body.day {
 .unified-panel-tabs {
   display: flex;
   gap: 0.25rem;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   flex: 1;
   justify-content: center;
   align-items: center;
@@ -4443,10 +4442,6 @@ body.day {
 }
 
 @media (max-width: 900px) {
-  .unified-panel-tabs-row {
-    top: 12px;
-  }
-
   .unified-panel-container {
     width: 96%;
     height: 85vh;
@@ -4474,6 +4469,8 @@ body.day {
 .tab-content-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .tab-content-title {
@@ -4481,7 +4478,6 @@ body.day {
   font-size: 1rem;
   color: #fff;
   margin: 0 0 1.5rem 0;
-  text-align: center;
 }
 
 /* Backpack/Inventory Content */
@@ -4489,23 +4485,23 @@ body.day {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  height: 100%;
   flex: 1;
 }
 
 .backpack-detail {
   display: flex;
   gap: 1.25rem;
+  flex: 1;
   align-items: flex-start;
 }
 
 .backpack-detail-image {
-  width: 96px;
-  height: 96px;
+  width: 30%;
+  height: 100%;
   border: 3px solid #f5d6a1;
   box-shadow: inset 0 0 0 2px #6b4226, 0 6px 0 #000;
   background-color: #111827;
-  background-size: contain;
+  background-size: 80%;
   background-repeat: no-repeat;
   background-position: center;
   flex-shrink: 0;
@@ -4513,13 +4509,14 @@ body.day {
 
 .backpack-detail-text {
   flex: 1;
+  padding: 0.5rem;
 }
 
 .backpack-detail-title {
   font-family: "Press Start 2P", monospace;
-  font-size: 0.8rem;
+  font-size: 2rem;
   color: #fef3c7;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 1rem 0;
 }
 
 .backpack-detail-description {
@@ -4531,19 +4528,27 @@ body.day {
 
 .backpack-detail-status {
   font-size: 0.6rem;
-  color: #9bd4d7;
+  color: #e5e7eb;
   margin: 0;
 }
 
+.backpack-detail-status.owned {
+  color: #4ade80;
+}
+
+.backpack-detail-status.missing {
+  color: #f97373;
+}
+
 .backpack-strip-wrapper {
-  margin-top: auto; /* push strip to bottom of layout */
+  margin-top: auto;
 }
 
 .inventory-strip {
   display: flex;
   gap: 0.75rem;
   padding: 0.5rem 0.25rem 0.25rem;
-  overflow-x: auto;
+  overflow-x: scroll;
 }
 
 .inventory-strip::-webkit-scrollbar {
@@ -4568,6 +4573,12 @@ body.day {
   min-width: 110px;
 }
 
+.inventory-item.selected {
+  background: #111827;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px #ffffff, 0 4px 0 #000000;
+}
+
 .inventory-item.owned {
   border-color: #facc6b;
   box-shadow: 0 4px 0 #b45309;
@@ -4576,6 +4587,39 @@ body.day {
 .inventory-item.missing {
   border-color: #4b5563;
   opacity: 0.55;
+}
+
+.inventory-item.missing .inventory-item-icon {
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+
+.backpack-detail-image.missing {
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+  .backpack-detail {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .backpack-detail-image {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 0.75rem;
+  }
+
+  .backpack-detail-text {
+    flex: 1;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+
+  .backpack-strip-wrapper {
+    margin-top: 0.75rem;
+  }
 }
 
 .inventory-item-icon {
@@ -4596,7 +4640,15 @@ body.day {
 
 .inventory-item-status {
   font-size: 0.5rem;
-  color: #9bd4d7;
+  color: #e5e7eb;
+}
+
+.inventory-item.owned .inventory-item-status {
+  color: #4ade80;
+}
+
+.inventory-item.missing .inventory-item-status {
+  color: #f97373;
 }
 
 /* Games Content */
@@ -4651,9 +4703,38 @@ body.day {
   padding: 2rem;
 }
 
-.home-intro {
-  text-align: center;
-  max-width: 600px;
+.home-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.home-detail {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.home-detail-image {
+  width: 30%;
+  height: 100%;
+  min-height: 160px;
+  border: 3px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226, 0 6px 0 #000;
+  background-color: #111827;
+  /* About‑me photo with a subtle vignette feel */
+  background-image: url("../images/about-me/IMG_0865.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  position: relative;
+}
+
+.home-detail-text {
+  flex: 1;
 }
 
 .home-greeting {
@@ -4676,6 +4757,56 @@ body.day {
   color: #fff;
   line-height: 1.8;
   margin: 0 0 2rem 0;
+}
+
+.home-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-highlight {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+.home-highlight::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  font-size: 1rem;
+  color: #fef3c7;
+}
+
+.home-highlight-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #fef3c7;
+  margin-bottom: 0.1rem;
+}
+
+.home-highlight-description {
+  font-size: 0.6rem;
+  color: #e5e7eb;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .home-detail {
+    flex-direction: column;
+  }
+
+  .home-detail-image {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 0.75rem;
+  }
 }
 
 .coin-progress {
@@ -4754,7 +4885,6 @@ body.day {
   color: #fef3c7;
   opacity: 0.9;
   line-height: 1.6;
-  text-align: center;
 }
 
 /* Home split layout */
