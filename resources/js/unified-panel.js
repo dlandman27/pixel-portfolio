@@ -150,10 +150,20 @@ var UnifiedPanel = (function () {
         return;
       }
 
+      // Reset any closing animation classes
+      var $container = $panel.find(".unified-panel-container");
+      $container.removeClass("hinge-out");
+
       var targetTab = tabKey || "home";
       switchTab(targetTab);
 
       $panel.addClass("active").attr("aria-hidden", "false");
+      // Trigger hinge-in animation
+      $container.addClass("hinge-in");
+      setTimeout(function () {
+        $container.removeClass("hinge-in");
+      }, 450);
+
       $("body").addClass("unified-panel-open");
       isOpen = true;
     });
@@ -171,9 +181,17 @@ var UnifiedPanel = (function () {
       return;
     }
 
-    $panel.removeClass("active").attr("aria-hidden", "true");
-    $("body").removeClass("unified-panel-open");
-    isOpen = false;
+    var $container = $panel.find(".unified-panel-container");
+
+    // Play hinge-out animation, then actually hide the panel
+    $container.removeClass("hinge-in").addClass("hinge-out");
+
+    setTimeout(function () {
+      $panel.removeClass("active").attr("aria-hidden", "true");
+      $("body").removeClass("unified-panel-open");
+      $container.removeClass("hinge-out");
+      isOpen = false;
+    }, 400);
   }
 
   /**
