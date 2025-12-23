@@ -38,33 +38,9 @@ var WORLD = (function () {
     });
   }
 
+  // Water animation disabled for now.
   function startRiverAnimation() {
-    var x = 0;
-    setInterval(function () {
-      x += 1;
-      $("#wrapper").css("background-position", x + "px 0");
-
-      $(".water.water_funnel").css("background-position", -x + "px 0");
-      $(".pool.top").css("background-position", -0.5 * x + "px 0");
-      $(".pool.middle").css("background-position", "0 " + 0.5 * x + "px");
-      $(".pool.verticalFunnel").css(
-        "background-position",
-        "0 " + 0.5 * x + "px"
-      );
-      $(".water.waterfall1").css("background-position", -2 * x + "px 0");
-      $(".pool.verticalFunnel2").css(
-        "background-position",
-        "0 " + 2 * x + "px"
-      );
-      $(".pool.verticalFunnel3").css(
-        "background-position",
-        "0 " + 2 * x + "px"
-      );
-      $(".pool.verticalFunnel4").css(
-        "background-position",
-        "0 " + 2 * x + "px"
-      );
-    }, 75);
+    return;
   }
 
   // Initialize movement system (call after DOM is ready)

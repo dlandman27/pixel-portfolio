@@ -16,6 +16,8 @@ var WORLD_COLLIDERS = {
       // From approx point (1036,181) rounded to 4px grid: (1036,180)
       // Right edge approximated to 1800 (world right fence)
       { x: 1046, y: 180, width: 764, height: 180, tag: "bridgeTopRightBlock" },
+      { x: 926, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
+      { x: 1036, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
 
       // Cave
       { x: 964, y: 28, width: 64, height: 100, tag: "cave-top" },

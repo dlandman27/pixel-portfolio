@@ -29,8 +29,8 @@
       this.collisionWorld = null;
       this.sceneName = null;
       this.player = null;
-      // Collider debug overlays are off by default; enable via Settings toggle
-      this._colliderDebugEnabled = false;
+      // Collider debug overlays default ON
+      this._colliderDebugEnabled = true;
       this._colliderDebugEls = [];
       this._initialMapMarginLeft = 0;
       this._initialMapMarginTop = 0;

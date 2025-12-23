@@ -333,6 +333,8 @@ function initCoins() {
   if (typeof COIN_CONFIG === "undefined" || !COIN_CONFIG.coins) {
     return;
   }
+  // Coins temporarily disabled.
+  return;
   
   var $map = $("#map");
   if ($map.length === 0) {
