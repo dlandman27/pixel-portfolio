@@ -57,14 +57,22 @@ var SpriteManager = (function() {
       return;
     }
 
+    // Ensure sprites are preloaded for this direction
+    if (!preloadedImages[direction] || !preloadedImages[direction].length) {
+      preloadSprites();
+    }
+
     // Skip frame 1 for front direction (wrong height)
     if (direction === "front" && frame === 1) {
       frame = 2;
     }
 
-    // Always use the preloaded image object to prevent flicker
+    // Always use the preloaded image object to prevent flicker (if available)
     // The browser caches these, so switching is smoother
-    var img = preloadedImages[direction][frame - 1];
+    var img =
+      preloadedImages[direction] && preloadedImages[direction][frame - 1]
+        ? preloadedImages[direction][frame - 1]
+        : null;
     var imageUrl = sheet.url + frame + ".png";
     
     // Use the preloaded image if available, otherwise use URL

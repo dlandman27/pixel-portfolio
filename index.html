@@ -19,6 +19,8 @@ and open the template in the editor.
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Press+Start+2P"
     />
+    <!-- Matter.js physics engine for reusable collision system -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js" crossorigin="anonymous"></script>
     <!-- Font Awesome for tab icons and other UI glyphs -->
     <link
       rel="stylesheet"
@@ -39,8 +41,12 @@ and open the template in the editor.
     <script type="text/javascript" src="resources/js/world.js"></script>
     <script type="text/javascript" src="resources/js/sprite-manager.js"></script>
     <script type="text/javascript" src="resources/js/config/collisions.js"></script>
+    <script type="text/javascript" src="resources/js/config/world.config.js"></script>
     <script type="text/javascript" src="resources/js/config/coins.js"></script>
     <script type="text/javascript" src="resources/js/collision-engine.js"></script>
+    <script type="text/javascript" src="resources/js/engine/collision-world.js"></script>
+    <script type="text/javascript" src="resources/js/game/game-world.js"></script>
+    <script type="text/javascript" src="resources/js/game/player-controller.js"></script>
     <script type="text/javascript" src="resources/js/cloud-manager.js"></script>
     <script type="text/javascript" src="resources/js/script.js"></script>
     <script type="text/javascript" src="resources/js/inventory.js"></script>
@@ -363,10 +369,19 @@ and open the template in the editor.
       <div class="minimap-widget-toggle-hint">Press M to toggle</div>
     </div>
 
+    <!-- Quick Camera Center Button (main UI) -->
+    <button
+      id="center-camera-btn"
+      class="nes-btn is-primary center-camera-btn"
+      type="button"
+    >
+      Center Camera
+    </button>
+
     <!-- Inventory slots removed - now in unified panel -->
     <div id="ui" style="display: none;"></div>
     <!-- Loading Screen -->
-    <div class="loading-screen">
+    <!-- <div class="loading-screen">
       <div class="loader-grid">
         <span>D</span>
         <span>Y</span>
@@ -381,6 +396,6 @@ and open the template in the editor.
         <span>A</span>
         <span>N</span>
       </div>
-    </div>
+    </div> -->
   </body>
 </html>

@@ -945,6 +945,31 @@ function showItemPickupAnimation(itemType) {
   $('body').append($icon);
   $('body').append($label);
   console.log('Icon element appended, image URL:', imageUrl);
+  
+  // Create a small pixel confetti burst around the item
+  (function createItemPickupConfetti() {
+    var colors = ['#fbbf24', '#fb7185', '#38bdf8', '#a855f7', '#4ade80'];
+    var count = 18;
+    for (var i = 0; i < count; i++) {
+      var dx = (Math.random() - 0.5) * 220; // spread horizontally
+      var dy = - (60 + Math.random() * 120); // burst upward
+      var color = colors[Math.floor(Math.random() * colors.length)];
+      var $confetti = $('<div class="item-pickup-confetti"></div>');
+      $confetti.css({
+        '--dx': dx + 'px',
+        '--dy': dy + 'px',
+        'background-color': color
+      });
+      $('body').append($confetti);
+      
+      // Clean up each confetti piece after its animation
+      (function(confettiEl) {
+        setTimeout(function() {
+          confettiEl.remove();
+        }, 800);
+      })($confetti);
+    }
+  })();
 
   // Force a reflow to ensure element is rendered before animation
   void $icon[0].offsetHeight;

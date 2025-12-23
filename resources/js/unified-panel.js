@@ -9,22 +9,13 @@ var UnifiedPanel = (function () {
   // Cache loaded tab templates as DocumentFragments
   var tabTemplates = {};
 
-  // Simple cache-busting suffix so HTML changes to components always show up
-  // Bump this value whenever component HTML changes.
-  var TEMPLATE_VERSION = "v=4";
-
   var tabTemplatePaths = {
-    home: "resources/components/unified-panel-home.html?" + TEMPLATE_VERSION,
-    backpack:
-      "resources/components/unified-panel-backpack.html?" + TEMPLATE_VERSION,
-    fishbook:
-      "resources/components/unified-panel-fishbook.html?" + TEMPLATE_VERSION,
-    achievements:
-      "resources/components/unified-panel-achievements.html?" +
-      TEMPLATE_VERSION,
-    games: "resources/components/unified-panel-games.html?" + TEMPLATE_VERSION,
-    settings:
-      "resources/components/unified-panel-settings.html?" + TEMPLATE_VERSION,
+    home: "resources/components/unified-panel-home.html",
+    backpack: "resources/components/unified-panel-backpack.html",
+    fishbook: "resources/components/unified-panel-fishbook.html",
+    achievements: "resources/components/unified-panel-achievements.html",
+    games: "resources/components/unified-panel-games.html",
+    settings: "resources/components/unified-panel-settings.html",
   };
 
   var tabs = {
@@ -55,7 +46,7 @@ var UnifiedPanel = (function () {
       return;
     }
 
-    $.get("resources/components/unified-panel.html?" + TEMPLATE_VERSION)
+    $.get("resources/components/unified-panel.html")
       .done(function (markup) {
         // Parse the static HTML into DOM nodes without building strings here
         var temp = document.createElement("div");
@@ -150,20 +141,10 @@ var UnifiedPanel = (function () {
         return;
       }
 
-      // Reset any closing animation classes
-      var $container = $panel.find(".unified-panel-container");
-      $container.removeClass("hinge-out");
-
       var targetTab = tabKey || "home";
       switchTab(targetTab);
 
       $panel.addClass("active").attr("aria-hidden", "false");
-      // Trigger hinge-in animation
-      $container.addClass("hinge-in");
-      setTimeout(function () {
-        $container.removeClass("hinge-in");
-      }, 450);
-
       $("body").addClass("unified-panel-open");
       isOpen = true;
     });
@@ -181,17 +162,15 @@ var UnifiedPanel = (function () {
       return;
     }
 
-    var $container = $panel.find(".unified-panel-container");
+    // Add a 'closing' state so we can play a hinge-out animation
+    $panel.removeClass("active").addClass("closing").attr("aria-hidden", "true");
+    $("body").removeClass("unified-panel-open");
+    isOpen = false;
 
-    // Play hinge-out animation, then actually hide the panel
-    $container.removeClass("hinge-in").addClass("hinge-out");
-
+    // After animation completes, fully hide and clear closing state
     setTimeout(function () {
-      $panel.removeClass("active").attr("aria-hidden", "true");
-      $("body").removeClass("unified-panel-open");
-      $container.removeClass("hinge-out");
-      isOpen = false;
-    }, 400);
+      $panel.removeClass("closing");
+    }, 500);
   }
 
   /**
@@ -271,32 +250,16 @@ var UnifiedPanel = (function () {
    */
   function loadTabContent(tabKey) {
     ensurePanelShell(function () {
-      var contentEl =
-        document.getElementById("unified-panel-tabpanel") ||
-        document.querySelector(".unified-panel-content");
-
-      // If the shell loaded without a content container for some reason,
-      // create one programmatically so tabs always have somewhere to render.
-      if (!contentEl) {
-        var panelEl = document.getElementById("unified-panel");
-        if (!panelEl) {
-          console.error("UnifiedPanel: panel element not found");
-          return;
-        }
-
-        var container = document.createElement("div");
-        container.className = "unified-panel-container";
-
-        contentEl = document.createElement("div");
-        contentEl.className = "unified-panel-content";
-        contentEl.id = "unified-panel-tabpanel";
-        contentEl.setAttribute("role", "tabpanel");
-
-        container.appendChild(contentEl);
-        panelEl.appendChild(container);
+      var $content = $("#unified-panel-tabpanel");
+      if (!$content.length) {
+        $content = $(".unified-panel-content");
       }
 
-      var $content = $(contentEl);
+      if (!$content.length) {
+        console.error("UnifiedPanel: content container not found");
+        return;
+      }
+
       $content.empty();
 
       getTabTemplate(tabKey, function (fragment) {
@@ -306,7 +269,7 @@ var UnifiedPanel = (function () {
         if (tabKey !== currentTab) return;
 
         $content.append(fragment);
-        hydrateTab(tabKey, contentEl);
+        hydrateTab(tabKey, $content[0]);
       });
     });
   }
@@ -326,7 +289,7 @@ var UnifiedPanel = (function () {
         hydrateFishbookTab(rootEl);
         break;
       case "achievements":
-        hydrateAchievementsTab(rootEl);
+        // No dynamic behavior yet
         break;
       case "games":
         hydrateGamesTab(rootEl);
@@ -366,80 +329,6 @@ var UnifiedPanel = (function () {
     }
 
     var items = rootEl.querySelectorAll(".inventory-item");
-
-    var detailRoot = rootEl.querySelector('[data-role="item-detail"]');
-    var detailImage = detailRoot
-      ? detailRoot.querySelector('[data-role="detail-image"]')
-      : null;
-    var detailTitle = detailRoot
-      ? detailRoot.querySelector('[data-role="detail-title"]')
-      : null;
-    var detailDescription = detailRoot
-      ? detailRoot.querySelector('[data-role="detail-description"]')
-      : null;
-    var detailStatus = detailRoot
-      ? detailRoot.querySelector('[data-role="detail-status"]')
-      : null;
-
-    function selectItem(itemEl) {
-      if (!detailRoot || !itemEl) return;
-
-      // Clear previous selection
-      for (var j = 0; j < items.length; j++) {
-        items[j].classList.remove("selected");
-      }
-      itemEl.classList.add("selected");
-
-      var title =
-        itemEl.getAttribute("data-item-title") ||
-        itemEl.querySelector(".inventory-item-name").textContent;
-      var description =
-        itemEl.getAttribute("data-item-description") || "";
-      var missingDescription =
-        itemEl.getAttribute("data-item-missing") || "";
-      var statusTextEl = itemEl.querySelector(".inventory-item-status");
-      var isOwned = itemEl.classList.contains("owned");
-
-      if (detailTitle) {
-        detailTitle.textContent = title;
-      }
-      if (detailDescription) {
-        detailDescription.textContent = description;
-      }
-      if (detailStatus && statusTextEl) {
-        detailStatus.className = detailStatus.className
-          .replace(/\bowned\b/g, "")
-          .replace(/\bmissing\b/g, "");
-
-        if (isOwned) {
-          detailStatus.className += " owned";
-          detailStatus.textContent =
-            "In your pack · " + statusTextEl.textContent;
-        } else {
-          detailStatus.className += " missing";
-          detailStatus.textContent =
-            (statusTextEl.textContent || "Not found yet") +
-            (missingDescription ? " · " + missingDescription : "");
-        }
-      }
-
-      if (detailImage) {
-        var iconEl = itemEl.querySelector(".inventory-item-icon");
-        var bg = iconEl
-          ? iconEl.style.backgroundImage || ""
-          : "";
-        detailImage.style.backgroundImage = bg;
-        if (isOwned) {
-          detailImage.className = detailImage.className.replace(
-            /\bmissing\b/g,
-            ""
-          );
-        } else if (detailImage.className.indexOf("missing") === -1) {
-          detailImage.className += " missing";
-        }
-      }
-    }
-
     for (var i = 0; i < items.length; i++) {
       var itemEl = items[i];
       var key = itemEl.getAttribute("data-item-key");
@@ -452,7 +341,7 @@ var UnifiedPanel = (function () {
 
       var statusEl = itemEl.querySelector(".inventory-item-status");
       if (statusEl) {
-        statusEl.textContent = hasItem ? "Owned" : "Missing";
+        statusEl.textContent = hasItem ? "✓ Owned" : "✗ Missing";
       }
 
       var badgeEl = itemEl.querySelector(".inventory-item-badge");
@@ -461,28 +350,15 @@ var UnifiedPanel = (function () {
       }
 
       var iconEl = itemEl.querySelector(".inventory-item-icon");
-      if (iconEl && icon) {
-        // data-icon now contains a path under resources/images (e.g. 'misc/backpack2.png')
-        iconEl.style.backgroundImage = "url(resources/images/" + icon + ")";
+      if (iconEl && hasItem && icon) {
+        iconEl.style.backgroundImage =
+          "url(resources/images/misc/" + icon + ")";
         iconEl.style.backgroundSize = "contain";
         iconEl.style.backgroundRepeat = "no-repeat";
         iconEl.style.backgroundPosition = "center";
         iconEl.style.width = "64px";
         iconEl.style.height = "64px";
       }
-
-      // Bind selection handler
-      itemEl.addEventListener("click", function (ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        selectItem(this);
-      });
-    }
-
-    // Auto-select first owned item, or first item if none owned
-    if (items.length && detailRoot) {
-      var firstOwned = rootEl.querySelector(".inventory-item.owned");
-      selectItem(firstOwned || items[0]);
     }
   }
 
@@ -518,111 +394,78 @@ var UnifiedPanel = (function () {
         }
       });
     }
-
-    // Populate high scores if available
-    var scoreEls = rootEl.querySelectorAll('[data-role="game-score"]');
-    for (var i = 0; i < scoreEls.length; i++) {
-      var el = scoreEls[i];
-      var game = el.getAttribute("data-game");
-      if (!game) continue;
-
-      if (game === "soccer") {
-        var val = 0;
-        if (typeof getCookie === "function") {
-          var cookieVal = getCookie("soccer-high-score");
-          if (cookieVal !== "") {
-            var parsed = parseInt(cookieVal, 10);
-            if (!isNaN(parsed)) {
-              val = parsed;
-            }
-          }
-        }
-        el.textContent = val;
-      } else if (game === "fishing") {
-        // No explicit high score yet; show dash by default.
-        el.textContent = "—";
-      }
-    }
-  }
-
-  function hydrateAchievementsTab(rootEl) {
-    var metrics = rootEl.querySelectorAll(".achievement-metric");
-    if (!metrics.length) return;
-
-    var totalCoins =
-      typeof COIN_CONFIG !== "undefined" && COIN_CONFIG && COIN_CONFIG.totalCoins
-        ? COIN_CONFIG.totalCoins
-        : 0;
-    var coinCount =
-      typeof inventory !== "undefined" && inventory && inventory.coinCount
-        ? inventory.coinCount
-        : 0;
-
-    var fishCollection =
-      typeof FISHREP !== "undefined" && FISHREP && FISHREP.collection
-        ? FISHREP.collection
-        : null;
-    var totalFish = fishCollection ? Object.keys(fishCollection).length : 0;
-    var caughtFish = fishCollection
-      ? Object.values(fishCollection).filter(function (x) {
-          return !!x;
-        }).length
-      : 0;
-
-    var itemKeys = ["backpack", "minimap", "resume", "fishingRod", "fishbook"];
-    var ownedItems = 0;
-    var totalItems = itemKeys.length;
-    if (typeof inventory !== "undefined" && inventory) {
-      for (var i = 0; i < itemKeys.length; i++) {
-        if (inventory[itemKeys[i]]) {
-          ownedItems++;
-        }
-      }
-    }
-
-    function applyMetric(metricEl, current, max) {
-      var summaryEl = metricEl.querySelector('[data-role="metric-summary"]');
-      var barEl = metricEl.querySelector('[data-role="metric-bar"]');
-      max = max || 0;
-
-      if (summaryEl) {
-        summaryEl.textContent = max > 0 ? current + " / " + max : "" + current;
-      }
-
-      if (barEl) {
-        var pct = max > 0 ? Math.min(100, (current / max) * 100) : 0;
-        barEl.style.width = pct + "%";
-      }
-    }
-
-    for (var idx = 0; idx < metrics.length; idx++) {
-      var metric = metrics[idx];
-      var type = metric.getAttribute("data-metric");
-      if (type === "coins") {
-        applyMetric(metric, coinCount, totalCoins);
-      } else if (type === "fish") {
-        applyMetric(metric, caughtFish, totalFish);
-      } else if (type === "items") {
-        applyMetric(metric, ownedItems, totalItems);
-      }
-    }
   }
 
   function hydrateSettingsTab(rootEl) {
     var resetBtn = rootEl.querySelector('[data-role="reset-items"]');
-    if (!resetBtn) return;
-
-    resetBtn.addEventListener("click", function () {
-      if (
-        window.confirm(
-          "Are you sure you want to reset all items? This will clear your progress and reload the page."
-        )
-      ) {
-        if (typeof resetAllItems === "function") {
-          resetAllItems();
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        if (
+          window.confirm(
+            "Are you sure you want to reset all items? This will clear your progress and reload the page."
+          )
+        ) {
+          if (typeof resetAllItems === "function") {
+            resetAllItems();
+          }
         }
+      });
+    }
+
+    // Collision debug toggle (WORLD_COLLIDERS-based only)
+    var debugBtn = rootEl.querySelector(
+      '[data-role="toggle-collision-debug"]'
+    );
+    if (debugBtn) {
+      // Initialize button state based on current GameWorld debug flag (if any)
+      var debugOn = false;
+      if (
+        window.playerController &&
+        window.playerController.gameWorld &&
+        typeof window.playerController.gameWorld.getColliderDebugEnabled ===
+          "function"
+      ) {
+        debugOn =
+          !!window.playerController.gameWorld.getColliderDebugEnabled();
       }
-    });
+
+      debugBtn.textContent = debugOn
+        ? "Hide Collision Boxes"
+        : "Show Collision Boxes";
+
+      debugBtn.addEventListener("click", function () {
+        debugOn = !debugOn;
+
+        // Toggle WORLD_COLLIDERS-based debug via GameWorld (if available)
+        if (
+          window.playerController &&
+          window.playerController.gameWorld &&
+          typeof window.playerController.gameWorld.setColliderDebugEnabled ===
+            "function"
+        ) {
+          window.playerController.gameWorld.setColliderDebugEnabled(debugOn);
+        }
+
+        debugBtn.textContent = debugOn
+          ? "Hide Collision Boxes"
+          : "Show Collision Boxes";
+      });
+    }
+
+    // Center camera on Dylan (clears manual pan and recenters on player)
+    var centerCamBtn = rootEl.querySelector('[data-role="center-camera"]');
+    if (centerCamBtn) {
+      centerCamBtn.addEventListener("click", function () {
+        if (
+          window.playerController &&
+          window.playerController.gameWorld &&
+          typeof window.playerController.gameWorld.centerCameraOnPlayer ===
+            "function"
+        ) {
+          window.playerController.gameWorld.centerCameraOnPlayer();
+        }
+      });
+    }
   }
 
   return {

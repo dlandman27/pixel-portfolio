@@ -10,7 +10,7 @@ var COLLISION_CONFIG = {
     }
   ],
 
-  // Main map collisions
+  // Main map collisions (legacy line-based system still used by script.js)
   mainMap: {
     // Distance per iteration based on element type
     distancePerIteration: {
@@ -760,7 +760,7 @@ var COLLISION_CONFIG = {
     ]
   },
 
-  // Tent 1 interior collisions
+  // Tent 1 interior collisions (legacy)
   tent1: {
     globalBlocks: [
       {
@@ -901,4 +901,3 @@ var COLLISION_CONFIG = {
     ]
   }
 };
-

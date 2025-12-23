@@ -26,6 +26,7 @@ var WORLD = (function () {
     anim: null,
     keysPressed: {},
     keyPressed: false,
+    // Base movement speed (pixels per tick). Increase for faster movement.
     distancePerIteration: 4,
     dylan: null, // Will be set to $("#dylan") when DOM is ready
   };

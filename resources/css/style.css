@@ -265,6 +265,8 @@ body {
   overflow-x: visible;
   /* top: 1200px; */
   zoom: 80%;
+  /* Let GameWorld control camera directly; no extra easing so camera matches player speed */
+  transition: none;
   /* width: 3000px; */
   /* inset: 0; 
     margin: auto; */
@@ -282,6 +284,7 @@ body {
   margin-right: 1000px;
   overflow: hidden;
   display: block;
+  transition: background-position 0.03s linear;
 }
 
 /*main character in the game*/
@@ -295,6 +298,11 @@ body {
   left: 980px;
   background-size: 32px;
   z-index: 49;
+  /* Smooth character movement (top/left) without animating sprite frame changes.
+     Duration and easing match #map so they move at the same visual speed. */
+  transition:
+    left 0.03s linear,
+    top 0.03s linear;
   margin: auto;
 }
 
@@ -1331,11 +1339,11 @@ body {
   display: none;
 }
 
-/* Minimap Widget - Top Left Corner */
+/* Minimap Widget - Bottom Right Corner */
 .minimap-widget {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  right: 1.5rem;
+  bottom: 1.5rem;
   width: 200px;
   height: 200px;
   background-color: rgba(0, 0, 0, 0.8);
@@ -1350,6 +1358,16 @@ body {
 
 .minimap-widget.active {
   display: block;
+}
+
+/* Main UI camera center button */
+.center-camera-btn {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 6.5rem; /* Just above minimap */
+  z-index: 10001;
+  font-size: 0.75rem;
+  padding: 0.5rem 0.9rem;
 }
 
 .minimap-widget-content {
@@ -1722,19 +1740,8 @@ body {
 }
 
 .settings_bar {
-  position: fixed;
-  top: 120px;
-  left: -176px;
-  width: 256px;
-  height: 128px;
-  z-index: 10000;
-  background-image: url("../images/misc/settings_bar.png");
-  background-size: 400px;
-  background-repeat: no-repeat;
-  background-position-x: -144px;
-  /* box-shadow:  5px 2px 5px rgb(0 0 0 / 30%); */
-  transition-timing-function: ease-out;
-  transition: all 1s;
+  /* Legacy side settings menu - fully hidden now in favor of new game menu */
+  display: none !important;
 }
 
 .settings-icon.SFX {
@@ -1785,18 +1792,11 @@ body {
   opacity: 10%;
 }
 .open {
-  left: 0;
+  /* Legacy .open modifier for settings_bar is now a no-op */
 }
 
 .settings_bar a {
-  position: absolute;
-  font-size: 32px;
-  top: 50%;
-  margin-top: -22px;
-  color: white;
-  right: 32px;
-  font-family: Courier, monospace;
-  transition: 400ms;
+  display: none;
 }
 
 .tentdoor {
@@ -2760,6 +2760,7 @@ body {
   background-image: url("../images/tiles/water.png");
   background-size: 32px;
   filter: brightness(1.1);
+  transition: background-position 0.03s linear;
 }
 
 .pool.middle {
@@ -3688,6 +3689,37 @@ i {
   }
 }
 
+/* Small pixel confetti burst on item pickup */
+.item-pickup-confetti {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -50%);
+  background: #fbbf24;
+  pointer-events: none;
+  z-index: 10000002;
+  border-radius: 1px;
+  animation: itemPickupConfetti 0.7s ease-out forwards;
+}
+
+@keyframes itemPickupConfetti {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--dx, 0px)),
+        calc(-50% + var(--dy, -80px))
+      )
+      scale(0.8)
+      rotate(280deg);
+  }
+}
+
 .matchbox {
   background-size: 16px;
   width: 16px;
@@ -3779,7 +3811,6 @@ i {
   outline: none;
   padding: 12px 16px;
   background-color: white;
-  cursor: pointer;
 }
 
 .btn:hover {
@@ -3789,6 +3820,20 @@ i {
 .btn.active {
   background-color: #666;
   color: white;
+}
+
+/* Global pixel cursor for all primary button styles */
+button,
+.nes-btn,
+.btn,
+.game-menu-item,
+.mobile-btn,
+.unified-panel-tab,
+.game-button,
+.settings-button {
+  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAzElEQVRYR+2X0Q6AIAhF5f8/2jYXZkwEjNSVvVUjDpcrGgT7FUkI2D9xRfQETwNIiWO85wfINfQUEyxBG2ArsLwC0jioGt5zFcwF4OYDPi/mBYKm4t0U8ATgRm3ThFoAqkhNgWkA0jJLvaOVSs7j3qMnSgXWBMiWPXe94QqMBMBc1VZIvaTu5u5pQewq0EqNZvIEMCmxAawK0DNkay9QmfFNAJUXfgGgUkLaE7j/h8fnASkxHTz0DGIBMCnBeeM7AArpUd3mz2x3C7wADglA8BcWMZhZAAAAAElFTkSuQmCC)
+      14 0,
+    pointer;
 }
 
 .nes-container.portfolio-elem {
@@ -4268,14 +4313,17 @@ body.day {
   z-index: 10000050;
   display: none;
   pointer-events: none;
+  /* Give the panel a 3D space for the hinge animation */
+  perspective: 1200px;
 }
 
-.unified-panel.active {
+.unified-panel.active,
+.unified-panel.closing {
   display: block !important;
   pointer-events: all;
 }
 
-.unified-panel:not(.active) {
+.unified-panel:not(.active):not(.closing) {
   display: none !important;
 }
 
@@ -4329,48 +4377,79 @@ body.day {
   );
   border: 4px solid #f5d6a1;
   transform: translate(-50%, -50%);
+  transform-origin: top center;
   box-shadow: 0 10px 0 #000, 0 0 0 4px #000;
 }
 
-/* Hinge-style open/close animations */
-.unified-panel-container.hinge-in {
-  transform-origin: top left;
-  animation: unified-panel-hinge-in 450ms cubic-bezier(0.22, 1, 0.36, 1);
+/* Decorative ropes so the panel feels like a hanging sign */
+.unified-panel-container::before,
+.unified-panel-container::after {
+  content: "";
+  position: absolute;
+  /* Make the rope thick and extend roughly from the top of the viewport down to the sign */
+  top: -60vh;
+  width: 8px;
+  height: 60vh;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #fef3c7 0,
+    #fef3c7 4px,
+    #d97757 4px,
+    #d97757 8px
+  );
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  z-index: 1;
+  pointer-events: none;
 }
 
-.unified-panel-container.hinge-out {
-  transform-origin: top left;
-  animation: unified-panel-hinge-out 400ms cubic-bezier(0.37, 0, 0.63, 1);
+.unified-panel-container::before {
+  left: 18%;
 }
 
-@keyframes unified-panel-hinge-in {
+.unified-panel-container::after {
+  right: 18%;
+}
+
+/* Hinge-in animation for unified panel */
+@keyframes unifiedPanelHingeIn {
   0% {
+    transform: translate(-50%, -70%) rotateX(-80deg);
     opacity: 0;
-    transform: translate(-54%, -60%) rotateZ(-10deg);
-  }
-  60% {
-    opacity: 1;
-    transform: translate(-51%, -51%) rotateZ(4deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotateZ(0deg);
-  }
-}
-
-@keyframes unified-panel-hinge-out {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotateZ(0deg);
   }
   40% {
+    transform: translate(-50%, -52%) rotateX(15deg);
     opacity: 1;
-    transform: translate(-52%, -52%) rotateZ(-8deg);
+  }
+  70% {
+    transform: translate(-50%, -50%) rotateX(-5deg);
   }
   100% {
-    opacity: 0;
-    transform: translate(-40%, -85%) rotateZ(28deg) scale(0.9);
+    transform: translate(-50%, -50%) rotateX(0deg);
   }
+}
+
+.unified-panel.active .unified-panel-container {
+  animation: unifiedPanelHingeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Hinge-out animation for unified panel on close */
+@keyframes unifiedPanelHingeOut {
+  0% {
+    transform: translate(-50%, -50%) rotateX(0deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -52%) rotateX(-10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -70%) rotateX(80deg);
+    opacity: 0;
+  }
+}
+
+.unified-panel.closing .unified-panel-container {
+  animation: unifiedPanelHingeOut 0.45s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 .unified-panel-close {
@@ -4954,6 +5033,54 @@ body.day {
   font-size: 0.8rem;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
   display: block;
+}
+
+/* Collision debug overlays */
+.collision-debug {
+  box-sizing: border-box;
+  border: 2px dashed rgba(239, 68, 68, 0.75);
+  background-color: rgba(239, 68, 68, 0.15);
+  pointer-events: none;
+  z-index: 999999;
+}
+
+.collision-debug-horizontal {
+  border-color: rgba(59, 130, 246, 0.85);
+  background-color: rgba(59, 130, 246, 0.18);
+}
+
+.collision-debug-vertical {
+  border-color: rgba(239, 68, 68, 0.85);
+  background-color: rgba(239, 68, 68, 0.18);
+}
+
+.collision-debug-dylan {
+  border-color: rgba(250, 204, 21, 0.95); /* amber */
+  background-color: rgba(250, 204, 21, 0.25);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+/* WORLD_COLLIDERS debug overlays (rect-based solids and triggers) */
+.world-collider-debug {
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 999998;
+}
+
+.world-collider-debug-solid {
+  border: 2px dashed rgba(59, 130, 246, 0.9); /* blue */
+  background-color: rgba(59, 130, 246, 0.25);
+}
+
+.world-collider-debug-trigger {
+  border: 2px dashed rgba(96, 165, 250, 0.9); /* lighter blue */
+  background-color: rgba(96, 165, 250, 0.25);
+}
+
+.world-collider-debug-player {
+  border: 2px solid rgba(250, 204, 21, 0.95); /* amber outline for player */
+  background-color: rgba(250, 204, 21, 0.18);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes coinFloat {

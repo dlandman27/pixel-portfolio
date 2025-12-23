@@ -123,9 +123,15 @@ $(window).load(function () {
      $('.loading-screen').fadeOut();  
   }, 2500);
 
-  // Center the map after the loader finishes
+  // Legacy: center the map after the loader finishes.
+  // With the new physics/camera system, GameWorld now owns camera placement,
+  // so we only call WORLD.centerMap if the old movement engine is still active.
   setTimeout(function(){ 
-    if (typeof WORLD !== "undefined" && typeof WORLD.centerMap === "function") {
+    if (
+      !window.useNewMovementEngine &&
+      typeof WORLD !== "undefined" &&
+      typeof WORLD.centerMap === "function"
+    ) {
       WORLD.centerMap();
     }
   },2400);//CHANGE IN ZOOM MUST CHANGE VALUE (CURR 1.2)(VALUE = 1+(1-ZOOMLEVEL))
@@ -144,7 +150,12 @@ $(window).load(function () {
 });
 
 $(window).resize(function () {
-  if (typeof WORLD !== "undefined" && typeof WORLD.centerMap === "function") {
+  // Legacy auto-centering; disabled when using the new physics/camera system
+  if (
+    !window.useNewMovementEngine &&
+    typeof WORLD !== "undefined" &&
+    typeof WORLD.centerMap === "function"
+  ) {
     WORLD.centerMap();
   }
 
@@ -158,8 +169,24 @@ $(window).resize(function () {
   }
 });
 
+// Global UI: center camera button in main HUD
+$(function () {
+  $("#center-camera-btn").click(function () {
+    if (
+      window.playerController &&
+      window.playerController.gameWorld &&
+      typeof window.playerController.gameWorld.centerCameraOnPlayer ===
+        "function"
+    ) {
+      window.playerController.gameWorld.centerCameraOnPlayer();
+    }
+  });
+});
+
 
 var x = 0;
+// Global reference to new physics-based game world
+var gameWorld = null;
 
 
 //Function called when the map is finished rendering
@@ -172,45 +199,32 @@ function startGame() {
     SpriteManager.init();
   }
 
-  var frame = 12;
-  var top = 112;
-  var speech;
-  var start = setInterval(function () {
-    if (top == 204) {//reached top location
-      // Use frame 2 instead of 1 for front (frame 1 has wrong height)
-      if (typeof SpriteManager !== "undefined") {
-        SpriteManager.setSpriteFrame("front", 2);
-      } else {
-        $("#dylan").css("background-image", "url(resources/images/characters/dylan/dylan-front-2.png)");
-      }
-      clearInterval(start);
+  // Initialize physics-based world for main map using WORLD_COLLIDERS
+  if (typeof GameWorld !== "undefined" && typeof WORLD_COLLIDERS !== "undefined") {
+    try {
+      gameWorld = new GameWorld();
+      gameWorld.init("mainMap");
+    } catch (e) {
+      console.error("Failed to initialize GameWorld:", e);
+    }
+  }
 
-      // Always allow movement once walkout completes
-      eventOccurence = false;
-      
-      // Show tutorial if it hasn't been shown before
-      if(getCookie("title-screen") != 'true'){
-        openTutorial();
-      }
-    }
-    frame++;
-    $("#dylan").css("visibility", "visible");
-    top += 4;
-    if (frame > 7) {
-      frame = 2; // Cycle back to 2, not 1
-    }
-    // Skip frame 1 for front direction
-    if (frame === 1) {
-      frame = 2;
-    }
-    if (typeof SpriteManager !== "undefined") {
-      SpriteManager.setSpriteFrame("front", frame);
-    } else {
-      $("#dylan").css("background-image", "url(resources/images/characters/dylan/dylan-front-" + frame + ".png)");
-    }
-    $("#dylan").css("top", top + "px");
-
-  }, 75);
+  // Disable original walk-out entrance animation; start with movement enabled
+  eventOccurence = false;
+  $("#dylan").css("visibility", "visible");
+  // Ensure a reasonable idle sprite
+  if (typeof SpriteManager !== "undefined") {
+    SpriteManager.setSpriteFrame("front", 2);
+  } else {
+    $("#dylan").css(
+      "background-image",
+      "url(resources/images/characters/dylan/dylan-front-2.png)"
+    );
+  }
+  // Show tutorial if it hasn't been shown before
+  if (getCookie("title-screen") != "true") {
+    openTutorial();
+  }
 
 
   //if tree has already been cut down
@@ -336,7 +350,7 @@ var keyD = typeof WORLD !== "undefined" ? WORLD.KEYS.D : 68;
 var keyEnter = typeof WORLD !== "undefined" ? WORLD.KEYS.ENTER : 13;
 var keySpace = typeof WORLD !== "undefined" ? WORLD.KEYS.SPACE : 32;
 
-// Movement state aliases
+// Movement state aliases (legacy - no longer used for core movement with the new engine)
 var anim = typeof WORLD !== "undefined" ? WORLD.movement.anim : null;
 var frame = typeof WORLD !== "undefined" ? WORLD.movement.frame : 1;
 var keyPressed = typeof WORLD !== "undefined" ? WORLD.movement.keyPressed : false;
@@ -349,7 +363,7 @@ var dylan = typeof WORLD !== "undefined" && WORLD.movement.dylan ? WORLD.movemen
 var doorOpen = false;
 
 
-//Keydown
+//Keydown - legacy handler; core movement is now handled by PlayerController in game/player-controller.js
 $(document).keydown(function(e){
   if(isReelingIn){
     reelIn(e.keyCode);
@@ -367,16 +381,20 @@ $(document).keydown(function(e){
     closeTutorial();
   }
 
-  // Use WORLD.movement for state management
+  // If the new movement engine is active, do not run legacy movement logic
+  if (window.useNewMovementEngine) {
+    return;
+  }
+
+  // Legacy movement path (will eventually be removed)
   if (typeof WORLD !== "undefined" && WORLD.movement) {
     WORLD.movement.keysPressed[e.which] = true;
   } else {
-  keysPressed[e.which] = true;
+    keysPressed[e.which] = true;
   }
-  move(e.keyCode);  
-  // useItem(e.keyCode);
-  
-  if(playSoccer && e.keyCode == keyEnter)
+  move(e.keyCode);
+
+  if (playSoccer && e.keyCode == keyEnter)
     moveBall();
 });
 
@@ -1391,7 +1409,6 @@ function openSettings(){
   else
     $(".settings_bar").addClass("open");
 }
-
 // function toggleMusic(){
 //   if($(".settings-icon.music").hasClass("on")){
 //     $(".settings-icon.music").removeClass("on").addClass("off");
