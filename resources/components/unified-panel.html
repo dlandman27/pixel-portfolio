@@ -7,113 +7,102 @@
 
   
   <div class="unified-panel-container">
-    <div
-      class="unified-panel-tabs-row"
-      role="tablist"
-      aria-label="Pixel portfolio panel tabs"
-    >
-      <div class="unified-panel-tabs">
+    <div class="unified-panel-tabs-row" role="tablist" aria-label="Pixel portfolio panel tabs">
+    <div class="unified-panel-tabs">
         <button
           id="unified-panel-tab-home"
           class="unified-panel-tab"
           type="button"
           data-tab="home"
-          data-label="Home"
           role="tab"
           aria-selected="true"
           aria-controls="unified-panel-tabpanel"
         >
           <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-house"></i>
+            <svg viewBox="0 0 24 24">
+              <path d="M3 11.5L12 3l9 8.5v8.5h-6v-6H9v6H3z" />
+            </svg>
           </span>
         </button>
-
+  
         <button
           id="unified-panel-tab-backpack"
           class="unified-panel-tab"
           type="button"
           data-tab="backpack"
-          data-label="Backpack"
           role="tab"
           aria-selected="false"
           aria-controls="unified-panel-tabpanel"
         >
           <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-suitcase"></i>
+            <i class="fas fa-briefcase"></i>
           </span>
         </button>
-
+  
         <button
           id="unified-panel-tab-fishbook"
           class="unified-panel-tab"
           type="button"
           data-tab="fishbook"
-          data-label="Fishbook"
           role="tab"
           aria-selected="false"
           aria-controls="unified-panel-tabpanel"
         >
           <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-fish"></i>
+            <i class="fas fa-fish"></i>
           </span>
         </button>
-
+  
         <button
           id="unified-panel-tab-achievements"
           class="unified-panel-tab"
           type="button"
           data-tab="achievements"
-          data-label="Achievements"
           role="tab"
           aria-selected="false"
           aria-controls="unified-panel-tabpanel"
         >
           <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-trophy"></i>
+            <i class="fas fa-trophy"></i>
           </span>
         </button>
-
+  
         <button
           id="unified-panel-tab-games"
           class="unified-panel-tab"
           type="button"
           data-tab="games"
-          data-label="Games"
           role="tab"
           aria-selected="false"
           aria-controls="unified-panel-tabpanel"
         >
           <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-gamepad"></i>
+            <i class="fas fa-gamepad"></i>
           </span>
         </button>
+  
+      <button
+        id="unified-panel-tab-settings"
+        class="unified-panel-tab"
+        type="button"
+        data-tab="settings"
+        role="tab"
+        aria-selected="false"
+        aria-controls="unified-panel-tabpanel"
+      >
+        <span class="tab-icon" aria-hidden="true">
+          <i class="fas fa-cog"></i>
+        </span>
+      </button>
 
-        <button
-          id="unified-panel-tab-settings"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="settings"
-          data-label="Settings"
-          role="tab"
-          aria-selected="false"
-          aria-controls="unified-panel-tabpanel"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-gear"></i>
-          </span>
-        </button>
-
-        <button
-          class="unified-panel-tab unified-panel-close"
-          type="button"
-          data-label="Close"
-          aria-label="Close panel"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fa-solid fa-xmark"></i>
-          </span>
-        </button>
-      </div>
+      <button
+        class="unified-panel-tab unified-panel-close"
+        type="button"
+        aria-label="Close panel"
+      >
+        <span class="tab-icon" aria-hidden="true">×</span>
+      </button>
+    </div>
     </div>
     <div
       class="unified-panel-content"
