@@ -50,18 +50,18 @@ var WORLD_COLLIDERS = {
         y: 126,
         width: 64,
         height: 4,
-        tag: "caveEntrance",
+        tag: "mainMap",
         nextScene: "cave",
         nextSpawn: { x: 192, y: 152 }
       },
       {
-        x: 997,
-        y: 220,
-        width: 64,
+        x: 290,
+        y: 670,
+        width: 38,
         height: 4,
         tag: "mainMap",
         nextScene: "mainMap",
-        nextSpawn: { x: 997, y: 220 }
+        nextSpawn: { x: 997, y: 176 }
       }
     ]
   },
