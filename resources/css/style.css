@@ -520,6 +520,17 @@ body {
   background-repeat: no-repeat;
   z-index: 11;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+  cursor: pointer;
+}
+
+.sign-interact.fishing-frenzy-sign {
+  left: 964px;
+  top: 1424px;
+  width: 44px;
+  height: 44px;
+  background-image: url("../images/sign.png");
+  background-size: 44px 44px;
+  z-index: 15;
 }
 
 /* Name Sign Above Cave */
@@ -1452,16 +1463,6 @@ body {
 
 .minimap-widget.active {
   display: block;
-}
-
-/* Main UI camera center button */
-.center-camera-btn {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 6.5rem; /* Just above minimap */
-  z-index: 10001;
-  font-size: 0.75rem;
-  padding: 0.5rem 0.9rem;
 }
 
 /* Fixed crosshair at viewport center for camera alignment */

@@ -220,6 +220,33 @@
         // Snap to whole pixels to avoid subpixel drift/lead
         newMarginLeft = Math.round(newMarginLeft);
         newMarginTop = Math.round(newMarginTop);
+
+        // Clamp so the camera never slides past the left or top page edges.
+        // This may break perfect centering near boundaries but prevents showing empty space.
+        if (newMarginLeft > 0) {
+          newMarginLeft = 0;
+        }
+        // Prevent exposing empty space on the right edge.
+        // Map width is based on world width scaled by EFFECTIVE_MAP_SCALE.
+        var mapWidthPx = WORLD_WIDTH * EFFECTIVE_MAP_SCALE;
+        var minMarginLeft = window.innerWidth - mapWidthPx;
+        if (newMarginLeft < minMarginLeft) {
+          newMarginLeft = minMarginLeft;
+        }
+        // Clamp so the camera never slides below the top of the page.
+        // This may break perfect centering near the top boundary, but prevents showing empty space.
+        if (newMarginTop > 0) {
+          newMarginTop = 0;
+        }
+        // Prevent exposing empty space on the bottom edge.
+        // Map height is based on world height scaled by EFFECTIVE_MAP_SCALE.
+        var mapHeightPx = WORLD_HEIGHT * EFFECTIVE_MAP_SCALE;
+        var bottomBufferPx = 2000; // allow slight extra downward pan
+        var minMarginTop = window.innerHeight - mapHeightPx - bottomBufferPx;
+        if (newMarginTop < minMarginTop) {
+          newMarginTop = minMarginTop;
+        }
+
         $parent.css({
           "margin-left": newMarginLeft + "px",
           "margin-top": newMarginTop + "px"

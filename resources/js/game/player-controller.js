@@ -6,6 +6,9 @@
     console.warn("GameWorld is not available; PlayerController will not start.");
   }
 
+  // Disable camera grab/drag and keyboard panning.
+  var CAMERA_PAN_INTERACTIONS_ENABLED = false;
+
   class PlayerController {
     constructor() {
       this.gameWorld = null;
@@ -54,7 +57,11 @@
         }
 
         // IJKL keys for manual camera pan (debug)
-        if (self.gameWorld && typeof self.gameWorld.panCamera === "function") {
+        if (
+          CAMERA_PAN_INTERACTIONS_ENABLED &&
+          self.gameWorld &&
+          typeof self.gameWorld.panCamera === "function"
+        ) {
           var panStep = 32;
           if (e.keyCode === 73) {
             // I - up
@@ -91,6 +98,9 @@
     }
 
     _bindMouse() {
+      if (!CAMERA_PAN_INTERACTIONS_ENABLED) {
+        return; // disable grab/drag panning
+      }
       var self = this;
       var isDragging = false;
       var startX = 0;

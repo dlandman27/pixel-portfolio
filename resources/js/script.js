@@ -173,21 +173,6 @@ $(window).resize(function () {
   }
 });
 
-// Global UI: center camera button in main HUD
-$(function () {
-  $("#center-camera-btn").click(function () {
-    if (
-      window.playerController &&
-      window.playerController.gameWorld &&
-      typeof window.playerController.gameWorld.centerCameraOnPlayer ===
-        "function"
-    ) {
-      window.playerController.gameWorld.centerCameraOnPlayer();
-    }
-  });
-});
-
-
 var x = 0;
 // Global reference to new physics-based game world
 var gameWorld = null;
