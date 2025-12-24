@@ -216,6 +216,10 @@
           viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + NUDGE_X;
         var newMarginTop =
           viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y + NUDGE_Y;
+
+        // Snap to whole pixels to avoid subpixel drift/lead
+        newMarginLeft = Math.round(newMarginLeft);
+        newMarginTop = Math.round(newMarginTop);
         $parent.css({
           "margin-left": newMarginLeft + "px",
           "margin-top": newMarginTop + "px"

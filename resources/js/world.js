@@ -38,9 +38,64 @@ var WORLD = (function () {
     });
   }
 
-  // Water animation disabled for now.
+  // Water animation (top river/edge) with cached selectors and rAF for smoother perf
   function startRiverAnimation() {
-    return;
+    var $wrapper = $("#wrapper");
+    var $waterFunnel = $(".water.water_funnel");
+    var $poolTop = $(".pool.top");
+    var $poolMiddle = $(".pool.middle");
+    var $poolVF = $(".pool.verticalFunnel");
+    var $waterfall1 = $(".water.waterfall1");
+    var $poolVF2 = $(".pool.verticalFunnel2");
+    var $poolVF3 = $(".pool.verticalFunnel3");
+    var $poolVF4 = $(".pool.verticalFunnel4");
+
+    // Skip if no water elements exist
+    if (
+      !$wrapper.length &&
+      !$waterFunnel.length &&
+      !$poolTop.length &&
+      !$poolMiddle.length &&
+      !$poolVF.length &&
+      !$waterfall1.length &&
+      !$poolVF2.length &&
+      !$poolVF3.length &&
+      !$poolVF4.length
+    ) {
+      return;
+    }
+
+    var x = 0;
+    var speed = 8; // pixels per second baseline (frame-rate independent)
+    var last = performance.now();
+
+    function tick(now) {
+      var dt = (now - last) / 1000;
+      last = now;
+      x += speed * dt;
+
+      if ($wrapper.length) $wrapper.css("background-position", x + "px 0");
+      if ($waterFunnel.length)
+        $waterFunnel.css("background-position", -x + "px 0");
+      if ($poolTop.length)
+        $poolTop.css("background-position", -0.5 * x + "px 0");
+      if ($poolMiddle.length)
+        $poolMiddle.css("background-position", "0 " + 0.5 * x + "px");
+      if ($poolVF.length)
+        $poolVF.css("background-position", "0 " + 0.5 * x + "px");
+      if ($waterfall1.length)
+        $waterfall1.css("background-position", -2 * x + "px 0");
+      if ($poolVF2.length)
+        $poolVF2.css("background-position", "0 " + 2 * x + "px");
+      if ($poolVF3.length)
+        $poolVF3.css("background-position", "0 " + 2 * x + "px");
+      if ($poolVF4.length)
+        $poolVF4.css("background-position", "0 " + 2 * x + "px");
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
   }
 
   // Initialize movement system (call after DOM is ready)

@@ -140,6 +140,10 @@ $(window).load(function () {
 
   //Function to handle weather
   dayCycle();
+  // Water animation
+  if (typeof WORLD !== "undefined" && typeof WORLD.startRiverAnimation === "function") {
+    WORLD.startRiverAnimation();
+  }
   
   // Initialize minimap widget if map was already collected
   if (typeof inventory !== "undefined" && inventory.minimap && typeof initMinimapWidget === "function") {
