@@ -29,8 +29,8 @@
       this.collisionWorld = null;
       this.sceneName = null;
       this.player = null;
-      // Collider debug overlays default ON
-      this._colliderDebugEnabled = true;
+      // Collider debug overlays default OFF
+      this._colliderDebugEnabled = false;
       this._colliderDebugEls = [];
       this._initialMapMarginLeft = 0;
       this._initialMapMarginTop = 0;
@@ -49,6 +49,28 @@
      * sceneName: 'mainMap', 'tent1', etc.
      */
     init(sceneName) {
+      this._buildScene(sceneName, null);
+    }
+
+    /**
+     * Change to a different scene (e.g., enter tent/cave).
+     * options.spawnOverride can set a custom spawn {x,y} within the target scene.
+     */
+    changeScene(sceneName, options) {
+      options = options || {};
+      var spawnOverride = options.spawnOverride || null;
+
+      // Clear debug overlays from previous scene
+      this.clearColliderDebugOverlays();
+
+      // Rebuild scene
+      this._buildScene(sceneName, spawnOverride);
+    }
+
+    /**
+     * Internal helper to build scene bodies/triggers/player.
+     */
+    _buildScene(sceneName, spawnOverride) {
       if (typeof WORLD_COLLIDERS === "undefined") {
         console.error("WORLD_COLLIDERS is not defined. Did you load world.config.js?");
         return;
@@ -61,7 +83,7 @@
         return;
       }
 
-      this._spawn = cfg.playerSpawn || { x: 0, y: 0 };
+      this._spawn = spawnOverride || cfg.playerSpawn || { x: 0, y: 0 };
 
       // Capture initial map camera offsets so we can pan relative to spawn
       var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
@@ -115,6 +137,9 @@
           });
         }
       }
+
+      // Wire trigger-based scene transitions if provided in config
+      this._wireSceneTriggers(cfg);
 
       // Example: wire tutorial trigger if present
       var self = this;
@@ -343,6 +368,21 @@
       if (this._colliderDebugEnabled) {
         this.renderColliderDebugOverlays();
       }
+    }
+
+    // Wire scene transitions from trigger definitions
+    _wireSceneTriggers(cfg) {
+      var self = this;
+      if (!cfg || !cfg.triggers || !cfg.triggers.length) return;
+      cfg.triggers.forEach(function (t) {
+        if (!t.tag || !t.nextScene) return;
+        var eventName = "enter:" + t.tag;
+        self.collisionWorld.on(eventName, function () {
+          self.changeScene(t.nextScene, {
+            spawnOverride: t.nextSpawn || null
+          });
+        });
+      });
     }
 
     // ---- Sprite animation based on input direction ----
