@@ -4,7 +4,8 @@
 
 var WORLD_COLLIDERS = {
   mainMap: {
-    playerSpawn: { x: 997, y: 148 },
+    // Start lower on the map so the intro drop lands mid-world instead of at the cave.
+    playerSpawn: { x: 997, y: 220 },
     // Main map solids/triggers; authored against a 4px grid
     solids: [
       // Bridge top left blocked area (everything left of bridge)
@@ -42,7 +43,53 @@ var WORLD_COLLIDERS = {
       { x: 1210, y: 620, width: 84, height: 466, tag: "bottomBorderWall1" },
       { x: 708, y: 1044, width: 584, height: 42, tag: "bottomBorderWall1" },
     ],
-    triggers: []
+    triggers: [
+      // Cave entrance trigger (top cave doorway)
+      {
+        x: 962,
+        y: 126,
+        width: 64,
+        height: 4,
+        tag: "caveEntrance",
+        nextScene: "cave",
+        nextSpawn: { x: 192, y: 152 }
+      },
+      {
+        x: 997,
+        y: 220,
+        width: 64,
+        height: 4,
+        tag: "mainMap",
+        nextScene: "mainMap",
+        nextSpawn: { x: 997, y: 220 }
+      }
+    ]
+  },
+  cave: {
+    // Vertical timeline cave (~1200 units tall)
+    playerSpawn: { x: 1000, y: 1100 },
+    solids: [
+      // Left wall
+      { x: 0, y: 0, width: 840, height: 1200, tag: "caveLeftWall" },
+      // Right wall
+      { x: 1160, y: 0, width: 840, height: 1200, tag: "caveRightWall" },
+      // Top cap
+      { x: 840, y: -40, width: 320, height: 40, tag: "caveTop" },
+      // Bottom cap
+      { x: 840, y: 1200, width: 320, height: 40, tag: "caveBottom" }
+    ],
+    triggers: [
+      // Exit back to main map at bottom of cave
+      {
+        x: 940,
+        y: 1130,
+        width: 120,
+        height: 70,
+        tag: "caveExit",
+        nextScene: "mainMap",
+        nextSpawn: { x: 997, y: 220 }
+      }
+    ]
   },
   tent1: {
     playerSpawn: { x: 192, y: 152 },

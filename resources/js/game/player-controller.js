@@ -16,6 +16,7 @@
       this.keysDown = {};
       this._lastTime = null;
       this._running = false;
+      this.disableInput = false;
     }
 
     init() {
@@ -38,6 +39,7 @@
       var movementKeys = [37, 38, 39, 40, 65, 68, 83, 87]; // arrows + WASD
 
       window.addEventListener("keydown", function (e) {
+        if (self.disableInput) return;
         // Spacebar: dev helper to log player position for collider authoring
         if (e.keyCode === 32) {
           e.preventDefault();
@@ -90,6 +92,7 @@
       });
 
       window.addEventListener("keyup", function (e) {
+        if (self.disableInput) return;
         if (movementKeys.indexOf(e.keyCode) !== -1) {
           self.keysDown[e.keyCode] = false;
           self._recomputeAxes();
@@ -155,6 +158,11 @@
     }
 
     _recomputeAxes() {
+      if (this.disableInput) {
+        this.inputState.x = 0;
+        this.inputState.y = 0;
+        return;
+      }
       var left = this.keysDown[37] || this.keysDown[65]; // left / A
       var right = this.keysDown[39] || this.keysDown[68]; // right / D
       var up = this.keysDown[38] || this.keysDown[87]; // up / W
@@ -184,7 +192,9 @@
         self._lastTime = now;
 
         if (self.gameWorld) {
-          self.gameWorld.update(delta, self.inputState);
+          // If input is disabled (e.g., during intro), force zero movement
+          var input = self.disableInput ? { x: 0, y: 0 } : self.inputState;
+          self.gameWorld.update(delta, input);
         }
 
         requestAnimationFrame(tick);

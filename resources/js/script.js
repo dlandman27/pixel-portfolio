@@ -246,6 +246,7 @@ $(function () {
   }
 })
 
+
 //Tells if the fire is on
 var fireOn = false;
 
@@ -1913,6 +1914,23 @@ var fish;
 var inFishing = false;
 var isReelingIn = false;
 
+function setMovementDisabled(flag) {
+  if (window.playerController) {
+    playerController.disableInput = !!flag;
+    if (flag) {
+      playerController.keysDown = {};
+      playerController.inputState = { x: 0, y: 0 };
+      if (
+        playerController.gameWorld &&
+        playerController.gameWorld.player &&
+        typeof playerController.gameWorld.player.setVelocity === "function"
+      ) {
+        playerController.gameWorld.player.setVelocity({ x: 0, y: 0 });
+      }
+    }
+  }
+}
+
 function goFishing(){
   $(".try-again").css("display","none");
   $("#rules-fishing").css("display","block");
@@ -1930,6 +1948,7 @@ function goFishing(){
     $(".fish-from-water").css({display: "none",marginLeft: 0, top: 1500});
     $("#fishing-game-screen").css("display","none");
     inFishing = true;
+    setMovementDisabled(true);
     $("#dylan").css({top: 1440, left: 984});
     $("#map").css({marginTop: -3696});
     
@@ -1962,6 +1981,7 @@ function closeFishing(){
   $(".fish-from-water").css({display: "none",marginLeft: 0, top: 1500});
   inFishing = false;
   eventOccurence = false;
+  setMovementDisabled(false);
   $("#dylan").css("background-image", URL.getDylan()+"/dylan-front-1.png)");
   $(".bio").css("display","none");
   $("#fishing-game-screen").css("display","none");

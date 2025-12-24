@@ -801,6 +801,24 @@ function enableBackpack() {
 // ----------------------
 // Item pickup animation (Totem of Undying style)
 // ----------------------
+function playConfettiLottie() {
+  var container = document.getElementById("lottie-confetti");
+  if (!container || typeof lottie === "undefined") return;
+  container.style.display = "block";
+  container.innerHTML = "";
+  var anim = lottie.loadAnimation({
+    container: container,
+    renderer: "svg",
+    loop: false,
+    autoplay: true,
+    path: "resources/images/lottie/confetti.json",
+  });
+  anim.addEventListener("complete", function () {
+    container.style.display = "none";
+    anim.destroy();
+  });
+}
+
 function showItemPickupAnimation(itemType) {
   console.log('showItemPickupAnimation called with:', itemType);
   
@@ -857,33 +875,11 @@ function showItemPickupAnimation(itemType) {
   
   console.log('Item found:', item);
 
-  // Get target position (inventory slot or backpack icon)
-  var $target = $(item.slot);
-  if ($target.length === 0) {
-    // Fallback to backpack icon if slot not found
-    $target = $("#backpack-icon");
-  }
-
-  // Get target position - try multiple methods
-  var targetOffset = $target.offset();
-  
-  // If element is hidden or offset() returns null, calculate position manually
-  if (!targetOffset || $target.css('visibility') === 'hidden' || $target.css('display') === 'none') {
-    // For fixed elements, use position() or calculate from viewport
-    var position = $target.position();
-    if (position && (position.left !== 0 || position.top !== 0)) {
-      targetOffset = {
-        left: position.left,
-        top: position.top
-      };
-    } else {
-      // Default to top-right corner (where backpack usually is)
-      targetOffset = {
-        left: window.innerWidth - 150,
-        top: 20
-      };
-    }
-  }
+  // Always send to top-right HUD corner (avoids misalignment when slots are off-screen)
+  var targetOffset = {
+    left: window.innerWidth - 110,
+    top: 36
+  };
 
   // Create the animated icon element using img tag for better compatibility
   var imageUrl = item.icon;
@@ -905,9 +901,10 @@ function showItemPickupAnimation(itemType) {
     marginTop: '-128px',
     zIndex: 10000000,
     pointerEvents: 'none',
-    opacity: 1,
+    opacity: 0,
     display: 'block',
-    visibility: 'visible'
+    visibility: 'visible',
+    transform: 'translate(40px, 16px) scale(0.7)'
   });
 
   // Create dark overlay for the screen
@@ -948,36 +945,52 @@ function showItemPickupAnimation(itemType) {
   $('body').append($label);
   console.log('Icon element appended, image URL:', imageUrl);
   
-  // Create a small pixel confetti burst around the item
+  // Play full-screen Lottie confetti if available
+  if (typeof playConfettiLottie === "function") {
+    playConfettiLottie();
+  }
+  
+  // Create a pixel confetti burst from bottom-left and bottom-right of the viewport
   (function createItemPickupConfetti() {
     var colors = ['#fbbf24', '#fb7185', '#38bdf8', '#a855f7', '#4ade80'];
-    var count = 18;
-    for (var i = 0; i < count; i++) {
-      var dx = (Math.random() - 0.5) * 220; // spread horizontally
-      var dy = - (60 + Math.random() * 120); // burst upward
-      var color = colors[Math.floor(Math.random() * colors.length)];
-      var $confetti = $('<div class="item-pickup-confetti"></div>');
-      $confetti.css({
-        '--dx': dx + 'px',
-        '--dy': dy + 'px',
-        'background-color': color
-      });
-      $('body').append($confetti);
-      
-      // Clean up each confetti piece after its animation
-      (function(confettiEl) {
-        setTimeout(function() {
-          confettiEl.remove();
-        }, 800);
-      })($confetti);
-    }
+    var total = 36;
+    var origins = [
+      { x: 0, y: window.innerHeight - 12, dir: 1 },  // bottom-left, shoot right/up
+      { x: window.innerWidth, y: window.innerHeight - 12, dir: -1 } // bottom-right, shoot left/up
+    ];
+    var perOrigin = Math.ceil(total / origins.length);
+
+    origins.forEach(function (origin) {
+      for (var i = 0; i < perOrigin; i++) {
+        var spreadX = 260;
+        var dx = (Math.random() * spreadX) * origin.dir; // shoot toward center
+        var dy = - (100 + Math.random() * 180); // burst upward
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        var $confetti = $('<div class="item-pickup-confetti"></div>');
+        $confetti.css({
+          '--dx': dx + 'px',
+          '--dy': dy + 'px',
+          'background-color': color,
+          left: origin.x + 'px',
+          top: origin.y + 'px'
+        });
+        $('body').append($confetti);
+        
+        // Clean up each confetti piece after its animation
+        (function(confettiEl) {
+          setTimeout(function() {
+            confettiEl.remove();
+          }, 1000);
+        })($confetti);
+      }
+    });
   })();
 
   // Force a reflow to ensure element is rendered before animation
   void $icon[0].offsetHeight;
   void $label[0].offsetHeight;
 
-  // Small delay to ensure DOM is ready, then start shake animation
+  // Small delay to ensure DOM is ready, then start lift animation (no shake)
   setTimeout(function() {
     // Fade in the overlay and label
     $overlay.css('opacity', 1);
@@ -986,10 +999,14 @@ function showItemPickupAnimation(itemType) {
       transition: 'opacity 0.3s ease-in'
     });
     
-    // Phase 1: Shake animation (0.8 seconds)
-    $icon.addClass('item-pickup-shake');
+    // Phase 1: Fade-in from the right, lift, and scale up (no spin)
+    $icon.css({
+      transition: 'transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.45s ease-out',
+      transform: 'translate(0px, -35px) scale(1.12)',
+      opacity: 1
+    });
     
-    // After shake completes (800ms), fly to backpack
+    // After lift completes (450ms), fly to backpack
     setTimeout(function() {
       // Fade out the overlay and label before flying
       $overlay.css({
@@ -1001,9 +1018,11 @@ function showItemPickupAnimation(itemType) {
         transition: 'opacity 0.2s ease-out'
       });
       
-      // Remove shake class and reset transform for smooth transition
-      $icon.removeClass('item-pickup-shake');
-      $icon.css('transform', 'translate(0, 0) scale(1) rotate(0deg)');
+      // Reset transform for smooth transition
+      $icon.css({
+        transition: 'transform 0.12s ease-out',
+        transform: 'translate(0, 0) scale(1) rotate(0deg)'
+      });
       
       // Remove overlay and label after fade out
       setTimeout(function() {
@@ -1013,7 +1032,7 @@ function showItemPickupAnimation(itemType) {
       
       // Small delay to ensure transform reset
       setTimeout(function() {
-        // Phase 2: Fly to backpack (0.6 seconds)
+        // Phase 2: Fly to backpack (gentle 0.65s)
         var endLeft = targetOffset.left;
         var endTop = targetOffset.top;
         
@@ -1028,24 +1047,25 @@ function showItemPickupAnimation(itemType) {
           marginTop: '0',
           width: '128px',
           height: '128px',
-          transform: 'translate(0, 0) scale(1) rotate(0deg)',
-          transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          transform: 'translate(0, 0) scale(1)',
+          transition: 'all 0.65s cubic-bezier(0.25, 0.9, 0.3, 1)'
         });
 
-        // Phase 3: Fade out and remove (after 600ms flight)
+        // Phase 3: Fade out and remove (after flight)
         setTimeout(function() {
+          // Fly toward target with a gentle scale down
           $icon.css({
-            opacity: 0,
-            transform: 'scale(0.5)',
-            transition: 'all 0.3s ease-out'
+            transform: 'translate(0, 0) scale(0.4)',
+            opacity: 0.05,
+            transition: 'transform 0.65s cubic-bezier(0.25, 0.9, 0.3, 1), opacity 0.4s ease-out'
           });
           
           setTimeout(function() {
             $icon.remove();
-          }, 300);
-        }, 600);
+          }, 700);
+        }, 650);
       }, 50);
-    }, 800);
+    }, 450);
   }, 10);
 }
 

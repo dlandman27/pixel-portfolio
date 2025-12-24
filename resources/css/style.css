@@ -1461,6 +1461,29 @@ body {
   image-rendering: pixelated;
 }
 
+.intro-drop {
+  animation: introDrop 0.3s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes introDrop {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+    translate: 0 -24px;
+  }
+  80% {
+    opacity: 0.5;
+    scale: 1.2;
+    translate: 0 4px;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+}
+
 .minimap-widget.active {
   display: block;
 }
@@ -3823,31 +3846,30 @@ i {
 /* Small pixel confetti burst on item pickup */
 .item-pickup-confetti {
   position: fixed;
-  left: 50%;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-  transform: translate(-50%, -50%);
+  left: 0;
+  top: 0;
+  width: 9px;
+  height: 9px;
   background: #fbbf24;
   pointer-events: none;
   z-index: 10000002;
-  border-radius: 1px;
-  animation: itemPickupConfetti 0.7s ease-out forwards;
+  border-radius: 2px;
+  animation: itemPickupConfetti 0.9s ease-out forwards;
 }
 
 @keyframes itemPickupConfetti {
   0% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    transform: translate(0, 0) scale(1) rotate(0deg);
   }
   100% {
     opacity: 0;
     transform: translate(
-        calc(-50% + var(--dx, 0px)),
-        calc(-50% + var(--dy, -80px))
+        var(--dx, 0px),
+        var(--dy, -150px)
       )
       scale(0.8)
-      rotate(280deg);
+      rotate(320deg);
   }
 }
 

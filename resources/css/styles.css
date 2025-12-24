@@ -1,0 +1,140 @@
+/* Cave scene styles */
+
+#cave {
+  position: fixed;
+  width: 2000px;
+  height: 1200px;
+  transform: scale(3, 3);
+  transform-origin: top left;
+  overflow: visible;
+  left: 0;
+  top: 0;
+  background: radial-gradient(ellipse at center, #2b2b2b 0%, #1d1d1d 60%, #0f0f0f 100%);
+  display: none;
+  background-color: #111;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.cave-hall {
+  position: absolute;
+  left: 880px;
+  width: 240px;
+  height: 1200px;
+  background: linear-gradient(180deg, #4a3827 0%, #3a2c1f 40%, #2c2118 100%);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+.cave-dark {
+  position: absolute;
+  top: 0;
+  width: 880px;
+  height: 1200px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.9));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cave-dark.right {
+  left: 1120px;
+  transform: scaleX(-1);
+}
+
+.cave-dark.left {
+  left: 0;
+}
+
+.cave-sign {
+  position: absolute;
+  width: 240px;
+  min-height: 120px;
+  color: #fdf6e3;
+  font-family: "Press Start 2P", cursive;
+  text-shadow: 2px 2px 0 #000;
+  z-index: 3;
+}
+
+.cave-sign.left {
+  left: 520px;
+}
+
+.cave-sign.right {
+  left: 1240px;
+}
+
+.cave-sign .post {
+  position: absolute;
+  left: 50%;
+  top: 32px;
+  width: 14px;
+  height: 110px;
+  background: #5a4632;
+  transform: translateX(-50%);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.cave-sign .plank {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  right: 20px;
+  height: 48px;
+  background: linear-gradient(90deg, #7b5b3c, #65472f);
+  border: 2px solid #3a2a1d;
+  box-shadow: 0 6px 0 #1f1610;
+}
+
+.cave-sign-label {
+  position: relative;
+  top: 56px;
+  padding: 14px 16px;
+  background: rgba(15, 15, 15, 0.8);
+  border: 2px solid #5c4735;
+  border-radius: 8px;
+  box-shadow: 0 4px 0 #1b130d;
+}
+
+.cave-sign-label .year {
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: #ffde89;
+}
+
+.cave-sign-label .title {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #f5e6d3;
+}
+
+.cave-sign-label .desc {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #d2c2b2;
+}
+
+.cave-exit {
+  position: absolute;
+  left: 940px;
+  top: 1130px;
+  width: 120px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
+  z-index: 4;
+}
+
+.cave-exit::after {
+  content: "Exit";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d8d8d8;
+  font-family: "Press Start 2P", cursive;
+  font-size: 11px;
+  text-shadow: 1px 1px 0 #000;
+}
+

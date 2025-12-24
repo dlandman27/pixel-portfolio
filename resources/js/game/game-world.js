@@ -27,6 +27,8 @@
   var MAP_ZOOM = 1;
   // Effective scale used for camera math (keep equal to MAP_SCALE)
   var EFFECTIVE_MAP_SCALE = MAP_SCALE;
+  // Intro settings
+  var INTRO_DURATION_MS = 1300;
 
   class GameWorld {
     constructor() {
@@ -46,6 +48,7 @@
       this._lastDir = "down"; // 'down' | 'up' | 'left' | 'right'
       this._lastFacingApplied = null;
       this._lastFrameApplied = null;
+      this._introPlayed = false;
     }
 
     /**
@@ -54,6 +57,8 @@
      */
     init(sceneName) {
       this._buildScene(sceneName, null);
+      // Hide player until intro completes
+      $("#dylan").css("visibility", "hidden");
     }
 
     /**
@@ -81,6 +86,9 @@
       }
 
       this.sceneName = sceneName || "mainMap";
+      this._setSceneVisibility(this.sceneName);
+      // Force debug overlays to regenerate on scene change
+      this._colliderDebugRendered = false;
       var cfg = WORLD_COLLIDERS[this.sceneName];
       if (!cfg) {
         console.error("WORLD_COLLIDERS has no entry for scene:", this.sceneName);
@@ -90,8 +98,7 @@
       this._spawn = spawnOverride || cfg.playerSpawn || { x: 0, y: 0 };
 
       // Capture initial map camera offsets so we can pan relative to spawn
-      var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
-      var $parent = $(parentSelector);
+      var $parent = this._getSceneElement();
       if ($parent.length) {
         var ml = parseInt($parent.css("margin-left"), 10);
         var mt = parseInt($parent.css("margin-top"), 10);
@@ -156,9 +163,19 @@
       // Initial sync of Dylan to physics position (do not auto-center; preserve manual offset)
       this.syncToDom();
 
-      // If debug was enabled before init, render overlays now
+      // Play intro drop only the first time we enter the main map
+      if (!this._introPlayed && this.sceneName === "mainMap") {
+        if (global.playerController) {
+          global.playerController.disableInput = true;
+        }
+        this._playIntroDrop();
+        this._introPlayed = true;
+      }
+
+      // If debug was enabled before init, render overlays once
       if (this._colliderDebugEnabled) {
         this.renderColliderDebugOverlays();
+        this._colliderDebugRendered = true;
       }
     }
 
@@ -168,14 +185,18 @@
      */
     update(deltaMs, input) {
       if (!this.collisionWorld) return;
-      this.collisionWorld.update(deltaMs, input || { x: 0, y: 0 });
-      this.updateAnimation(deltaMs, input || { x: 0, y: 0 });
+      var effectiveInput = input || { x: 0, y: 0 };
+      if (global.playerController && global.playerController.disableInput) {
+        effectiveInput = { x: 0, y: 0 };
+        if (this.player && typeof this.player.setVelocity === "function") {
+          this.player.setVelocity({ x: 0, y: 0 });
+        }
+      }
+      this.collisionWorld.update(deltaMs, effectiveInput);
+      this.updateAnimation(deltaMs, effectiveInput);
       this.syncToDom();
 
-       // Keep debug overlays (including player box) in sync with movement
-       if (this._colliderDebugEnabled) {
-         this.renderColliderDebugOverlays();
-       }
+      // Do not re-render debug overlays every frame; only on enable/scene change
     }
 
     /**
@@ -199,8 +220,7 @@
       }
 
       // Camera follow: keep player centered using world pos and effective scale.
-      var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
-      var $parent = $(parentSelector);
+      var $parent = this._getSceneElement();
       if ($parent.length) {
         var viewportCenterX = window.innerWidth / 2;
         var viewportCenterY = window.innerHeight / 2;
@@ -240,7 +260,8 @@
         }
         // Prevent exposing empty space on the bottom edge.
         // Map height is based on world height scaled by EFFECTIVE_MAP_SCALE.
-        var mapHeightPx = WORLD_HEIGHT * EFFECTIVE_MAP_SCALE;
+        var mapHeightPx =
+          (this.sceneName === "cave" ? 1200 : WORLD_HEIGHT) * EFFECTIVE_MAP_SCALE;
         var bottomBufferPx = 2000; // allow slight extra downward pan
         var minMarginTop = window.innerHeight - mapHeightPx - bottomBufferPx;
         if (newMarginTop < minMarginTop) {
@@ -258,8 +279,10 @@
 
     setColliderDebugEnabled(enabled) {
       this._colliderDebugEnabled = !!enabled;
+      this._colliderDebugRendered = false;
       if (this._colliderDebugEnabled) {
         this.renderColliderDebugOverlays();
+        this._colliderDebugRendered = true;
       } else {
         this.clearColliderDebugOverlays();
       }
@@ -280,14 +303,17 @@
     }
 
     renderColliderDebugOverlays() {
-      this.clearColliderDebugOverlays();
+      // Avoid rebuilding repeatedly each frame; only build when enabled/changed.
       if (!this._colliderDebugEnabled) return;
+      // Clear existing overlays once before drawing
+      this.clearColliderDebugOverlays();
       if (typeof WORLD_COLLIDERS === "undefined") return;
 
       var cfg = WORLD_COLLIDERS[this.sceneName];
       if (!cfg) return;
 
-      var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
+      var parentSelector =
+        this.sceneName === "tent1" ? "#tent1" : this.sceneName === "cave" ? "#cave" : "#map";
       var $parent = $(parentSelector);
       if (!$parent.length) return;
 
@@ -325,7 +351,9 @@
             left: t.x + "px",
             top: t.y + "px",
             width: t.width + "px",
-            height: t.height + "px"
+            height: t.height + "px",
+            background: "rgba(255,0,0,0.15)",
+            border: "2px solid rgba(255,0,0,0.7)"
           });
           if (t.tag) {
             $tEl.attr("title", t.tag);
@@ -372,8 +400,7 @@
     logCameraState() {
       if (!this.player) return;
       var pos = this.player.getPosition();
-      var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
-      var $parent = $(parentSelector);
+      var $parent = this._getSceneElement();
       var ml = $parent.length ? parseInt($parent.css("margin-left"), 10) || 0 : 0;
       var mt = $parent.length ? parseInt($parent.css("margin-top"), 10) || 0 : 0;
       console.log(
@@ -407,6 +434,66 @@
 
     getCameraOffset() {
       return { x: this._cameraOffset.x, y: this._cameraOffset.y };
+    }
+
+    _setSceneVisibility(sceneName) {
+      var $map = $("#map");
+      var $cave = $("#cave");
+      var $tent1 = $("#tent1");
+
+      if (sceneName === "cave") {
+        if ($map.length) $map.hide();
+        if ($tent1.length) $tent1.hide();
+        if ($cave.length) $cave.show();
+      } else if (sceneName === "tent1") {
+        if ($map.length) $map.hide();
+        if ($cave.length) $cave.hide();
+        if ($tent1.length) $tent1.show();
+      } else {
+        if ($map.length) $map.show();
+        if ($cave.length) $cave.hide();
+        if ($tent1.length) $tent1.hide();
+      }
+    }
+
+    _getSceneElement() {
+      var selector =
+        this.sceneName === "tent1"
+          ? "#tent1"
+          : this.sceneName === "cave"
+          ? "#cave"
+          : "#map";
+      var $el = $(selector);
+      if ($el.length) return $el;
+      return $("body");
+    }
+
+    // Intro animation: make Dylan fall in from above the viewport
+    _playIntroDrop() {
+      var $dylan = $("#dylan");
+      if (!$dylan.length) return;
+      $dylan.removeClass("intro-drop");
+      // Force reflow so animation can restart if needed
+      void $dylan[0].offsetWidth;
+      $dylan.addClass("intro-drop");
+      // Show player immediately as drop starts
+      $dylan.css("visibility", "visible");
+      // Disable movement during intro
+      if (global.playerController) {
+        global.playerController.disableInput = true;
+        global.playerController.keysDown = {};
+        global.playerController.inputState = { x: 0, y: 0 };
+      }
+      if (this.player && typeof this.player.setVelocity === "function") {
+        this.player.setVelocity({ x: 0, y: 0 });
+      }
+      // Clean up after animation finishes to avoid lingering transforms
+      setTimeout(function () {
+        $dylan.removeClass("intro-drop");
+        if (global.playerController) {
+          global.playerController.disableInput = false;
+        }
+      }, INTRO_DURATION_MS);
     }
 
     // Utility: recenter camera on the player's current world position.
