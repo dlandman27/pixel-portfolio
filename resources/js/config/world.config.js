@@ -4,7 +4,7 @@
 
 var WORLD_COLLIDERS = {
   mainMap: {
-    playerSpawn: { x: 980, y: 740 },
+    playerSpawn: { x: 997, y: 148 },
     // Main map solids/triggers; authored against a 4px grid
     solids: [
       // Bridge top left blocked area (everything left of bridge)

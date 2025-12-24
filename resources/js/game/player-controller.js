@@ -44,6 +44,12 @@
           ) {
             self.gameWorld.logPlayerPositionOnce();
           }
+          if (
+            self.gameWorld &&
+            typeof self.gameWorld.logCameraState === "function"
+          ) {
+            self.gameWorld.logCameraState();
+          }
           return;
         }
 

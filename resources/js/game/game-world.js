@@ -23,6 +23,10 @@
   var WORLD_HEIGHT = 1200;
   // Visual map scale (matches CSS: transform: scale(3, 3))
   var MAP_SCALE = 3;
+  // CSS zoom is visual-only; ignore it for camera math so centering isn't affected.
+  var MAP_ZOOM = 1;
+  // Effective scale used for camera math (keep equal to MAP_SCALE)
+  var EFFECTIVE_MAP_SCALE = MAP_SCALE;
 
   class GameWorld {
     constructor() {
@@ -149,9 +153,8 @@
         }
       });
 
-      // Initial sync of Dylan to physics position
-      // Ensure camera starts centered on the player (respecting clamping)
-      this.centerCameraOnPlayer();
+      // Initial sync of Dylan to physics position (do not auto-center; preserve manual offset)
+      this.syncToDom();
 
       // If debug was enabled before init, render overlays now
       if (this._colliderDebugEnabled) {
@@ -195,24 +198,24 @@
         });
       }
 
-      // Camera follow: always keep the camera centered on the player.
-      // Account for MAP_SCALE so the visual center matches the scaled map.
+      // Camera follow: keep player centered using world pos and effective scale.
       var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
       var $parent = $(parentSelector);
       if ($parent.length) {
         var viewportCenterX = window.innerWidth / 2;
         var viewportCenterY = window.innerHeight / 2;
 
-        // Player world position becomes the camera center; then we add any
-        // manual offset (for drag / debug panning).
         var camX = pos.x;
         var camY = pos.y;
 
-        // Move the scaled map by the player's world position times MAP_SCALE.
+        // Optional micro-adjust to fine-tune visual centering
+        var NUDGE_X = 0; // negative shifts camera left; adjust as needed
+        var NUDGE_Y = 0;  // negative shifts camera up; adjust as needed
+
         var newMarginLeft =
-          viewportCenterX - camX * MAP_SCALE + this._cameraOffset.x;
+          viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + NUDGE_X;
         var newMarginTop =
-          viewportCenterY - camY * MAP_SCALE + this._cameraOffset.y;
+          viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y + NUDGE_Y;
         $parent.css({
           "margin-left": newMarginLeft + "px",
           "margin-top": newMarginTop + "px"
@@ -331,6 +334,22 @@
         "WORLD_COLLIDER_POINT:",
         Math.round(pos.x),
         Math.round(pos.y)
+      );
+    }
+
+    // Utility: log player and camera state (for debugging)
+    logCameraState() {
+      if (!this.player) return;
+      var pos = this.player.getPosition();
+      var parentSelector = this.sceneName === "tent1" ? "#tent1" : "#map";
+      var $parent = $(parentSelector);
+      var ml = $parent.length ? parseInt($parent.css("margin-left"), 10) || 0 : 0;
+      var mt = $parent.length ? parseInt($parent.css("margin-top"), 10) || 0 : 0;
+      console.log(
+        "[CameraLog] player=", pos.x.toFixed(1), pos.y.toFixed(1),
+        "offset=", this._cameraOffset.x.toFixed(1), this._cameraOffset.y.toFixed(1),
+        "margin=", ml.toFixed(1), mt.toFixed(1),
+        "scene=", this.sceneName
       );
     }
 

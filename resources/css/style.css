@@ -261,10 +261,11 @@ body {
 /*Container to hold the elements of the map*/
 #map {
   transform: scale(3, 3);
+  transform-origin: top left;
   position: fixed;
   overflow-x: visible;
   /* top: 1200px; */
-  zoom: 80%;
+  /* Removed zoom to keep camera math aligned with MAP_SCALE */
   /* Let GameWorld control camera directly; no extra easing so camera matches player speed */
   transition: none;
   /* width: 3000px; */
@@ -1368,6 +1369,24 @@ body {
   z-index: 10001;
   font-size: 0.75rem;
   padding: 0.5rem 0.9rem;
+}
+
+/* Fixed crosshair at viewport center for camera alignment */
+.center-crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 0, 0, 0.9);
+  border: 1px solid #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 6px rgba(255, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 10002;
 }
 
 .minimap-widget-content {
