@@ -21,15 +21,26 @@ var WORLD_COLLIDERS = {
 
       // Cave
       { x: 964, y: 28, width: 64, height: 100, tag: "cave-top" },
-      { x: 950, y: 60, width: 14, height: 100, tag: "cave-left" },
-      { x: 1026, y: 60, width: 14, height: 100, tag: "cave-right" },
+      { x: 950, y: 60, width: 14, height: 118, tag: "cave-left" },
+      { x: 1026, y: 60, width: 14, height: 118, tag: "cave-right" },
 
 
       // Left Border Wall
-      { x: 136, y: 360, width: 32, height: 504, tag: "leftBorderWall" },
+      { x: 136, y: 360, width: 32, height: 504, tag: "leftFence" },
+      { x: 166, y: 676, width: 124, height: 12, tag: "leftFenceBottomTent" },
+      { x: 326, y: 676, width: 130, height: 12, tag: "leftFenceBottomTentRight" },
       { x: 440, y: 360, width: 16, height: 290, tag: "rightBorderWall" },
       { x: 168, y: 860, width: 322, height: 490, tag: "bottomBorderWall" },
-      { x: 490, y: 1324, width: 440, height: 176, tag: "bottomBorderWall1" },
+      { x: 490, y: 1330, width: 454, height: 176, tag: "bottomFence" },
+      { x: 1048, y: 1330, width: 800, height: 176, tag: "bottomFenceRight" },
+      { x: 928, y: 1504, width: 140, height: 8, tag: "bottomBorderWall1" },
+      
+      // Bonfire
+      { x: 708, y: 620, width: 82, height: 270, tag: "bottomBorderWall1" },
+      { x: 708, y: 620, width: 266, height: 24, tag: "bottomBorderWall1" },
+      { x: 1030, y: 620, width: 258, height: 24, tag: "bottomBorderWall1" },
+      { x: 1210, y: 620, width: 84, height: 466, tag: "bottomBorderWall1" },
+      { x: 708, y: 1044, width: 584, height: 42, tag: "bottomBorderWall1" },
     ],
     triggers: []
   },

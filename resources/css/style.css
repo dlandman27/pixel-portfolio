@@ -645,7 +645,7 @@ body {
 
 #ocean {
   background-image: url("../images/tiles/ocean.png");
-  height: 400px;
+  height: 800px;
   width: 2000px;
   position: absolute;
   background-size: 32px;
@@ -667,8 +667,8 @@ body {
   background-image: url("../images/roads/bridge.png");
   background-size: 128px;
   background-repeat: repeat-y;
-  margin-left: 936px;
-  margin-top: -80px;
+  margin-left: 932px;
+  margin-top: -70px;
   z-index: 14;
 }
 
