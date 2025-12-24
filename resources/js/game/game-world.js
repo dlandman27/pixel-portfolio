@@ -89,6 +89,12 @@
       this._setSceneVisibility(this.sceneName);
       // Force debug overlays to regenerate on scene change
       this._colliderDebugRendered = false;
+      // Build cave DOM if entering cave
+      if (this.sceneName === "cave" && typeof buildCaveDomIfNeeded === "function") {
+        buildCaveDomIfNeeded();
+      }
+      // Move Dylan to the active scene container
+      this._moveDylanToActiveScene();
       var cfg = WORLD_COLLIDERS[this.sceneName];
       if (!cfg) {
         console.error("WORLD_COLLIDERS has no entry for scene:", this.sceneName);
@@ -247,8 +253,14 @@
           newMarginLeft = 0;
         }
         // Prevent exposing empty space on the right edge.
-        // Map width is based on world width scaled by EFFECTIVE_MAP_SCALE.
-        var mapWidthPx = WORLD_WIDTH * EFFECTIVE_MAP_SCALE;
+        // Map width depends on the current scene
+        var sceneWidth = WORLD_WIDTH;
+        if (this.sceneName === "tent1") {
+          sceneWidth = 384;
+        } else if (this.sceneName === "cave") {
+          sceneWidth = 2000;
+        }
+        var mapWidthPx = sceneWidth * EFFECTIVE_MAP_SCALE;
         var minMarginLeft = window.innerWidth - mapWidthPx;
         if (newMarginLeft < minMarginLeft) {
           newMarginLeft = minMarginLeft;
@@ -259,10 +271,18 @@
           newMarginTop = 0;
         }
         // Prevent exposing empty space on the bottom edge.
-        // Map height is based on world height scaled by EFFECTIVE_MAP_SCALE.
-        var mapHeightPx =
-          (this.sceneName === "cave" ? 1200 : WORLD_HEIGHT) * EFFECTIVE_MAP_SCALE;
-        var bottomBufferPx = 2000; // allow slight extra downward pan
+        // Map height depends on the current scene
+        var sceneHeight = WORLD_HEIGHT;
+        if (this.sceneName === "cave") {
+          sceneHeight = 1200;
+        } else if (this.sceneName === "tent1") {
+          sceneHeight = 200;
+        }
+        var mapHeightPx = sceneHeight * EFFECTIVE_MAP_SCALE;
+        var bottomBufferPx = 0; // no extra buffer for cave
+        if (this.sceneName === "mainMap") {
+          bottomBufferPx = 2000; // allow slight extra downward pan on main map
+        }
         var minMarginTop = window.innerHeight - mapHeightPx - bottomBufferPx;
         if (newMarginTop < minMarginTop) {
           newMarginTop = minMarginTop;
@@ -437,22 +457,37 @@
     }
 
     _setSceneVisibility(sceneName) {
-      var $map = $("#map");
-      var $cave = $("#cave");
-      var $tent1 = $("#tent1");
-
       if (sceneName === "cave") {
-        if ($map.length) $map.hide();
-        if ($tent1.length) $tent1.hide();
-        if ($cave.length) $cave.show();
+        $("#cave").css("display", "block");
+        $("#map").css("display", "none");
+        $(".cover-screen.tent1").css("display", "none");
       } else if (sceneName === "tent1") {
-        if ($map.length) $map.hide();
-        if ($cave.length) $cave.hide();
-        if ($tent1.length) $tent1.show();
+        $(".cover-screen.tent1").css("display", "block");
+        $("#map").css("display", "none");
+        $("#cave").css("display", "none");
       } else {
-        if ($map.length) $map.show();
-        if ($cave.length) $cave.hide();
-        if ($tent1.length) $tent1.hide();
+        $("#map").css("display", "block");
+        $(".cover-screen.tent1").css("display", "none");
+        $("#cave").css("display", "none");
+      }
+    }
+
+    _moveDylanToActiveScene() {
+      var $dylan = $("#dylan");
+      if (!$dylan.length) return;
+
+      var targetContainer;
+      if (this.sceneName === "cave") {
+        targetContainer = $("#cave");
+      } else if (this.sceneName === "tent1") {
+        targetContainer = $("#tent1");
+      } else {
+        targetContainer = $("#map");
+      }
+
+      // Only move if Dylan is not already in the target container
+      if (targetContainer.length && $dylan.parent()[0] !== targetContainer[0]) {
+        targetContainer.append($dylan);
       }
     }
 
@@ -465,7 +500,7 @@
           : "#map";
       var $el = $(selector);
       if ($el.length) return $el;
-      return $("body");
+      return $("#map");
     }
 
     // Intro animation: make Dylan fall in from above the viewport
@@ -604,6 +639,55 @@
           );
         }
       }
+    }
+  }
+
+  // Build cave DOM on-demand (used when entering cave scene)
+  function buildCaveDomIfNeeded() {
+    var $cave = $("#cave");
+    if (!$cave.length) return;
+    var $hall = $('<div class="cave-hall"></div>');
+    var $sideRocksLeft = $('<div class="cave-side-rocks-left"></div>');
+    var $sideRocksRight = $('<div class="cave-side-rocks-right"></div>');
+    var $overlayLeft = $('<div class="cave-dark left"></div>');
+    var $overlayRight = $('<div class="cave-dark right"></div>');
+    var $exit = $('<div class="cave-exit" aria-label="Exit cave"></div>');
+    var $exitLightBeam = $('<div class="cave-exit-light-beam"></div>');
+    var $exitRocksLeft = $('<div class="cave-exit-rocks-left"></div>');
+    var $exitRocksTop = $('<div class="cave-exit-rocks-top"></div>');
+
+    $cave.empty();
+    $cave.append($overlayLeft);
+    $cave.append($overlayRight);
+    $cave.append($exitLightBeam);
+    $cave.append($sideRocksLeft);
+    $cave.append($sideRocksRight);
+    $cave.append($hall);
+    $cave.append($exitRocksLeft);
+    $cave.append($exitRocksTop);
+    $cave.append($exit);
+
+    if (typeof TIMELINE_ENTRIES !== "undefined") {
+      TIMELINE_ENTRIES.forEach(function (entry) {
+        var side = entry.side === "right" ? "right" : "left";
+        var $sign = $('<div class="cave-sign ' + side + '"></div>');
+        var year = entry.year || "";
+        var title = entry.title || "";
+        var desc = entry.description || "";
+        var img = entry.image || "";
+        
+        if (img) {
+          var $img = $('<div class="img"></div>');
+          $img.css("background-image", "url(" + img + ")");
+          $sign.append($img);
+        }
+        
+        $sign.append("<div class='year'>" + year + "</div>");
+        $sign.append("<div class='title'>" + title + "</div>");
+        $sign.append("<div class='desc'>" + desc + "</div>");
+        $sign.css("top", (entry.y || 0) + "px");
+        $cave.append($sign);
+      });
     }
   }
 

@@ -44,50 +44,51 @@ var WORLD_COLLIDERS = {
       { x: 708, y: 1044, width: 584, height: 42, tag: "bottomBorderWall1" },
     ],
     triggers: [
-      // Cave entrance trigger (top cave doorway)
       {
         x: 962,
         y: 126,
         width: 64,
         height: 4,
-        tag: "mainMap",
+        tag: "caveEntrance",
         nextScene: "cave",
-        nextSpawn: { x: 192, y: 152 }
+        nextSpawn: { x: 1000, y: 1156 }
       },
       {
         x: 290,
         y: 670,
         width: 38,
         height: 4,
-        tag: "mainMap",
+        tag: "tentEntrance",
         nextScene: "mainMap",
         nextSpawn: { x: 997, y: 176 }
       }
     ]
   },
   cave: {
-    // Vertical timeline cave (~1200 units tall)
+    // Vertical timeline cave (~1200 units tall, narrow 120px hall)
     playerSpawn: { x: 1000, y: 1100 },
     solids: [
       // Left wall
-      { x: 0, y: 0, width: 840, height: 1200, tag: "caveLeftWall" },
+      { x: 0, y: 0, width: 940, height: 1172, tag: "caveLeftWall" },
       // Right wall
-      { x: 1160, y: 0, width: 840, height: 1200, tag: "caveRightWall" },
+      { x: 1060, y: 0, width: 940, height: 1172, tag: "caveRightWall" },
       // Top cap
-      { x: 840, y: -40, width: 320, height: 40, tag: "caveTop" },
-      // Bottom cap
-      { x: 840, y: 1200, width: 320, height: 40, tag: "caveBottom" }
+      { x: 940, y: -40, width: 120, height: 40, tag: "caveTop" },
+      // Bottom rocks - left side (before exit opening)
+      { x: 0, y: 1172, width: 976, height: 16, tag: "caveExitRocksLeft" },
+      // Bottom rocks - right side (after exit opening)
+      { x: 1024, y: 1172, width: 976, height: 16, tag: "caveExitRocksRight" }
     ],
     triggers: [
       // Exit back to main map at bottom of cave
       {
         x: 940,
-        y: 1130,
+        y: 1206,
         width: 120,
         height: 70,
         tag: "caveExit",
         nextScene: "mainMap",
-        nextSpawn: { x: 997, y: 220 }
+        nextSpawn: { x: 997, y: 176 }
       }
     ]
   },

@@ -358,7 +358,7 @@ body {
   width: 2000px;
   height: 96px;
   background: url("../images/tiles/rocks.jpg");
-  background-size: 32px;
+  background-size: 16px;
   z-index: 51;
 }
 .rocks_top {
@@ -366,7 +366,7 @@ body {
   width: 2000px;
   height: 32px;
   background: url("../images/tiles/rocks.jpg");
-  background-size: 32px;
+  background-size: 16px;
   z-index: 1;
   box-shadow: 0px -5px 10px rgba(0, 0, 0, 0.4) inset;
 }
@@ -431,6 +431,28 @@ body {
   filter: blur(1.2px);
   pointer-events: none;
   z-index: -1;
+}
+
+#topbushes-border {
+  width: 2000px;
+  height: 10px;
+  position: absolute;
+  background-image: url("../images/tiles/tile_0042.png");
+  background-size: 16px;
+  background-repeat: repeat-x;
+  z-index: 3;
+  box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.4);
+  filter: saturate(1.4);
+}
+
+.small-grass {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-image: url("../images/tiles/tile_0044.png");
+  background-size: 32px;
+  background-repeat: no-repeat;
+  z-index: 2;
 }
 
 #cliff {
@@ -2393,11 +2415,11 @@ body {
 .path {
   background-image: url("../images/tiles/stone-path.png");
   /* background-image: url("../images/tiles/cobblestone-path2.png"); */
-  background-size: 20px;
+  background-size: 16px;
   position: absolute;
   background-repeat: round;
   filter: brightness(1.2);
-  opacity: 0.3;
+  opacity: 0.5;
   z-index: 5;
 }
 

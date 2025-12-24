@@ -9,35 +9,107 @@
   overflow: visible;
   left: 0;
   top: 0;
-  background: radial-gradient(ellipse at center, #2b2b2b 0%, #1d1d1d 60%, #0f0f0f 100%);
-  display: none;
-  background-color: #111;
+  background: url(../images/tiles/rocks.png) repeat;
+  background-size: 16px;
   z-index: 9999;
-  pointer-events: none;
+  filter: brightness(0.8);
 }
 
 .cave-hall {
   position: absolute;
-  left: 880px;
-  width: 240px;
+  left: 940px;
+  width: 120px;
   height: 1200px;
-  background: linear-gradient(180deg, #4a3827 0%, #3a2c1f 40%, #2c2118 100%);
-  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.55);
+  background: url(../images/tiles/tile_0109.png) repeat;
+  background-size: 16px;
   z-index: 1;
+  filter: brightness(0.3);
+  box-shadow: inset 0 0 0px -2px rgba(0, 0, 0, 0.55) inset;
+}
+
+.cave-hall::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 100%;
+  background: url(../images/tiles/tile_0108.png) repeat-y;
+  background-size: 16px;
+  box-shadow: inset 0 0 0px -2px rgba(0, 0, 0, 0.55);
+}
+
+.cave-hall::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 16px;
+  height: 100%;
+  background: url(../images/tiles/tile_0110.png) repeat-y;
+  background-size: 16px;
+}
+
+.cave-side-rocks-left {
+  position: absolute;
+  left: 924px;
+  top: 0;
+  width: 16px;
+  height: 1172px;
+  background: url(../images/tiles/rocks.jpg);
+  background-size: 16px;
+  z-index: 3;
+  filter: brightness(0.2);
+  box-shadow: 
+    inset -3px 0 6px rgba(0, 0, 0, 0.01),
+    inset -2px 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.cave-side-rocks-left::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  pointer-events: none;
+}
+
+.cave-side-rocks-right {
+  position: absolute;
+  left: 1060px;
+  top: 0;
+  width: 16px;
+  height: 1172px;
+  background: url(../images/tiles/rocks.jpg);
+  background-size: 16px;
+  z-index: 3;
+  filter: brightness(0.2);
+}
+
+.cave-side-rocks-right::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+  pointer-events: none;
 }
 
 .cave-dark {
   position: absolute;
   top: 0;
-  width: 880px;
+  width: 940px;
   height: 1200px;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.9));
+  background: rgba(0, 0, 0, 0.8);
   pointer-events: none;
   z-index: 2;
 }
 
 .cave-dark.right {
-  left: 1120px;
+  left: 1060px;
   transform: scaleX(-1);
 }
 
@@ -47,94 +119,181 @@
 
 .cave-sign {
   position: absolute;
-  width: 240px;
-  min-height: 120px;
+  width: 260px;
+  padding: 12px 14px;
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   color: #fdf6e3;
   font-family: "Press Start 2P", cursive;
-  text-shadow: 2px 2px 0 #000;
-  z-index: 3;
+  z-index: 10;
+  backdrop-filter: blur(4px);
 }
 
 .cave-sign.left {
-  left: 520px;
+  left: 620px;
+}
+
+.cave-sign.left::after {
+  content: "";
+  position: absolute;
+  right: -90px;
+  top: 50%;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  transform: translateY(-50%);
 }
 
 .cave-sign.right {
-  left: 1240px;
+  left: 1120px;
 }
 
-.cave-sign .post {
+.cave-sign.right::after {
+  content: "";
   position: absolute;
-  left: 50%;
-  top: 32px;
-  width: 14px;
-  height: 110px;
-  background: #5a4632;
-  transform: translateX(-50%);
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+  left: -90px;
+  top: 50%;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  transform: translateY(-50%);
 }
 
-.cave-sign .plank {
-  position: absolute;
-  left: 20px;
-  top: 0;
-  right: 20px;
-  height: 48px;
-  background: linear-gradient(90deg, #7b5b3c, #65472f);
-  border: 2px solid #3a2a1d;
-  box-shadow: 0 6px 0 #1f1610;
-}
-
-.cave-sign-label {
-  position: relative;
-  top: 56px;
-  padding: 14px 16px;
-  background: rgba(15, 15, 15, 0.8);
-  border: 2px solid #5c4735;
-  border-radius: 8px;
-  box-shadow: 0 4px 0 #1b130d;
-}
-
-.cave-sign-label .year {
-  font-size: 12px;
+.cave-sign .year {
+  font-size: 6px;
   margin-bottom: 6px;
   color: #ffde89;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.cave-sign-label .title {
-  font-size: 13px;
+.cave-sign .title {
+  font-size: 10px;
   margin-bottom: 6px;
-  color: #f5e6d3;
+  color: #ffffff;
+  line-height: 1.3;
 }
 
-.cave-sign-label .desc {
-  font-size: 11px;
-  line-height: 1.4;
+.cave-sign .desc {
+  font-size: 6px;
+  line-height: 1.5;
   color: #d2c2b2;
+  opacity: 0.9;
+}
+
+.cave-sign .img {
+  width: 100%;
+  height: 80px;
+  margin-bottom: 8px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .cave-exit {
   position: absolute;
-  left: 940px;
-  top: 1130px;
-  width: 120px;
-  height: 70px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px dashed rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
-  z-index: 4;
+  left: 972px;
+  top: 1172px;
+  width: 56px;
+  height: 16px;
+  background-color: #21211a;
+  border-radius: 0px 0px 4px 4px;
+  z-index: 6;
+  box-shadow: -6px 0px 12px rgba(0, 0, 0, 0.5) inset,
+              6px 0px 12px rgba(0, 0, 0, 0.5) inset;
 }
 
-.cave-exit::after {
-  content: "Exit";
+.cave-exit::before {
+  content: "";
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d8d8d8;
-  font-family: "Press Start 2P", cursive;
-  font-size: 11px;
-  text-shadow: 1px 1px 0 #000;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 150%;
+  background: radial-gradient(ellipse at bottom, rgba(255, 244, 200, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.cave-exit-light-beam {
+    position: absolute;
+    left: 968px;
+    top: 1150px;
+    width: 64px;
+    height: 32px;
+    background: linear-gradient(to bottom, transparent 0%, rgba(255, 244, 200, 1) 70%, rgba(255, 244, 200, 01) 100%);
+    filter: blur(10px);
+    pointer-events: none;
+    z-index: 4;
+    border-radius: 0px 0px 4px 4px;
+    opacity: 0.5;
+}
+
+.cave-exit-rocks-left {
+  position: absolute;
+  left: 0px;
+  top: 1172px;
+  width: 2000px;
+  height: 16px;
+  background: url(../images/tiles/rocks.jpg);
+  background-size: 16px;
+  z-index: 5;
+  filter: brightness(0.3);
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.cave-exit-rocks-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+  pointer-events: none;
+}
+
+.cave-exit-rocks-left::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 976px;
+  width: 48px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.3), transparent);
+  pointer-events: none;
+}
+
+.cave-exit-rocks-top {
+  position: absolute;
+  left: 0px;
+  top: 1188px;
+  width: 2000px;
+  height: 12px;
+  background: url(../images/tiles/rocks.jpg);
+  background-size: 16px;
+  z-index: 700;
+  filter: brightness(0.3);
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.01),
+    inset 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cave-exit-rocks-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent);
+  pointer-events: none;
 }
 
