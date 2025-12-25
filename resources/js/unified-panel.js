@@ -452,20 +452,6 @@ var UnifiedPanel = (function () {
       });
     }
 
-    // Center camera on Dylan (clears manual pan and recenters on player)
-    var centerCamBtn = rootEl.querySelector('[data-role="center-camera"]');
-    if (centerCamBtn) {
-      centerCamBtn.addEventListener("click", function () {
-        if (
-          window.playerController &&
-          window.playerController.gameWorld &&
-          typeof window.playerController.gameWorld.centerCameraOnPlayer ===
-            "function"
-        ) {
-          window.playerController.gameWorld.centerCameraOnPlayer();
-        }
-      });
-    }
   }
 
   return {

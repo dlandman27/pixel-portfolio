@@ -59,9 +59,18 @@ var WORLD_COLLIDERS = {
         width: 38,
         height: 4,
         tag: "tentEntrance",
-        nextScene: "mainMap",
-        nextSpawn: { x: 997, y: 176 }
-      }
+        nextScene: "tent1",
+        nextSpawn: { x: 208, y: 150 }
+      },
+      // {
+      //   x: 290,
+      //   y: 660,
+      //   width: 38,
+      //   height: 4,
+      //   tag: "tentEntrance",
+      //   nextScene: "tent1",
+      //   nextSpawn: { x: 152, y: -50 }
+      // }
     ]
   },
   cave: {
@@ -93,15 +102,38 @@ var WORLD_COLLIDERS = {
     ]
   },
   tent1: {
-    playerSpawn: { x: 192, y: 152 },
+    playerSpawn: { x: 208, y: 94 },
     solids: [
-      // Rough tent interior bounds – refine as needed
-      { x: 0, y: -44, width: 384, height: 12, tag: "tentTop" },
-      { x: 0, y: 176, width: 384, height: 12, tag: "tentBottom" },
-      { x: 0, y: -44, width: 12, height: 232, tag: "tentLeft" },
-      { x: 372, y: -44, width: 12, height: 232, tag: "tentRight" }
+      // Tent interior bounds matching visual container (416x188)
+      { x: -12, y: -40, width: 416, height: 12, tag: "tentTop" },
+      { x: 0, y: 190, width: 162, height: 12, tag: "tentBottomLeft" },
+      { x: 258, y: 190, width: 162, height: 12, tag: "tentBottomRight" },
+      { x: -4, y: -44, width: 12, height: 244, tag: "tentLeft" },
+      { x: 414, y: -44, width: 12, height: 244, tag: "tentRight" },
+      { x: 198, y: -44, width: 68, height: 114, tag: "tentCenter" }
     ],
-    triggers: []
+    triggers: [
+      // Front door exit (doormat.front at top: 182px, centered in 416px width)
+      {
+        x: 176,
+        y: 194,
+        width: 64,
+        height: 34,
+        tag: "tentExitFront",
+        nextScene: "mainMap",
+        nextSpawn: { x: 308, y: 730 }
+      },
+      // Back door exit (doormat.back at top: 0px, centered in 416px width)
+      {
+        x: 152,
+        y: -58,
+        width: 64,
+        height: 34,
+        tag: "tentExitBack",
+        nextScene: "mainMap",
+        nextSpawn: { x: 290, y: 640 }
+      }
+    ]
   }
 };
 

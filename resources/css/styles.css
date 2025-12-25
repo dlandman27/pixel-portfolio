@@ -15,6 +15,21 @@
   filter: brightness(0.8);
 }
 
+/* Tent scene styles */
+
+#tent1 {
+  position: fixed;
+  width: 416px;
+  height: 188px;
+  transform: scale(3, 3);
+  transform-origin: top left;
+  overflow: visible;
+  left: 0;
+  top: 0;
+  background: #414756;
+  z-index: 9999;
+}
+
 .cave-hall {
   position: absolute;
   left: 940px;
@@ -178,7 +193,7 @@
 }
 
 .cave-sign .desc {
-  font-size: 6px;
+  font-size: 5px;
   line-height: 1.5;
   color: #d2c2b2;
   opacity: 0.9;

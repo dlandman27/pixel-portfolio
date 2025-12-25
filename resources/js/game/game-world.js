@@ -89,6 +89,10 @@
       this._setSceneVisibility(this.sceneName);
       // Force debug overlays to regenerate on scene change
       this._colliderDebugRendered = false;
+      // Build tent DOM if entering tent
+      if (this.sceneName === "tent1" && typeof buildTentDomIfNeeded === "function") {
+        buildTentDomIfNeeded();
+      }
       // Build cave DOM if entering cave
       if (this.sceneName === "cave" && typeof buildCaveDomIfNeeded === "function") {
         buildCaveDomIfNeeded();
@@ -176,6 +180,18 @@
         }
         this._playIntroDrop();
         this._introPlayed = true;
+      } else {
+        // Ensure input is enabled for all other scenes immediately
+        if (global.playerController) {
+          global.playerController.disableInput = false;
+          // Clear any stuck keys and input state
+          global.playerController.keysDown = {};
+          global.playerController.inputState = { x: 0, y: 0 };
+        }
+        // Reset player velocity to prevent momentum carry-over
+        if (this.player && typeof this.player.setVelocity === "function") {
+          this.player.setVelocity({ x: 0, y: 0 });
+        }
       }
 
       // If debug was enabled before init, render overlays once
@@ -228,70 +244,98 @@
       // Camera follow: keep player centered using world pos and effective scale.
       var $parent = this._getSceneElement();
       if ($parent.length) {
-        var viewportCenterX = window.innerWidth / 2;
-        var viewportCenterY = window.innerHeight / 2;
-
-        var camX = pos.x;
-        var camY = pos.y;
-
-        // Optional micro-adjust to fine-tune visual centering
-        var NUDGE_X = 0; // negative shifts camera left; adjust as needed
-        var NUDGE_Y = 0;  // negative shifts camera up; adjust as needed
-
-        var newMarginLeft =
-          viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + NUDGE_X;
-        var newMarginTop =
-          viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y + NUDGE_Y;
-
-        // Snap to whole pixels to avoid subpixel drift/lead
-        newMarginLeft = Math.round(newMarginLeft);
-        newMarginTop = Math.round(newMarginTop);
-
-        // Clamp so the camera never slides past the left or top page edges.
-        // This may break perfect centering near boundaries but prevents showing empty space.
-        if (newMarginLeft > 0) {
-          newMarginLeft = 0;
-        }
-        // Prevent exposing empty space on the right edge.
-        // Map width depends on the current scene
         var sceneWidth = WORLD_WIDTH;
+        var sceneHeight = WORLD_HEIGHT;
+        
         if (this.sceneName === "tent1") {
-          sceneWidth = 384;
+          sceneWidth = 416;
+          sceneHeight = 1200;
         } else if (this.sceneName === "cave") {
           sceneWidth = 2000;
-        }
-        var mapWidthPx = sceneWidth * EFFECTIVE_MAP_SCALE;
-        var minMarginLeft = window.innerWidth - mapWidthPx;
-        if (newMarginLeft < minMarginLeft) {
-          newMarginLeft = minMarginLeft;
-        }
-        // Clamp so the camera never slides below the top of the page.
-        // This may break perfect centering near the top boundary, but prevents showing empty space.
-        if (newMarginTop > 0) {
-          newMarginTop = 0;
-        }
-        // Prevent exposing empty space on the bottom edge.
-        // Map height depends on the current scene
-        var sceneHeight = WORLD_HEIGHT;
-        if (this.sceneName === "cave") {
           sceneHeight = 1200;
-        } else if (this.sceneName === "tent1") {
-          sceneHeight = 200;
         }
+        
+        var mapWidthPx = sceneWidth * EFFECTIVE_MAP_SCALE;
         var mapHeightPx = sceneHeight * EFFECTIVE_MAP_SCALE;
-        var bottomBufferPx = 0; // no extra buffer for cave
-        if (this.sceneName === "mainMap") {
-          bottomBufferPx = 2000; // allow slight extra downward pan on main map
-        }
-        var minMarginTop = window.innerHeight - mapHeightPx - bottomBufferPx;
-        if (newMarginTop < minMarginTop) {
-          newMarginTop = minMarginTop;
-        }
+        
+        // Special case for tent: always center on player, no clamping
+        if (this.sceneName === "tent1") {
+          var viewportCenterX = window.innerWidth / 2;
+          var viewportCenterY = window.innerHeight / 2;
 
-        $parent.css({
-          "margin-left": newMarginLeft + "px",
-          "margin-top": newMarginTop + "px"
-        });
+          var camX = pos.x;
+          var camY = pos.y;
+
+          var newMarginLeft = viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x;
+          var newMarginTop = viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y;
+
+          // Snap to whole pixels
+          newMarginLeft = Math.round(newMarginLeft);
+          newMarginTop = Math.round(newMarginTop);
+
+          $parent.css({
+            "margin-left": newMarginLeft + "px",
+            "margin-top": newMarginTop + "px"
+          });
+        }
+        // For small scenes that fit within viewport, center the scene itself
+        else if (mapWidthPx <= window.innerWidth && mapHeightPx <= window.innerHeight) {
+          var newMarginLeft = (window.innerWidth - mapWidthPx) / 2;
+          var newMarginTop = (window.innerHeight - mapHeightPx) / 2;
+          
+          $parent.css({
+            "margin-left": Math.round(newMarginLeft) + "px",
+            "margin-top": Math.round(newMarginTop) + "px"
+          });
+        } else {
+          // For large scenes, follow the player with camera clamping
+          var viewportCenterX = window.innerWidth / 2;
+          var viewportCenterY = window.innerHeight / 2;
+
+          var camX = pos.x;
+          var camY = pos.y;
+
+          // Optional micro-adjust to fine-tune visual centering
+          var NUDGE_X = 0; // negative shifts camera left; adjust as needed
+          var NUDGE_Y = 0;  // negative shifts camera up; adjust as needed
+
+          var newMarginLeft =
+            viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + NUDGE_X;
+          var newMarginTop =
+            viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y + NUDGE_Y;
+
+          // Snap to whole pixels to avoid subpixel drift/lead
+          newMarginLeft = Math.round(newMarginLeft);
+          newMarginTop = Math.round(newMarginTop);
+
+          // Clamp so the camera never slides past the left or top page edges.
+          if (newMarginLeft > 0) {
+            newMarginLeft = 0;
+          }
+          
+          var minMarginLeft = window.innerWidth - mapWidthPx;
+          if (newMarginLeft < minMarginLeft) {
+            newMarginLeft = minMarginLeft;
+          }
+          
+          if (newMarginTop > 0) {
+            newMarginTop = 0;
+          }
+          
+          var bottomBufferPx = 0;
+          if (this.sceneName === "mainMap") {
+            bottomBufferPx = 2000; // allow slight extra downward pan on main map
+          }
+          var minMarginTop = window.innerHeight - mapHeightPx - bottomBufferPx;
+          if (newMarginTop < minMarginTop) {
+            newMarginTop = minMarginTop;
+          }
+
+          $parent.css({
+            "margin-left": newMarginLeft + "px",
+            "margin-top": newMarginTop + "px"
+          });
+        }
       }
     }
 
@@ -460,14 +504,14 @@
       if (sceneName === "cave") {
         $("#cave").css("display", "block");
         $("#map").css("display", "none");
-        $(".cover-screen.tent1").css("display", "none");
+        $("#tent1").css("display", "none");
       } else if (sceneName === "tent1") {
-        $(".cover-screen.tent1").css("display", "block");
+        $("#tent1").css("display", "block");
         $("#map").css("display", "none");
         $("#cave").css("display", "none");
       } else {
         $("#map").css("display", "block");
-        $(".cover-screen.tent1").css("display", "none");
+        $("#tent1").css("display", "none");
         $("#cave").css("display", "none");
       }
     }
@@ -489,6 +533,12 @@
       if (targetContainer.length && $dylan.parent()[0] !== targetContainer[0]) {
         targetContainer.append($dylan);
       }
+      
+      // Ensure Dylan is visible
+      $dylan.css({
+        "visibility": "visible",
+        "display": "block"
+      });
     }
 
     _getSceneElement() {
@@ -640,6 +690,45 @@
         }
       }
     }
+  }
+
+  // Build tent DOM on-demand (used when entering tent scene)
+  function buildTentDomIfNeeded() {
+    var $tent = $("#tent1");
+    if (!$tent.length) return;
+
+    // Add all tent elements directly to #tent1 (like cave does)
+    $tent.empty();
+    
+    // Add the main tentInterior background container
+    $tent.append('<div class="tentInterior tent1"></div>');
+    $tent.append('<a><div onClick="takeMatchbox()" class="matchbox"></div></a>');
+    $tent.append('<div class="divider"></div>');
+    $tent.append('<div class="tentInterior tent1 door front"></div>');
+    $tent.append('<div class="tentInterior tent1 backwall"></div>');
+    $tent.append('<div class="tentInterior tent1 divider-wall"></div>');
+    $tent.append('<div class="tentInterior tent1 divider-wall bottomLining"></div>');
+    $tent.append('<div class="tentInterior tent1 divider-wall topLining"></div>');
+    $tent.append('<div class="tentInterior tent1 divider-wall topLining t2"></div>');
+    $tent.append('<div class="tentInterior tent1 bottomLining"></div>');
+    $tent.append('<div class="tentInterior tent1 topLining"></div>');
+    $tent.append('<div class="tentInterior tent1 topLining t2"></div>');
+    
+    // Kitchen
+    $tent.append('<div class="shelf"></div>');
+    $tent.append('<div class="kitchen"></div>');
+    $tent.append('<div class="kitchen-floor"></div>');
+    $tent.append('<div class="backdoor"></div>');
+    $tent.append('<div class="doormat back"></div>');
+    $tent.append('<div class="kitchen-table"></div>');
+    
+    // Center
+    $tent.append('<div class="painting"></div>');
+    $tent.append('<div class="doormat front"></div>');
+    
+    // Den
+    $tent.append('<a><div onClick="sitOnCouch()" class="couch"></div></a>');
+    $tent.append('<a><div onClick="openTVScreen()" class="tv back"><div class="tv front"><p style="position: absolute; left: 13px; color: darkgray; font-size: 0.4rem; top: 10px;">About Me</p></div></div></a>');
   }
 
   // Build cave DOM on-demand (used when entering cave scene)
