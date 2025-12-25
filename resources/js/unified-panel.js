@@ -540,18 +540,11 @@ var UnifiedPanel = (function () {
       actionBtn.style.marginRight = "0.5rem";
       
       if (gameKey === "fishing") {
-        actionBtn.textContent = "Play Fishing";
-        actionBtn.addEventListener("click", function() {
-          if (typeof goFishing === "function") {
-            close();
-            goFishing();
-          }
-        });
-        detailActionsEl.appendChild(actionBtn);
+        // Play Fishing button removed - users should access fishing from the dock sign
         
         // Add fishbook button
         var fishbookBtn = document.createElement("button");
-        fishbookBtn.className = "nes-btn";
+        fishbookBtn.className = "nes-btn is-primary";
         fishbookBtn.textContent = "View Fishbook";
         fishbookBtn.addEventListener("click", function() {
           if (typeof openFishbook === "function") {

@@ -183,63 +183,85 @@ and open the template in the editor.
     <!-- Soccer Start Screen -->
     <section>
       <dialog class="nes-dialog" id="dialog-rounded">
-        <div class="nes-container with-title" id="soccer-start-screen">
-          <p class="title">Soccer Shootout</p>
+        <div class="dialog-container">
+          <div class="dialog-content">
+            <div class="nes-container with-title" id="soccer-start-screen">
+              <p class="title">Soccer Shootout</p>
 
-          <form method="dialog" id="start_game_form">
-            <menu class="dialog-menu">
-              <p>Rules:</p>
-              <p>1. Click <b>Enter</b> to move the ball up the field</p>
-              <p>2. Get a point for every goal you score</p>
-              <p>3. You will have 30s to see how many goals you can score</p>
-              <p><br /><br />Click to Start Game</p>
-              <button onClick="playSoccer()" class="nes-btn is-warning">
-                Start
-              </button>
-              <button onClick="endSoccerGame()" class="nes-btn is-warning">
-                Go Back to Website
-              </button>
-            </menu>
-          </form>
+              <form method="dialog" id="start_game_form">
+                <menu class="dialog-menu">
+                  <p>Rules:</p>
+                  <p>1. Click <b>Enter</b> to move the ball up the field</p>
+                  <p>2. Get a point for every goal you score</p>
+                  <p>3. You will have 30s to see how many goals you can score</p>
+                  <p><br /><br />Click to Start Game</p>
+                  <button onClick="playSoccer()" class="nes-btn is-warning">
+                    Start
+                  </button>
+                  <button onClick="endSoccerGame()" class="nes-btn is-warning">
+                    Go Back to Website
+                  </button>
+                </menu>
+              </form>
 
-          <form method="dialog" id="1_player_form">
-            <p>GAME OVER</p>
-            <p id="highscore">Personal Best: 0</p>
-            <p id="score_on_scoreboard">Score: 0</p>
-            <button onClick="endSoccerGame()" class="nes-btn is-warning">
-              Go Back to Website
-            </button>
-            <button onClick="playSoccer()" class="nes-btn is-warning">
-              Play Again
-            </button>
-          </form>
+              <form method="dialog" id="1_player_form">
+                <menu class="dialog-menu">
+                  <p>GAME OVER</p>
+                  <p id="highscore">Personal Best: 0</p>
+                  <p id="score_on_scoreboard">Score: 0</p>
+                  <button onClick="endSoccerGame()" class="nes-btn is-warning">
+                    Go Back to Website
+                  </button>
+                  <button onClick="playSoccer()" class="nes-btn is-warning">
+                    Play Again
+                  </button>
+                </menu>
+              </form>
+            </div>
+          </div>
         </div>
 
-        <div class="nes-container with-title" id="fishing-start-screen">
-          <p class="title">Fishing Frenzy</p>
+        <div class="dialog-container">
+          <div class="dialog-content">
+            <div class="nes-container with-title" id="fishing-start-screen">
+              <p class="title">Fishing Frenzy</p>
 
-          <form method="dialog">
-            <menu class="dialog-menu">
-              <p>Rules:</p>
-              <p>1. Wait until there is a pull on the fishing line</p>
-              <p>2. Press <b>SPACE</b> to pull on the line</p>
-              <p>
-                3. Depending on the difficulty will determine the number of
-                times you must pull the line
-              </p>
-              <p>
-                4. If you pull the line in enough times before the time runs
-                out, you reel in the fish
-              </p>
+              <form method="dialog">
+                <menu class="dialog-menu">
+                  <p id="fishing-rod-message" style="display: none; color: #ff6b6b; font-weight: bold; margin-bottom: 1rem;">Fishing rod not found</p>
+                  <p>Rules:</p>
+                  <p>1. Wait until there is a pull on the fishing line</p>
+                  <p>2. Press <b>SPACE</b> to pull on the line</p>
+                  <p>
+                    3. Depending on the difficulty will determine the number of
+                    times you must pull the line
+                  </p>
+                  <p>
+                    4. If you pull the line in enough times before the time runs
+                    out, you reel in the fish
+                  </p>
+                  <p style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                    5. View your caught fish in the menu
+                    <button class="nes-btn is-primary game-menu-toggle fishing-menu-preview" style="pointer-events: none; flex-shrink: 0;">
+                      <span class="game-menu-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </span>
+                    </button>
+                    on the top right
+                  </p>
 
-              <button onClick="throwLine()" class="nes-btn is-warning">
-                Throw Line
-              </button>
-              <button onClick="closeFishing()" class="nes-btn is-warning">
-                Back to Website
-              </button>
-            </menu>
-          </form>
+                  <button onClick="throwLine()" class="nes-btn is-warning" id="throw-line-btn">
+                    Throw Line
+                  </button>
+                  <button onClick="closeFishing()" class="nes-btn is-warning">
+                    Back to Website
+                  </button>
+                </menu>
+              </form>
+            </div>
+          </div>
         </div>
       </dialog>
     </section>

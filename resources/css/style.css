@@ -559,8 +559,8 @@ body {
 }
 
 .sign-interact.fishing-frenzy-sign {
-  left: 964px;
-  top: 1424px;
+  left: 1020px;
+  top: 1454px;
   width: 44px;
   height: 44px;
   background-image: url("../images/sign.png");
@@ -2506,7 +2506,7 @@ body {
 }
 
 
-.yellow-flowers::after, .pink-tulips::after, .small-grass::after, .mushroom-yellow::after, .mushroom-purple::after {
+.yellow-flowers::after, .pink-tulips::after {
   content: "";
   position: absolute;
   left: 0px;
@@ -2697,6 +2697,44 @@ body {
 .stairs-left.campfire {
   top: 752px;
   left: 752px;
+}
+
+/* WIP Blocker for Stairs */
+.wip-blocker {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  border: 4px solid #fef3c7;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  color: #fef3c7;
+  text-shadow: 2px 2px 0 #000;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.wip-blocker.stairs-wip {
+  top: 504px;
+  left: 1597px;
+  width: 80px;
+  height: 100px;
+  padding: 0.5rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.wip-blocker.stairs-front-wip {
+  top: 602px;
+  left: 972px;
+  width: 56px;
+  height: 68px;
+  padding: 0.5rem;
+  text-align: center;
+  line-height: 1.4;
 }
 
 .bonfire-floor {
@@ -4356,7 +4394,162 @@ button,
 }
 
 #dialog-rounded {
-  background-color: burlywood;
+  /* Match unified panel style - transparent dialog, content inside */
+  background: transparent;
+  border: none;
+  padding: 0;
+  max-width: none;
+  width: auto;
+  height: auto;
+}
+
+#dialog-rounded::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+/* Dialog container matching unified panel */
+#dialog-rounded .dialog-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  padding: 0.75rem 0.75rem 1rem;
+  /* NES-style wood frame */
+  background-color: #6b4226;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #7b4f2f 0,
+    #7b4f2f 12px,
+    #6b4226 12px,
+    #6b4226 24px
+  );
+  border: 4px solid #f5d6a1;
+  box-shadow: 0 10px 0 #000, 0 0 0 4px #000;
+  z-index: 10000051;
+}
+
+/* Content area with blackboard background like unified panel */
+#dialog-rounded .dialog-content {
+  padding: 1.5rem 1.75rem 2rem;
+  background: url(../images/tiles/blackboard.png) repeat;
+  background-size: 16px;
+  border: 4px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226;
+  margin: 0;
+  min-height: 200px;
+}
+
+#dialog-rounded .nes-container {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+#dialog-rounded .nes-container.with-title {
+  padding-top: 0;
+}
+
+#dialog-rounded .nes-container.with-title > .title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  color: #fef3c7;
+  margin: 0 0 1.5rem 0;
+  padding: 0.75rem 1rem;
+  background: #8b5a2b;
+  border: 2px solid #f5d6a1;
+  box-shadow: inset 0 1px 0 #a0642f;
+  text-align: center;
+  display: block;
+}
+
+
+#dialog-rounded .dialog-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#dialog-rounded .dialog-menu p {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #fef3c7;
+  line-height: 1.6;
+  margin: 0;
+}
+
+#dialog-rounded .dialog-menu p b {
+  color: #fbbf24;
+}
+
+#dialog-rounded .dialog-menu button {
+  margin-top: 0.5rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+}
+
+#dialog-rounded #fishing-rod-message {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(255, 107, 107, 0.2);
+  border: 2px solid #ff6b6b;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Menu button preview in fishing dialog */
+#dialog-rounded .fishing-menu-preview {
+  width: 32px;
+  height: 32px;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+#dialog-rounded .fishing-menu-preview .game-menu-icon {
+  width: 14px;
+  height: 10px;
+  display: inline-block;
+  position: relative;
+}
+
+#dialog-rounded .fishing-menu-preview .game-menu-icon span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: #ffffff;
+  border-radius: 1px;
+}
+
+#dialog-rounded .fishing-menu-preview .game-menu-icon span:nth-child(1) {
+  top: 0;
+}
+
+#dialog-rounded .fishing-menu-preview .game-menu-icon span:nth-child(2) {
+  top: 4px;
+}
+
+#dialog-rounded .fishing-menu-preview .game-menu-icon span:nth-child(3) {
+  top: 8px;
+}
+
+/* Disabled button styling for fishing rod */
+.nes-btn.is-disabled,
+.nes-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 #scoreboard {
@@ -5527,15 +5720,15 @@ body.dusk {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 400px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .settings-button {
-  width: 100%;
   padding: 1rem;
   font-family: "Press Start 2P", monospace;
   font-size: 0.7rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Home Content */
@@ -6160,6 +6353,10 @@ body.dusk {
   .settings-row {
     flex-direction: column;
     align-items: stretch;
+  }
+  
+  .settings-button {
+    width: 100%;
   }
   
   .speed-buttons {

@@ -42,6 +42,7 @@
       this._initialMapMarginTop = 0;
       this._spawn = { x: 0, y: 0 };
       this._cameraOffset = { x: 0, y: 0 };
+      this._shakeOffset = { x: 0, y: 0 };
       // Bonfire camera animation state
       this._bonfireCameraTarget = null; // { x, y } when sitting, null when not
       this._bonfireCameraCurrent = null; // Current interpolated position
@@ -262,6 +263,55 @@
     update(deltaMs, input) {
       if (!this.collisionWorld) return;
       var effectiveInput = input || { x: 0, y: 0 };
+      
+      // Check if fishing - maintain position and disable movement
+      var isFishing = (typeof window !== "undefined" && 
+                       ((typeof window.inFishing !== "undefined" && window.inFishing) ||
+                        (typeof window.isReelingIn !== "undefined" && window.isReelingIn)));
+      
+      if (isFishing && this.player) {
+        // Lock player to fishing position
+        this.player.setPosition({ x: 992, y: 1558 });
+        if (typeof this.player.setVelocity === "function") {
+          this.player.setVelocity({ x: 0, y: 0 });
+        }
+        effectiveInput = { x: 0, y: 0 };
+      }
+      
+      // Check if chopping tree - maintain position and disable movement
+      // Only lock if we have the axe (meaning we're chopping, not picking up the axe)
+      var isChoppingTree = (typeof window !== "undefined" && 
+                            typeof window.eventOccurence !== "undefined" && 
+                            window.eventOccurence && 
+                            typeof window.hitCount !== "undefined" && 
+                            window.hitCount < 7 &&
+                            typeof window.inventory !== "undefined" &&
+                            window.inventory.axe);
+      
+      if (isChoppingTree && this.player) {
+        // Lock player to tree chopping position (at actual tree location)
+        this.player.setPosition({ x: 242, y: 456 });
+        if (typeof this.player.setVelocity === "function") {
+          this.player.setVelocity({ x: 0, y: 0 });
+        }
+        effectiveInput = { x: 0, y: 0 };
+      }
+      
+      // Check if picking up axe - maintain position at stump
+      var isPickingUpAxe = (typeof window !== "undefined" && 
+                            typeof window.eventOccurence !== "undefined" && 
+                            window.eventOccurence && 
+                            typeof window.inventory !== "undefined" &&
+                            !window.inventory.axe);
+      
+      if (isPickingUpAxe && this.player) {
+        // Lock player to axe pickup position
+        this.player.setPosition({ x: 423, y: 434 });
+        if (typeof this.player.setVelocity === "function") {
+          this.player.setVelocity({ x: 0, y: 0 });
+        }
+        effectiveInput = { x: 0, y: 0 };
+      }
       
       // Check if input is disabled
       var inputDisabled = false;
@@ -793,10 +843,11 @@
           var NUDGE_Y = 0;  // negative shifts camera up; adjust as needed
 
           // Always apply camera offset - it allows free panning even when snapped
+          // Also apply shake offset for screen shake effects
           var newMarginLeft =
-            viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + NUDGE_X;
+            viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + this._shakeOffset.x + NUDGE_X;
           var newMarginTop =
-            viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y + NUDGE_Y;
+            viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y + this._shakeOffset.y + NUDGE_Y;
 
           // Snap to whole pixels to avoid subpixel drift/lead
           newMarginLeft = Math.round(newMarginLeft);

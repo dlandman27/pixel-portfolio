@@ -166,18 +166,18 @@ var ZINDEX_RULES = {
     },
     {
       selector: "#stump",
-      whenAbove: { top: { max: 400 }, zIndex: 100 },
-      whenBelow: { top: { min: 400 }, zIndex: 10 }
+      whenAbove: { top: { max: 446 }, zIndex: 100 },
+      whenBelow: { top: { min: 446 }, zIndex: 10 }
     },
     {
       selector: "#falling-tree",
-      whenAbove: { top: { max: 448 }, zIndex: 100 },
-      whenBelow: { top: { min: 448 }, zIndex: 10 }
+      whenAbove: { top: { max: 488 }, zIndex: 100 },
+      whenBelow: { top: { min: 488 }, zIndex: 10 }
     },
     {
       selector: "#wood-log",
-      whenAbove: { top: { max: 496 }, zIndex: 100 },
-      whenBelow: { top: { min: 496 }, zIndex: 10 }
+      whenAbove: { top: { max: 9999 }, zIndex: 150 },
+      whenBelow: { top: { min: 0 }, zIndex: 150 }
     },
     {
       selector: ".s4",
@@ -198,6 +198,13 @@ var ZINDEX_RULES = {
       selector: "#arch",
       whenAbove: { top: { max: 344 }, zIndex: 100 },
       whenBelow: { top: { min: 344 }, zIndex: 11 }
+    },
+    
+    // Fishing Frenzy sign at dock
+    {
+      selector: ".fishing-frenzy-sign",
+      whenAbove: { top: { max: 1474 }, zIndex: 51 },
+      whenBelow: { top: { min: 1474 }, zIndex: 48 }
     }
   ],
   

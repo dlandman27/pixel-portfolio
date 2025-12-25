@@ -415,17 +415,36 @@ var completedBook = false;
 
 //Function called when reeling in a fish for key space
 function reelIn(code){
-  if(code == keySpace && !keysPressed[code]){
+  // Remove the keysPressed check since player-controller handles it now
+  if(code == keySpace){
+    // Ensure movement is disabled and player stays at fishing position
+    setMovementDisabled(true);
+    // Convert CSS position to world coordinates
+    if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+      gameWorld.player.setPosition({ x: 992, y: 1558 });
+      gameWorld.syncToDom();
+    } else {
+      $("#dylan").css({top: 1514, left: 976});
+    }
+    
     document.getElementById("reel-progress").value += 1;
     if(document.getElementById("reel-progress").value == document.getElementById("reel-progress").max){
       clearInterval(reel_in_timer);
       $(".fish-from-water").css("display","block");
       $("progress").css("display","none");
       $(".fish-from-water").animate({
-        top: 1438,
+        top: 1446, // 1438 + 8px to push fish down
         marginLeft: "-="+(parseInt($(".fish-from-water").css("width"))/4)
       });
       isReelingIn = false;
+      // Keep movement disabled and maintain position
+      setMovementDisabled(true);
+      if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+        gameWorld.player.setPosition({ x: 992, y: 1558 });
+        gameWorld.syncToDom();
+      } else {
+        $("#dylan").css({top: 1514, left: 976});
+      }
       // Fishing catch sprite - keep direct for now as it's not part of walking animation
       $("#dylan").css("background-image", URL.getDylan() + "/fishing/dylan-fishing-catch.png)");
       $(".information").text("NICE!, I caught a "+fish.getName()+"!!");
@@ -449,9 +468,7 @@ function reelIn(code){
         completedBook = true;
       }
     }
-    else{
-      $("#dylan").css("background-image", URL.getDylan() + "/fishing/dylan-fishing-2.png)");
-    }
+    // Animation is now handled by player-controller (fishing-2 on space in, fishing-3 on space out)
     
   }
 }
@@ -476,10 +493,19 @@ function move(keyCode) {
   // walking.playbackRate = 2.5;
   
   
-  //if an event is occuring
+  //if an event is occuring or fishing
   var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
-  if (onLog || eventOccurence || sitting) {
+  if (onLog || eventOccurence || sitting || inFishing || isReelingIn) {
     clearInterval(animRef);
+    // Maintain fishing position if fishing
+    if (inFishing || isReelingIn) {
+      if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+        gameWorld.player.setPosition({ x: 992, y: 1558 });
+        gameWorld.syncToDom();
+      } else {
+        $("#dylan").css({top: 1514, left: 976});
+      }
+    }
     if (typeof WORLD !== "undefined" && WORLD.movement) {
       WORLD.movement.anim = null;
     }
@@ -942,14 +968,39 @@ function treeChop() {
     if (inventory.axe && hitCount < 7) {
       hitCount++;
       var url = URL.getFallingTree();
-      $("#dylan").css({
-        left: 260+"px",
-        top: 464+"px"
-      });
+      // Disable movement during tree chopping
+      setMovementDisabled(true);
+      // Set map position first
       $("#map").css({
         marginLeft: 2208+"px",
         marginTop: -816+"px"
-      })
+      });
+      // Set player position to world coordinates at the tree location
+      // Tree is at CSS left: 212-272 (center ~242), top: 448-464 (center ~456)
+      // Using world coordinates: (242, 456)
+      if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+        gameWorld.player.setPosition({ x: 242, y: 456 });
+        if (typeof gameWorld.player.setVelocity === "function") {
+          gameWorld.player.setVelocity({ x: 0, y: 0 });
+        }
+        gameWorld.syncToDom();
+        // Force another sync after a brief delay to ensure position sticks
+        setTimeout(function() {
+          if (gameWorld && gameWorld.player && gameWorld.syncToDom) {
+            gameWorld.player.setPosition({ x: 242, y: 456 });
+            if (typeof gameWorld.player.setVelocity === "function") {
+              gameWorld.player.setVelocity({ x: 0, y: 0 });
+            }
+            gameWorld.syncToDom();
+          }
+        }, 10);
+      } else {
+        // Fallback to direct CSS if player controller not available
+        $("#dylan").css({
+          left: 260+"px",
+          top: 464+"px"
+        });
+      }
       $("#falling-tree").css("z-index","48");
       eventOccurence = true;
       $("#dylan").css("background-image", URL.getDylan() + "/axe/chop/dylan-chop-" + 1 + ".png)");
@@ -961,6 +1012,7 @@ function treeChop() {
               temp = 1;
               clearInterval(swing);
               eventOccurence = false;
+              setMovementDisabled(false);
               $("#falling-tree").css("background-image", url + "/falling-tree-" + hitCount + ".png)").css("width","256px");
             }
             else{
@@ -979,6 +1031,11 @@ function treeChop() {
                 setTimeout(function () {
                   $("#falling-tree").css("background-image", url + "/falling-tree-" + (++hitCount) + ".png)");
                   eventOccurence = false;
+                  setMovementDisabled(false);
+                  // Screen shake when tree falls (on last frame)
+                  if (i === 2) {
+                    screenShake();
+                  }
                 }, 30 * (i + 1));
               }
               moveWood();
@@ -2531,13 +2588,39 @@ function goFishing(){
   //   $(".bio").css("display","none");
   //   $("#fishing-game-screen").css("display","none");
   // }
-  if(!inFishing && !isReelingIn && parseInt($("#dylan").css("top")) >= 1314 && inventory.fishingRod){
+  if(!inFishing && !isReelingIn && parseInt($("#dylan").css("top")) >= 1314){
     $("progress").css("display","none");
     $(".fish-from-water").css({display: "none",marginLeft: 0, top: 1500});
     $("#fishing-game-screen").css("display","none");
     inFishing = true;
     setMovementDisabled(true);
-    $("#dylan").css({top: 1440, left: 984});
+    // Move player to fishing position using player controller
+    // Convert CSS position to world coordinates
+    // CSS left: 976, top: 1514
+    // World x = CSS left + sprite width/2 = 976 + 16 = 992
+    // World y: CSS top = footY - sprite height, so footY = 1514 + 64 = 1578
+    // World y = footY - collider height/2 = 1578 - 20 = 1558
+    if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+      // Set position and velocity to zero
+      gameWorld.player.setPosition({ x: 992, y: 1558 });
+      if (typeof gameWorld.player.setVelocity === "function") {
+        gameWorld.player.setVelocity({ x: 0, y: 0 });
+      }
+      gameWorld.syncToDom();
+      // Force another sync after a brief delay to ensure position sticks
+      setTimeout(function() {
+        if (gameWorld && gameWorld.player && gameWorld.syncToDom) {
+          gameWorld.player.setPosition({ x: 992, y: 1558 });
+          if (typeof gameWorld.player.setVelocity === "function") {
+            gameWorld.player.setVelocity({ x: 0, y: 0 });
+          }
+          gameWorld.syncToDom();
+        }
+      }, 10);
+    } else {
+      // Fallback to direct CSS if player controller not available
+      $("#dylan").css({top: 1514, left: 976});
+    }
     $("#map").css({marginTop: -3696});
     
 
@@ -2546,13 +2629,31 @@ function goFishing(){
     $("#soccer-start-screen").css("display","none");
     $("#fishing-start-screen").css("display","block");
     $("#1_player_form").css("display","none");
+    
+    // Update button state based on fishing rod availability
+    updateFishingRodButtonState();
   }
-  else if(parseInt($("#dylan").css("top")) < 1412 &&  inventory.fishingRod){
+  else if(parseInt($("#dylan").css("top")) < 1412){
     $(".nes-balloon.from-left p").text("I need to be closer to the water to use this");
     $(".nes-balloon.from-left").css({display:"block",top: "-90px"});
     setTimeout(function(){$(".nes-balloon.from-left").fadeOut()},1000)
   }
   $(".achievement").css("display","none");
+}
+
+function updateFishingRodButtonState(){
+  var throwLineBtn = $("#throw-line-btn");
+  var rodMessage = $("#fishing-rod-message");
+  
+  if(!inventory.fishingRod){
+    throwLineBtn.prop("disabled", true);
+    throwLineBtn.addClass("is-disabled");
+    rodMessage.show();
+  } else {
+    throwLineBtn.prop("disabled", false);
+    throwLineBtn.removeClass("is-disabled");
+    rodMessage.hide();
+  }
 }
 
 function addToCollection(fish){
@@ -2578,12 +2679,72 @@ function closeFishing(){
 
 var reel_in_timer;
 
+// Screen shake function for tree falling
+function screenShake() {
+  if (typeof gameWorld === "undefined" || !gameWorld) return;
+  
+  var shakeIntensity = 8;
+  var shakeDuration = 400; // milliseconds
+  var shakeInterval = 20; // milliseconds between shakes
+  var shakeCount = shakeDuration / shakeInterval;
+  var currentShake = 0;
+  
+  var shakeTimer = setInterval(function() {
+    if (currentShake >= shakeCount) {
+      // Reset shake offset
+      if (gameWorld && gameWorld._shakeOffset) {
+        gameWorld._shakeOffset.x = 0;
+        gameWorld._shakeOffset.y = 0;
+      }
+      clearInterval(shakeTimer);
+      return;
+    }
+    
+    // Calculate shake intensity (decreases over time)
+    var intensity = shakeIntensity * (1 - (currentShake / shakeCount));
+    var offsetX = (Math.random() - 0.5) * intensity * 2;
+    var offsetY = (Math.random() - 0.5) * intensity * 2;
+    
+    // Apply shake offset to game world
+    if (gameWorld && gameWorld._shakeOffset) {
+      gameWorld._shakeOffset.x = offsetX;
+      gameWorld._shakeOffset.y = offsetY;
+    }
+    
+    currentShake++;
+  }, shakeInterval);
+}
+
 
 function throwLine(again){
+  // Check if fishing rod is available
+  if(!inventory.fishingRod){
+    return; // Button should be disabled, but just in case
+  }
+  
   if(again = "again"){
     closeFishing();
   }
   eventOccurence = true;
+  // Ensure movement is disabled and player is at fishing position
+  setMovementDisabled(true);
+  // Convert CSS position to world coordinates
+  // CSS left: 976, top: 1514
+  // World x = CSS left + sprite width/2 = 976 + 16 = 992
+  // World y: CSS top = footY - sprite height, so footY = 1514 + 64 = 1578
+  // World y = footY - collider height/2 = 1578 - 20 = 1558
+  if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+    gameWorld.player.setPosition({ x: 992, y: 1558 });
+    // Force immediate sync
+    setTimeout(function() {
+      if (gameWorld && gameWorld.syncToDom) {
+        gameWorld.syncToDom();
+      }
+    }, 0);
+  } else {
+    $("#dylan").css({top: 1514, left: 976});
+  }
+  
   $(".try-again").css("display","none");
   $(".information").text("Searching...");
   $(".bio").css("display","none");
@@ -2601,6 +2762,16 @@ var rarity = [2,2,2,4,4,4,3,5,5,5];
 function putFishOnLine(){
   eventOccurence = true;
   isReelingIn = true;
+  // Ensure movement is disabled and player stays at fishing position
+  setMovementDisabled(true);
+  // Convert CSS position to world coordinates
+  if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+    gameWorld.player.setPosition({ x: 992, y: 1558 });
+    gameWorld.syncToDom();
+  } else {
+    $("#dylan").css({top: 1514, left: 976});
+  }
+  
   $(".information").text("REEL IT IN!!");
   var names = ["shark","whale","guinneafish","clownfish","blowfish","blobfish","turtle","surgeonfish","sunfish","bettafish"]
   
@@ -2641,6 +2812,9 @@ function putFishOnLine(){
       clearInterval(reel_in_timer);
       $(".information").text("Fish Got Away...");
       isReelingIn = false;
+      // Keep movement disabled and maintain position
+      setMovementDisabled(true);
+      $("#dylan").css({top: 1514, left: 976});
       $("progress").css("display","none");
       setTimeout(endFishing,1000);
     }

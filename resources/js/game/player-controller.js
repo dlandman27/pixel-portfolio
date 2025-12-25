@@ -39,10 +39,26 @@
       var movementKeys = [37, 38, 39, 40, 65, 68, 83, 87]; // arrows + WASD
 
       window.addEventListener("keydown", function (e) {
-        if (self.disableInput) return;
-        // Spacebar: dev helper to log player position for collider authoring
+        // Spacebar: handle fishing reel in or dev helper (allow even when input disabled)
         if (e.keyCode === 32) {
           e.preventDefault();
+          // Check if fishing/reeling (allow even when disableInput is true)
+          if (typeof window !== "undefined" && typeof window.isReelingIn !== "undefined" && window.isReelingIn) {
+            // Set fishing animation FIRST (space in = fishing-2) - hands up animation
+            var $dylan = $("#dylan");
+            if ($dylan.length) {
+              var url = typeof URL !== "undefined" && URL.getDylan ? URL.getDylan() : "";
+              $dylan.css("background-image", url + "/fishing/dylan-fishing-2.png)");
+            }
+            // Then handle fishing reel in
+            if (typeof window.reelIn === "function") {
+              window.reelIn(e.keyCode);
+            }
+            return;
+          }
+          // Only allow dev helpers if input is not disabled
+          if (self.disableInput) return;
+          // Dev helper to log player position for collider authoring
           if (
             self.gameWorld &&
             typeof self.gameWorld.logPlayerPositionOnce === "function"
@@ -57,6 +73,8 @@
           }
           return;
         }
+        
+        if (self.disableInput) return;
 
         // IJKL keys for manual camera pan (debug)
         if (
@@ -103,6 +121,22 @@
       });
 
       window.addEventListener("keyup", function (e) {
+        // Spacebar: handle fishing reel out (allow even when input disabled)
+        if (e.keyCode === 32) {
+          // Check if fishing/reeling (allow even when disableInput is true)
+          if (typeof window !== "undefined" && typeof window.isReelingIn !== "undefined" && window.isReelingIn) {
+            // Set fishing animation (space out = fishing-3)
+            if (self.gameWorld && self.gameWorld.player) {
+              var $dylan = $("#dylan");
+              if ($dylan.length) {
+                var url = typeof URL !== "undefined" && URL.getDylan ? URL.getDylan() : "";
+                $dylan.css("background-image", url + "/fishing/dylan-fishing-3.png)");
+              }
+            }
+          }
+          return;
+        }
+        
         if (self.disableInput) return;
         if (movementKeys.indexOf(e.keyCode) !== -1) {
           self.keysDown[e.keyCode] = false;

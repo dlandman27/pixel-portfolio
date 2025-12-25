@@ -19,6 +19,14 @@ var WORLD_COLLIDERS = {
       { x: 1046, y: 180, width: 764, height: 180, tag: "bridgeTopRightBlock" },
       { x: 926, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
       { x: 1036, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
+      
+      // Games section (top right) - block access
+      { x: 1440, y: 358, width: 400, height: 416, tag: "gamesSectionBlock" },
+      
+      // Block stairs with WIP barrier
+      // { x: 752, y: 866, width: 38, height: 66, tag: "stairsBlocked" },
+      // { x: 752, y: 996, width: 38, height: 66, tag: "stairsBlocked" },
+      // { x: 972, y: 602, width: 56, height: 68, tag: "stairsBlocked" },
 
       // Cave
       { x: 964, y: 28, width: 64, height: 100, tag: "cave-top" },
@@ -34,7 +42,7 @@ var WORLD_COLLIDERS = {
       { x: 168, y: 860, width: 322, height: 490, tag: "bottomBorderWall" },
       { x: 490, y: 1330, width: 454, height: 176, tag: "bottomFence" },
       { x: 1048, y: 1330, width: 800, height: 176, tag: "bottomFenceRight" },
-      { x: 928, y: 1504, width: 140, height: 8, tag: "bottomBorderWall1" },
+      { x: 928, y: 1514, width: 140, height: 8, tag: "bottomBorderWall1" },
       
       // Bonfire
       { x: 708, y: 620, width: 82, height: 270, tag: "bottomBorderWall1" },

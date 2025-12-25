@@ -620,6 +620,11 @@ function takeFishingRod() {
       );
       showItemPickupAnimation("fishingRod");
       checkIfComplete();
+      
+      // Update fishing modal button state if modal is open
+      if (typeof updateFishingRodButtonState === "function") {
+        updateFishingRodButtonState();
+      }
     } else if (!inventory.fishingRod) {
       $(".nes-balloon.from-left p").text(
         "Hmm... If only I had a place to store this"
@@ -642,14 +647,38 @@ function takeAxe() {
     parseInt($("#dylan").css("top")) <= 492
   ) {
     if (!inventory.axe) {
-      $("#dylan").css({
-        left: 412 + "px",
-        top: 396 + "px",
-      });
+      // Disable movement during axe pickup
+      setMovementDisabled(true);
+      // Set map position first
       $("#map").css({
         marginLeft: 1728 + "px",
         marginTop: -576 + "px",
       });
+      // Set player position to world coordinates (423, 434) for axe pickup
+      // This is different from tree chopping position (427, 437)
+      if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+        gameWorld.player.setPosition({ x: 423, y: 434 });
+        if (typeof gameWorld.player.setVelocity === "function") {
+          gameWorld.player.setVelocity({ x: 0, y: 0 });
+        }
+        gameWorld.syncToDom();
+        // Force another sync after a brief delay to ensure position sticks
+        setTimeout(function() {
+          if (gameWorld && gameWorld.player && gameWorld.syncToDom) {
+            gameWorld.player.setPosition({ x: 423, y: 434 });
+            if (typeof gameWorld.player.setVelocity === "function") {
+              gameWorld.player.setVelocity({ x: 0, y: 0 });
+            }
+            gameWorld.syncToDom();
+          }
+        }, 10);
+      } else {
+        // Fallback to direct CSS if player controller not available
+        $("#dylan").css({
+          left: 412 + "px",
+          top: 396 + "px",
+        });
+      }
       eventOccurence = true;
       var url = URL.getNature();
       var dylanURL = URL.getDylan() + "/axe/pickup";
@@ -663,6 +692,7 @@ function takeAxe() {
         }
         if (i > 6) {
           eventOccurence = false;
+          setMovementDisabled(false);
           $("#dylan").css("background-size", "32px").css("width", "32px");
           clearInterval(grabAxe);
           $("#dylan").css(
@@ -1180,15 +1210,6 @@ function resetAllItems() {
   if (openBag) {
     openInventory();
   }
-
-  // Show confirmation
-  $(".achievement").css("background-color", "#3EB489");
-  $(".achievement").css("display", "block").fadeIn();
-  $(".achievement-name").text("Items Reset");
-  $(".achievement-description").text("All items have been reset");
-  setTimeout(function () {
-    $(".achievement").fadeOut();
-  }, 3000);
 
   // Reload page to fully reset state
   setTimeout(function() {

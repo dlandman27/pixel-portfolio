@@ -57,9 +57,18 @@ $(document).keyup(function (e) {
 
 // function to handle movement of the character and the map
 function move(keyCode) {
-  // if an event is occuring
-  if (onLog || eventOccurence || sitting) {
+  // if an event is occuring or fishing
+  if (onLog || eventOccurence || sitting || (typeof inFishing !== "undefined" && inFishing) || (typeof isReelingIn !== "undefined" && isReelingIn)) {
     clearInterval(anim);
+    // Maintain fishing position if fishing
+    if ((typeof inFishing !== "undefined" && inFishing) || (typeof isReelingIn !== "undefined" && isReelingIn)) {
+      if (typeof gameWorld !== "undefined" && gameWorld && gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+        gameWorld.player.setPosition({ x: 992, y: 1558 });
+        gameWorld.syncToDom();
+      } else {
+        $("#dylan").css({top: 1514, left: 976});
+      }
+    }
     return;
   } else {
     $(".tooltiptext").css("opacity", 0);

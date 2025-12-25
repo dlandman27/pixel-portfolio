@@ -1,0 +1,3 @@
+{"location":"inventory.js:643","message":"takeAxe called","data":{"inventoryAxe":false,"eventOccurence":false,"hitCount":1},"timestamp":1766700875149,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"inventory.js:643","message":"takeAxe called","data":{"inventoryAxe":false,"eventOccurence":false,"hitCount":1},"timestamp":1766700917664,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"inventory.js:643","message":"takeAxe called","data":{"inventoryAxe":false,"eventOccurence":false,"hitCount":1},"timestamp":1766700936757,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
