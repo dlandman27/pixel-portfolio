@@ -1557,138 +1557,209 @@ $(document).ready(function() {
       closeTutorial();
     }
     
-    // Clear any existing movement
-    var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
-    clearInterval(animRef);
-    if (typeof WORLD !== "undefined" && WORLD.movement) {
-      WORLD.movement.anim = null;
-      WORLD.movement.keyPressed = false;
+    // Check if new movement engine (PlayerController) is active
+    if (window.useNewMovementEngine && window.playerController) {
+      // Clear all direction keys first
+      window.playerController.keysDown[37] = false;
+      window.playerController.keysDown[38] = false;
+      window.playerController.keysDown[39] = false;
+      window.playerController.keysDown[40] = false;
+      
+      // Set the pressed direction
+      window.playerController.keysDown[direction] = true;
+      
+      // Recompute axes to update movement
+      if (typeof window.playerController._recomputeAxes === 'function') {
+        window.playerController._recomputeAxes();
+      }
     } else {
-      keyPressed = false;
+      // Legacy movement engine
+      var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
+      clearInterval(animRef);
+      if (typeof WORLD !== "undefined" && WORLD.movement) {
+        WORLD.movement.anim = null;
+      } else {
+        anim = null;
+      }
+      
+      // Clear all direction keys first
+      keysPressed[37] = false;
+      keysPressed[38] = false;
+      keysPressed[39] = false;
+      keysPressed[40] = false;
+      
+      // Then set the current direction as pressed
+      keysPressed[direction] = true;
+      
+      // Also update WORLD.movement.keysPressed if it exists
+      if (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) {
+        WORLD.movement.keysPressed[37] = false;
+        WORLD.movement.keysPressed[38] = false;
+        WORLD.movement.keysPressed[39] = false;
+        WORLD.movement.keysPressed[40] = false;
+        WORLD.movement.keysPressed[direction] = true;
+      }
+      
+      // Reset keyPressed flag so move() can start a new interval
+      if (typeof WORLD !== "undefined" && WORLD.movement) {
+        WORLD.movement.keyPressed = false;
+      } else {
+        keyPressed = false;
+      }
+      
+      // Call move immediately to turn character and start movement
+      move(direction);
     }
-    
-    // Set the key as pressed in both keysPressed objects
-    keysPressed[direction] = true;
-    keysPressed[37] = false;
-    keysPressed[38] = false;
-    keysPressed[39] = false;
-    keysPressed[40] = false;
-    keysPressed[direction] = true;
-    
-    // Also update WORLD.movement.keysPressed if it exists
-    if (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) {
-      WORLD.movement.keysPressed[direction] = true;
-      WORLD.movement.keysPressed[37] = false;
-      WORLD.movement.keysPressed[38] = false;
-      WORLD.movement.keysPressed[39] = false;
-      WORLD.movement.keysPressed[40] = false;
-      WORLD.movement.keysPressed[direction] = true;
-    }
-    
-    // Call move immediately to turn character and start movement
-    move(direction);
   }
 
   function stopMovement() {
-    // Clear the animation interval
-    var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
-    clearInterval(animRef);
-    if (typeof WORLD !== "undefined" && WORLD.movement) {
-      WORLD.movement.keyPressed = false;
-      WORLD.movement.anim = null;
+    // Check if new movement engine (PlayerController) is active
+    if (window.useNewMovementEngine && window.playerController) {
+      // Clear all direction keys
+      window.playerController.keysDown[37] = false;
+      window.playerController.keysDown[38] = false;
+      window.playerController.keysDown[39] = false;
+      window.playerController.keysDown[40] = false;
+      
+      // Recompute axes to stop movement
+      if (typeof window.playerController._recomputeAxes === 'function') {
+        window.playerController._recomputeAxes();
+      }
     } else {
-      keyPressed = false;
-    }
-    
-    // Clear all direction keys in both keysPressed objects
-    keysPressed[37] = false;
-    keysPressed[38] = false;
-    keysPressed[39] = false;
-    keysPressed[40] = false;
-    
-    // Also clear WORLD.movement.keysPressed if it exists
-    if (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) {
-      WORLD.movement.keysPressed[37] = false;
-      WORLD.movement.keysPressed[38] = false;
-      WORLD.movement.keysPressed[39] = false;
-      WORLD.movement.keysPressed[40] = false;
+      // Legacy movement engine
+      var animRef = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.anim : anim;
+      clearInterval(animRef);
+      if (typeof WORLD !== "undefined" && WORLD.movement) {
+        WORLD.movement.keyPressed = false;
+        WORLD.movement.anim = null;
+      } else {
+        keyPressed = false;
+      }
+      
+      // Clear all direction keys in both keysPressed objects
+      keysPressed[37] = false;
+      keysPressed[38] = false;
+      keysPressed[39] = false;
+      keysPressed[40] = false;
+      
+      // Also clear WORLD.movement.keysPressed if it exists
+      if (typeof WORLD !== "undefined" && WORLD.movement && WORLD.movement.keysPressed) {
+        WORLD.movement.keysPressed[37] = false;
+        WORLD.movement.keysPressed[38] = false;
+        WORLD.movement.keysPressed[39] = false;
+        WORLD.movement.keysPressed[40] = false;
+      }
     }
   }
 
   // Up button
-  $('.mobile-btn-up').live('touchstart', function(e) {
+  $('.mobile-btn-up').bind('touchstart', function(e) {
     e.preventDefault();
+    e.stopPropagation();
     startMovement(38);
+    return false;
   });
-  $('.mobile-btn-up').live('touchend touchcancel', function(e) {
+  $('.mobile-btn-up').bind('touchend', function(e) {
     e.preventDefault();
     stopMovement();
   });
-  $('.mobile-btn-up').live('mousedown', function(e) {
+  $('.mobile-btn-up').bind('touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-up').bind('mousedown', function(e) {
     e.preventDefault();
     startMovement(38);
   });
-  $('.mobile-btn-up').live('mouseup mouseleave', function(e) {
+  $('.mobile-btn-up').bind('mouseup', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-up').bind('mouseleave', function(e) {
     e.preventDefault();
     stopMovement();
   });
 
   // Down button
-  $('.mobile-btn-down').live('touchstart', function(e) {
+  $('.mobile-btn-down').bind('touchstart', function(e) {
     e.preventDefault();
     startMovement(40);
   });
-  $('.mobile-btn-down').live('touchend touchcancel', function(e) {
+  $('.mobile-btn-down').bind('touchend', function(e) {
     e.preventDefault();
     stopMovement();
   });
-  $('.mobile-btn-down').live('mousedown', function(e) {
+  $('.mobile-btn-down').bind('touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-down').bind('mousedown', function(e) {
     e.preventDefault();
     startMovement(40);
   });
-  $('.mobile-btn-down').live('mouseup mouseleave', function(e) {
+  $('.mobile-btn-down').bind('mouseup', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-down').bind('mouseleave', function(e) {
     e.preventDefault();
     stopMovement();
   });
 
   // Left button
-  $('.mobile-btn-left').live('touchstart', function(e) {
+  $('.mobile-btn-left').bind('touchstart', function(e) {
     e.preventDefault();
     startMovement(37);
   });
-  $('.mobile-btn-left').live('touchend touchcancel', function(e) {
+  $('.mobile-btn-left').bind('touchend', function(e) {
     e.preventDefault();
     stopMovement();
   });
-  $('.mobile-btn-left').live('mousedown', function(e) {
+  $('.mobile-btn-left').bind('touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-left').bind('mousedown', function(e) {
     e.preventDefault();
     startMovement(37);
   });
-  $('.mobile-btn-left').live('mouseup mouseleave', function(e) {
+  $('.mobile-btn-left').bind('mouseup', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-left').bind('mouseleave', function(e) {
     e.preventDefault();
     stopMovement();
   });
 
   // Right button
-  $('.mobile-btn-right').live('touchstart', function(e) {
+  $('.mobile-btn-right').bind('touchstart', function(e) {
     e.preventDefault();
     startMovement(39);
   });
-  $('.mobile-btn-right').live('touchend touchcancel', function(e) {
+  $('.mobile-btn-right').bind('touchend', function(e) {
     e.preventDefault();
     stopMovement();
   });
-  $('.mobile-btn-right').live('mousedown', function(e) {
+  $('.mobile-btn-right').bind('touchcancel', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-right').bind('mousedown', function(e) {
     e.preventDefault();
     startMovement(39);
   });
-  $('.mobile-btn-right').live('mouseup mouseleave', function(e) {
+  $('.mobile-btn-right').bind('mouseup', function(e) {
+    e.preventDefault();
+    stopMovement();
+  });
+  $('.mobile-btn-right').bind('mouseleave', function(e) {
     e.preventDefault();
     stopMovement();
   });
 
   // Logo Gallery Click Handlers
-  $('.logo-item').live('click', function(e) {
+  $('.logo-item').bind('click', function(e) {
     e.stopPropagation();
     openPortfolioWithLogoFilter();
   });
@@ -1747,7 +1818,7 @@ function openMinimap(){
   eventOccurence = true;
 }
 
-$("#minimap").live('click',function () {
+$("#minimap").live('click', function () {
   $("#minimap").remove();
   if(!inSoccer && !inFishing){
     eventOccurence = false;

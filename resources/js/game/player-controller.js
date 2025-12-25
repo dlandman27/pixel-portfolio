@@ -98,6 +98,26 @@
           self._recomputeAxes();
         }
       });
+
+      // Clear all keys when window loses focus (prevents stuck keys)
+      window.addEventListener("blur", function () {
+        self.keysDown = {};
+        self._recomputeAxes();
+      });
+
+      // Clear all keys when context menu opens (prevents right-click bug)
+      window.addEventListener("contextmenu", function () {
+        self.keysDown = {};
+        self._recomputeAxes();
+      });
+
+      // Clear all keys when page visibility changes (tab switching)
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+          self.keysDown = {};
+          self._recomputeAxes();
+        }
+      });
     }
 
     _bindMouse() {

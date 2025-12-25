@@ -16,7 +16,7 @@
   var PLAYER_SPRITE_HEIGHT = 64;
   var PLAYER_COLLIDER_WIDTH = 24;
   var PLAYER_COLLIDER_HEIGHT = 40;
-  var PLAYER_MAX_SPEED = 2.2;
+  var PLAYER_DEFAULT_SPEED = 2.2;
 
   // World/map dimensions (in world units) – match #wrapper in CSS.
   var WORLD_WIDTH = 2000;
@@ -49,6 +49,21 @@
       this._lastFacingApplied = null;
       this._lastFrameApplied = null;
       this._introPlayed = false;
+      // Player speed (configurable via settings)
+      this._playerSpeed = this._getInitialSpeed();
+    }
+    
+    /**
+     * Get initial player speed from cookie or default
+     */
+    _getInitialSpeed() {
+      if (typeof getCookie === "function") {
+        var savedSpeed = getCookie("character-speed");
+        if (savedSpeed) {
+          return parseFloat(savedSpeed);
+        }
+      }
+      return PLAYER_DEFAULT_SPEED;
     }
 
     /**
@@ -128,7 +143,7 @@
         y: spawn.y,
         width: PLAYER_COLLIDER_WIDTH,
         height: PLAYER_COLLIDER_HEIGHT,
-        maxSpeed: PLAYER_MAX_SPEED
+        maxSpeed: this._playerSpeed
       });
 
       // Register solids
@@ -181,16 +196,9 @@
         this._playIntroDrop();
         this._introPlayed = true;
       } else {
-        // Ensure input is enabled for all other scenes immediately
+        // Ensure input is enabled for all other scenes
         if (global.playerController) {
           global.playerController.disableInput = false;
-          // Clear any stuck keys and input state
-          global.playerController.keysDown = {};
-          global.playerController.inputState = { x: 0, y: 0 };
-        }
-        // Reset player velocity to prevent momentum carry-over
-        if (this.player && typeof this.player.setVelocity === "function") {
-          this.player.setVelocity({ x: 0, y: 0 });
         }
       }
 
@@ -217,8 +225,43 @@
       this.collisionWorld.update(deltaMs, effectiveInput);
       this.updateAnimation(deltaMs, effectiveInput);
       this.syncToDom();
+      this.updateDoors();
 
       // Do not re-render debug overlays every frame; only on enable/scene change
+    }
+
+    /**
+     * Update tent doors based on player position.
+     * Replicates legacy door logic from script.js move() function.
+     */
+    updateDoors() {
+      if (this.sceneName !== "mainMap") return;
+      if (!this.player) return;
+      
+      var $dylan = $("#dylan");
+      if (!$dylan.length) return;
+      
+      var dylanLeft = parseInt($dylan.css("left"));
+      
+      // Control tent1 door based on player position
+      // Door opens when player moves left (left < 428), closes when moving right (left >= 428)
+      if (typeof doorOpen === "undefined") {
+        global.doorOpen = false;
+      }
+      
+      if (!global.doorOpen) {
+        // Door is closed, check if we should open it
+        if (dylanLeft < 428) {
+          $(".tentdoor.tent1").animate({ "height": 0 }, 1000);
+          global.doorOpen = true;
+        }
+      } else {
+        // Door is open, check if we should close it
+        if (dylanLeft >= 428) {
+          $(".tentdoor.tent1").animate({ "height": 38 }, 1000);
+          global.doorOpen = false;
+        }
+      }
     }
 
     /**
@@ -258,27 +301,31 @@
         var mapWidthPx = sceneWidth * EFFECTIVE_MAP_SCALE;
         var mapHeightPx = sceneHeight * EFFECTIVE_MAP_SCALE;
         
-        // Special case for tent: always center on player, no clamping
+        // Special handling for tent: center horizontally, follow vertically
         if (this.sceneName === "tent1") {
-          var viewportCenterX = window.innerWidth / 2;
+          var newMarginLeft = (window.innerWidth - mapWidthPx) / 2;
+          
+          // Follow player vertically
           var viewportCenterY = window.innerHeight / 2;
-
-          var camX = pos.x;
           var camY = pos.y;
-
-          var newMarginLeft = viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x;
           var newMarginTop = viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y;
-
-          // Snap to whole pixels
-          newMarginLeft = Math.round(newMarginLeft);
           newMarginTop = Math.round(newMarginTop);
-
+          
+          // Clamp vertical position
+          if (newMarginTop > 0) {
+            newMarginTop = 0;
+          }
+          var minMarginTop = window.innerHeight - mapHeightPx;
+          if (newMarginTop < minMarginTop) {
+            newMarginTop = minMarginTop;
+          }
+          
           $parent.css({
-            "margin-left": newMarginLeft + "px",
+            "margin-left": Math.round(newMarginLeft) + "px",
             "margin-top": newMarginTop + "px"
           });
         }
-        // For small scenes that fit within viewport, center the scene itself
+        // For small scenes (like tent) that fit within viewport, center the scene itself
         else if (mapWidthPx <= window.innerWidth && mapHeightPx <= window.innerHeight) {
           var newMarginLeft = (window.innerWidth - mapWidthPx) / 2;
           var newMarginTop = (window.innerHeight - mapHeightPx) / 2;
@@ -354,6 +401,24 @@
 
     getColliderDebugEnabled() {
       return !!this._colliderDebugEnabled;
+    }
+
+    /**
+     * Set player movement speed
+     */
+    setPlayerSpeed(speed) {
+      this._playerSpeed = speed;
+      // Update the player's maxSpeed directly
+      if (this.player) {
+        this.player.maxSpeed = speed;
+      }
+    }
+
+    /**
+     * Get current player speed
+     */
+    getPlayerSpeed() {
+      return this._playerSpeed;
     }
 
     clearColliderDebugOverlays() {

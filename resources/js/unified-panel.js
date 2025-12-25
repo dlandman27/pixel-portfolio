@@ -744,6 +744,51 @@ var UnifiedPanel = (function () {
       });
     }
 
+    // Character speed setting
+    var speedBtns = rootEl.querySelectorAll('[data-role="set-speed"]');
+    if (speedBtns.length > 0) {
+      // Get current speed from cookie or default
+      var currentSpeed = getCookie("character-speed") || "2.2";
+      
+      // Update button states based on current speed
+      function updateSpeedButtons() {
+        speedBtns.forEach(function(btn) {
+          var btnSpeed = btn.getAttribute("data-speed");
+          if (btnSpeed === currentSpeed) {
+            btn.classList.add("is-primary");
+          } else {
+            btn.classList.remove("is-primary");
+          }
+        });
+      }
+      
+      // Initialize button states
+      updateSpeedButtons();
+      
+      // Add click handlers
+      speedBtns.forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          var newSpeed = btn.getAttribute("data-speed");
+          currentSpeed = newSpeed;
+          
+          // Save to cookie
+          setCookie("character-speed", newSpeed);
+          
+          // Update button states
+          updateSpeedButtons();
+          
+          // Apply to game world if available
+          if (
+            window.playerController &&
+            window.playerController.gameWorld &&
+            typeof window.playerController.gameWorld.setPlayerSpeed === "function"
+          ) {
+            window.playerController.gameWorld.setPlayerSpeed(parseFloat(newSpeed));
+          }
+        });
+      });
+    }
+
   }
 
   return {
