@@ -28,7 +28,7 @@
   // Effective scale used for camera math (keep equal to MAP_SCALE)
   var EFFECTIVE_MAP_SCALE = MAP_SCALE;
   // Intro settings
-  var INTRO_DURATION_MS = 1300;
+  var INTRO_DURATION_MS = 500; // Reduced from 1300ms to 500ms for faster movement enable
 
   class GameWorld {
     constructor() {

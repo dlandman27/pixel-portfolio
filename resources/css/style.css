@@ -3479,6 +3479,7 @@ body {
   width: 50%;
   height: 200px;
   visibility: hidden;
+  display: none; /* Ensure it's completely hidden */
 }
 
 .carousel.c2.projects {
@@ -3804,7 +3805,7 @@ body.game-menu-open .game-menu-panel {
   box-shadow: 0 8px 0 #000;
   width: 260px;
   z-index: 10000035;
-  display: flex;
+  display: none !important; /* Hidden - not used in current implementation */
   flex-direction: column;
 }
 
