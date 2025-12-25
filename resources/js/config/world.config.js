@@ -58,19 +58,19 @@ var WORLD_COLLIDERS = {
         y: 670,
         width: 38,
         height: 4,
-        tag: "tentEntrance",
+        tag: "tentEntranceFront",
         nextScene: "tent1",
-        nextSpawn: { x: 208, y: 150 }
+        nextSpawn: { x: 208, y: 164 }
       },
-      // {
-      //   x: 290,
-      //   y: 660,
-      //   width: 38,
-      //   height: 4,
-      //   tag: "tentEntrance",
-      //   nextScene: "tent1",
-      //   nextSpawn: { x: 152, y: -50 }
-      // }
+      {
+        x: 290,
+        y: 630,
+        width: 38,
+        height: 4,
+        tag: "tentEntranceBack",
+        nextScene: "tent1",
+        nextSpawn: { x: 170, y: 0 }
+      }
     ]
   },
   cave: {
@@ -131,7 +131,7 @@ var WORLD_COLLIDERS = {
         height: 34,
         tag: "tentExitBack",
         nextScene: "mainMap",
-        nextSpawn: { x: 290, y: 640 }
+        nextSpawn: { x: 290, y: 600 }
       }
     ]
   }

@@ -86,6 +86,17 @@
 
         // Preserve existing behaviours for movement keys (WASD / arrows)
         if (movementKeys.indexOf(e.keyCode) !== -1) {
+          // If player is sitting on a log, stand up first
+          if (typeof window !== "undefined" && typeof window.onLog !== "undefined" && window.onLog && typeof window.standUpFromLog === "function") {
+            window.standUpFromLog();
+            // Small delay to ensure position is set before movement starts
+            setTimeout(function() {
+              self.keysDown[e.keyCode] = true;
+              self._recomputeAxes();
+            }, 10);
+            return; // Don't process key immediately
+          }
+          
           self.keysDown[e.keyCode] = true;
           self._recomputeAxes();
         }

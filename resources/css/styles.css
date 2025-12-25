@@ -153,12 +153,20 @@
 .cave-sign.left::after {
   content: "";
   position: absolute;
-  right: -90px;
-  top: 50%;
+  right: -78px;
+  top: 0%;
   width: 90px;
   height: 1px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.4) 0px,
+    rgba(255, 255, 255, 0.4) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  opacity: 0.3;
   transform: translateY(-50%);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
 .cave-sign.right {
@@ -168,12 +176,20 @@
 .cave-sign.right::after {
   content: "";
   position: absolute;
-  left: -90px;
-  top: 50%;
+  left: -78px;
+  top: 0%;
   width: 90px;
   height: 1px;
-  background: linear-gradient(to left, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  background: repeating-linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.4) 0px,
+    rgba(255, 255, 255, 0.4) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  opacity: 0.3;
   transform: translateY(-50%);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
 .cave-sign .year {
@@ -209,6 +225,192 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+
+/* Responsive: Make interactive signs larger on small screens */
+@media (max-width: 900px) {
+  .cave-timeline-sign-interact {
+    width: 40px;
+    height: 40px;
+    background-size: 40px 40px;
+  }
+}
+
+/* Interactive signs for timeline entries */
+.cave-timeline-sign-interact {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-image: url("../images/sign.png");
+  background-size: 32px 32px;
+  background-repeat: no-repeat;
+  z-index: 15;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25)) brightness(0.6);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%); /* Center vertically on the Y position */
+}
+
+.cave-timeline-sign-interact::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  filter: blur(3px);
+  z-index: -1;
+}
+
+.cave-timeline-sign-text {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fdf6e3;
+  font-family: "Press Start 2P", cursive;
+  font-size: 6px;
+  white-space: nowrap;
+  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+  pointer-events: none;
+  z-index: 16;
+}
+
+/* Timeline Modal */
+.timeline-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100000;
+  display: none;
+  pointer-events: none;
+}
+
+.timeline-modal.active {
+  display: block;
+  pointer-events: all;
+}
+
+.timeline-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+.timeline-modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  background: rgba(20, 20, 20, 0.98);
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.8), 0 0 0 4px rgba(0, 0, 0, 0.5);
+  padding: 40px 20px 20px 20px;
+  overflow-y: auto;
+  transform: translate(-50%, -50%) scale(0.9);
+  transition: transform 0.3s ease;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+.timeline-modal.active .timeline-modal-content {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.timeline-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 3;
+  color: #fdf6e3;
+  font-size: 24px;
+  padding: 8px;
+  line-height: 1;
+}
+
+.timeline-modal-close:hover {
+  opacity: 0.7;
+}
+
+.timeline-modal-entry-content {
+  color: #fdf6e3;
+  font-family: "Press Start 2P", cursive;
+}
+
+.timeline-entry-content {
+  margin-top: 60px;
+  color: #fdf6e3;
+  font-family: "Press Start 2P", cursive;
+}
+
+.timeline-modal-img,
+.timeline-entry-img {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 20px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.timeline-modal-year,
+.timeline-entry-year {
+  font-size: 12px;
+  margin-bottom: 12px;
+  color: #ffde89;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.timeline-modal-title,
+.timeline-entry-title {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.timeline-modal-desc,
+.timeline-entry-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d2c2b2;
+  opacity: 0.9;
+  font-family: "Courier New", Courier, monospace;
+}
+
+/* Responsive: Make modal full screen on small devices */
+@media (max-width: 900px) {
+  .timeline-modal-content {
+    width: 95%;
+    max-width: 95%;
+    max-height: 90vh;
+  }
+  
+  .cave-timeline-sign-interact {
+    width: 40px;
+    height: 40px;
+    background-size: 40px 40px;
+  }
+}
+
 .cave-exit {
   position: absolute;
   left: 972px;
@@ -241,12 +443,26 @@
     top: 1150px;
     width: 64px;
     height: 32px;
-    background: linear-gradient(to bottom, transparent 0%, rgba(255, 244, 200, 1) 70%, rgba(255, 244, 200, 01) 100%);
+    background: linear-gradient(to bottom, transparent 0%, rgba(255, 244, 200, 1) 70%, rgba(255, 244, 200, 1) 100%);
     filter: blur(10px);
     pointer-events: none;
     z-index: 4;
     border-radius: 0px 0px 4px 4px;
-    opacity: 0.5;
+    opacity: 0.8;
+    animation: exit-light-pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(255, 244, 200, 0.6),
+                0 0 40px rgba(255, 220, 150, 0.4);
+}
+
+@keyframes exit-light-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .cave-exit-rocks-left {

@@ -42,6 +42,12 @@
       this._initialMapMarginTop = 0;
       this._spawn = { x: 0, y: 0 };
       this._cameraOffset = { x: 0, y: 0 };
+      // Bonfire camera animation state
+      this._bonfireCameraTarget = null; // { x, y } when sitting, null when not
+      this._bonfireCameraCurrent = null; // Current interpolated position
+      // Star creation interval
+      this._starCreationInterval = null;
+      this._shootingStarInterval = null;
       // Animation state
       this._animFrame = 2;
       this._animAccum = 0;
@@ -86,6 +92,33 @@
 
       // Clear debug overlays from previous scene
       this.clearColliderDebugOverlays();
+      
+      // Clear z-index debug overlays when changing scenes
+      if (typeof ZIndexManager !== "undefined") {
+        ZIndexManager.setDebugEnabled(false);
+      }
+      
+      // Reset z-index tracking when changing scenes
+      if (typeof ZIndexManager !== "undefined") {
+        ZIndexManager.reset();
+      }
+      
+      // Stop star creation when changing scenes
+      if (this._starCreationInterval) {
+        clearInterval(this._starCreationInterval);
+        this._starCreationInterval = null;
+      }
+      
+      // Stop shooting star creation when changing scenes
+      if (this._shootingStarInterval) {
+        clearInterval(this._shootingStarInterval);
+        this._shootingStarInterval = null;
+      }
+      
+      // Notify CloudManager of scene change
+      if (typeof CloudManager !== "undefined" && typeof CloudManager.onSceneChange === "function") {
+        CloudManager.onSceneChange(sceneName);
+      }
 
       // Rebuild scene
       this._buildScene(sceneName, spawnOverride);
@@ -111,6 +144,10 @@
       // Build cave DOM if entering cave
       if (this.sceneName === "cave" && typeof buildCaveDomIfNeeded === "function") {
         buildCaveDomIfNeeded();
+        // Immediately update z-indexes after building cave DOM so signs have correct z-index on entry
+        if (this.player) {
+          this.updateZIndexes();
+        }
       }
       // Move Dylan to the active scene container
       this._moveDylanToActiveScene();
@@ -202,6 +239,15 @@
         }
       }
 
+      // Initialize z-index manager for this scene
+      if (typeof ZIndexManager !== "undefined") {
+        ZIndexManager.init(this.sceneName);
+        // If debug was enabled, render debug overlays
+        if (this._colliderDebugEnabled) {
+          ZIndexManager.setDebugEnabled(true, this.sceneName);
+        }
+      }
+
       // If debug was enabled before init, render overlays once
       if (this._colliderDebugEnabled) {
         this.renderColliderDebugOverlays();
@@ -226,6 +272,7 @@
       this.updateAnimation(deltaMs, effectiveInput);
       this.syncToDom();
       this.updateDoors();
+      this.updateZIndexes();
 
       // Do not re-render debug overlays every frame; only on enable/scene change
     }
@@ -265,6 +312,206 @@
     }
 
     /**
+     * Update z-indexes of objects based on player position.
+     * Uses ZIndexManager to dynamically change z-indexes so player can walk behind/in front of objects.
+     */
+    updateZIndexes() {
+      if (!this.player) return;
+      if (typeof ZIndexManager === "undefined") return;
+      
+      // Get player position (center of collider)
+      var pos = this.player.getPosition();
+      
+      // Update z-indexes based on player position
+      ZIndexManager.update(pos.y, pos.x, this.sceneName);
+      
+      // Update timeline signs z-index individually based on their Y position
+      if (this.sceneName === "cave") {
+        var $signs = $(".cave-timeline-sign-interact");
+        $signs.each(function() {
+          var $sign = $(this);
+          var signY = parseFloat($sign.attr("data-sign-y")) || 0;
+          // Player z-index in cave is 9999
+          // Use player's center Y position for comparison
+          // signY is the sign's top Y position (stored in data-sign-y)
+          // In cave: Y increases as you go down
+          // When player Y > sign Y: player should be in front (player is below sign)
+          // When player Y <= sign Y: sign should be in front (player is at or above sign)
+          if (pos.y > signY) {
+            // Player center is below sign top - player should be in front (sign behind player)
+            $sign.css("z-index", "9998");
+          } else {
+            // Player center is at or above sign top - sign should be in front of player
+            $sign.css("z-index", "10000");
+          }
+        });
+      }
+      
+      // Update bonfire vignette effect
+      this.updateBonfireVignette(pos);
+    }
+    
+    /**
+     * Update bonfire vignette effect based on player position.
+     * Creates a cozy, focused atmosphere when player is in the bonfire area.
+     * Uses two vignette layers to darken both background and foreground elements.
+     */
+    updateBonfireVignette(pos) {
+      if (this.sceneName !== "mainMap") return;
+      
+      var $vignetteBottom = $("#bonfire-vignette-bottom");
+      var $vignetteMiddle = $("#bonfire-vignette-middle");
+      var $vignetteTop = $("#bonfire-vignette-top");
+      var $stars = $("#bonfire-stars");
+      if (!$vignetteBottom.length && !$vignetteMiddle.length && !$vignetteTop.length) return;
+      
+      // Bonfire area boundaries (adjusted to match collision bounds)
+      // Center is approximately at x: 984, y: 652
+      var bonfireMinX = 780;  // Left wall
+      var bonfireMaxX = 1292; // Right wall
+      var bonfireMinY = 650;  // Top cliff
+      var bonfireMaxY = 1068; // Bottom trees
+      
+      // Check if player is in bonfire area
+      var inBonfireArea = pos.x >= bonfireMinX && pos.x <= bonfireMaxX &&
+                         pos.y >= bonfireMinY && pos.y <= bonfireMaxY;
+            
+      // Toggle vignette class on all three layers
+      if (inBonfireArea) {
+        $vignetteBottom.addClass("active");
+        $vignetteMiddle.addClass("active");
+        $vignetteTop.addClass("active");
+        
+        // Show stars container
+        if ($stars.length) {
+          $stars.addClass("active");
+          
+          // Initialize star creation interval if not already set
+          if (!this._starCreationInterval) {
+            this._startStarCreation($stars);
+          }
+          
+          // Initialize shooting star creation if not already set
+          if (!this._shootingStarInterval) {
+            this._startShootingStarCreation($stars);
+          }
+        }
+      } else {
+        $vignetteBottom.removeClass("active");
+        $vignetteMiddle.removeClass("active");
+        $vignetteTop.removeClass("active");
+        
+        // Hide stars and stop creating new ones
+        if ($stars.length) {
+          $stars.removeClass("active");
+        }
+        
+        // Stop star creation
+        if (this._starCreationInterval) {
+          clearInterval(this._starCreationInterval);
+          this._starCreationInterval = null;
+        }
+        
+        // Stop shooting star creation
+        if (this._shootingStarInterval) {
+          clearInterval(this._shootingStarInterval);
+          this._shootingStarInterval = null;
+        }
+      }
+    }
+    
+    /**
+     * Start creating stars continuously while in bonfire area
+     */
+    _startStarCreation($container) {
+      var self = this;
+      var mapWidth = 2000;
+      var mapHeight = 1200;
+      
+      // Create a new star every 200-400ms
+      this._starCreationInterval = setInterval(function() {
+        // Remove old stars that have faded out (opacity 0 after animation)
+        $container.find(".bonfire-star").each(function() {
+          var $star = $(this);
+          // Check if animation has completed (stars fade out at 50% of 4s = 2s)
+          var animationDelay = parseFloat($star.css("animation-delay")) || 0;
+          var elapsed = (Date.now() - ($star.data("createdAt") || Date.now())) / 1000;
+          if (elapsed > 2 + animationDelay) {
+            $star.remove();
+          }
+        });
+        
+        // Create a new star
+        var $star = $("<div>").addClass("bonfire-star");
+        
+        // Random position across the map
+        var x = Math.random() * mapWidth;
+        var y = Math.random() * mapHeight;
+        
+        // Make some stars brighter (20% chance)
+        if (Math.random() < 0.2) {
+          $star.addClass("bright");
+        }
+        
+        // Random animation delay for variety (0-1s)
+        var delay = Math.random() * 1;
+        $star.css({
+          left: x + "px",
+          top: y + "px",
+          "animation-delay": delay + "s"
+        });
+        
+        // Track when star was created
+        $star.data("createdAt", Date.now());
+        
+        $container.append($star);
+        
+        // Remove star after animation completes (4s + delay)
+        setTimeout(function() {
+          $star.remove();
+        }, (4000 + delay * 1000));
+      }, 300); // Create a new star every 300ms
+    }
+    
+    /**
+     * Start creating shooting stars occasionally for ambiance
+     */
+    _startShootingStarCreation($container) {
+      var self = this;
+      var mapWidth = 2000;
+      var mapHeight = 1200;
+      
+      // Create a shooting star every 3-8 seconds
+      function createShootingStar() {
+        var $shootingStar = $("<div>").addClass("shooting-star");
+        
+        // Random starting position (top-left area for diagonal movement)
+        var startX = Math.random() * (mapWidth * 0.3); // Start in left 30% of map
+        var startY = Math.random() * (mapHeight * 0.2); // Start in top 20% of map
+        
+        $shootingStar.css({
+          left: startX + "px",
+          top: startY + "px"
+        });
+        
+        $container.append($shootingStar);
+        
+        // Remove after animation completes (2s)
+        setTimeout(function() {
+          $shootingStar.remove();
+        }, 2000);
+        
+        // Schedule next shooting star (3-8 seconds)
+        var nextDelay = 3000 + Math.random() * 5000;
+        self._shootingStarInterval = setTimeout(createShootingStar, nextDelay);
+      }
+      
+      // Start the first shooting star after a short delay
+      var initialDelay = 2000 + Math.random() * 3000;
+      this._shootingStarInterval = setTimeout(createShootingStar, initialDelay);
+    }
+
+    /**
      * Push the physics player position into the #dylan DOM element.
      * We treat the physics body position as the center of the collider,
      * whose bottom edge roughly corresponds to Dylan's feet.
@@ -278,10 +525,25 @@
         var footY = pos.y + PLAYER_COLLIDER_HEIGHT / 2;
         var left = pos.x - PLAYER_SPRITE_WIDTH / 2;
         var top = footY - PLAYER_SPRITE_HEIGHT;
-        $dylan.css({
+        
+        // Set z-index based on scene
+        var currentZIndex = $dylan.css("z-index");
+        var cssUpdate = {
           left: left + "px",
           top: top + "px"
-        });
+        };
+        // Set z-index based on scene: 9999 in tent and cave, 49 on main map
+        if (this.sceneName === "tent1" || this.sceneName === "cave") {
+          if (currentZIndex !== "9999") {
+            cssUpdate["z-index"] = "9999";
+          }
+        } else if (this.sceneName === "mainMap") {
+          // Reset to 49 when on main map (correct z-index for player on main map)
+          if (currentZIndex !== "49") {
+            cssUpdate["z-index"] = "49";
+          }
+        }
+        $dylan.css(cssUpdate);
       }
 
       // Camera follow: keep player centered using world pos and effective scale.
@@ -301,24 +563,17 @@
         var mapWidthPx = sceneWidth * EFFECTIVE_MAP_SCALE;
         var mapHeightPx = sceneHeight * EFFECTIVE_MAP_SCALE;
         
-        // Special handling for tent: center horizontally, follow vertically
+        // Special handling for tent: center horizontally, follow vertically (no clamping)
         if (this.sceneName === "tent1") {
           var newMarginLeft = (window.innerWidth - mapWidthPx) / 2;
           
-          // Follow player vertically
+          // Follow player vertically with camera offset (no clamping in tent)
           var viewportCenterY = window.innerHeight / 2;
           var camY = pos.y;
           var newMarginTop = viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y;
           newMarginTop = Math.round(newMarginTop);
           
-          // Clamp vertical position
-          if (newMarginTop > 0) {
-            newMarginTop = 0;
-          }
-          var minMarginTop = window.innerHeight - mapHeightPx;
-          if (newMarginTop < minMarginTop) {
-            newMarginTop = minMarginTop;
-          }
+          // No clamping in tent - allow free camera movement
           
           $parent.css({
             "margin-left": Math.round(newMarginLeft) + "px",
@@ -339,13 +594,57 @@
           var viewportCenterX = window.innerWidth / 2;
           var viewportCenterY = window.innerHeight / 2;
 
-          var camX = pos.x;
-          var camY = pos.y;
+          var camX, camY;
+          
+          // Check if player is sitting on a log - if so, smoothly center camera on bonfire instead of player
+          var isSitting = typeof window !== "undefined" && typeof window.onLog !== "undefined" && window.onLog;
+          var bonfireCenterX = 999;
+          var bonfireCenterY = 834;
+          
+          if (isSitting) {
+            // Set target for smooth camera movement
+            if (!this._bonfireCameraTarget) {
+              // Initialize target and current position
+              this._bonfireCameraTarget = { x: bonfireCenterX, y: bonfireCenterY };
+              // Start from current camera position (derived from current margin)
+              var $parent = this._getSceneElement();
+              if ($parent.length) {
+                var currentMarginLeft = parseInt($parent.css("margin-left")) || 0;
+                var currentMarginTop = parseInt($parent.css("margin-top")) || 0;
+                var viewportCenterX = window.innerWidth / 2;
+                var viewportCenterY = window.innerHeight / 2;
+                // Reverse the camera formula: worldPos = (viewportCenter - margin + offset) / scale
+                var currentWorldX = (viewportCenterX - currentMarginLeft + this._cameraOffset.x) / EFFECTIVE_MAP_SCALE;
+                var currentWorldY = (viewportCenterY - currentMarginTop + this._cameraOffset.y) / EFFECTIVE_MAP_SCALE;
+                this._bonfireCameraCurrent = { x: currentWorldX, y: currentWorldY };
+              } else {
+                this._bonfireCameraCurrent = { x: bonfireCenterX, y: bonfireCenterY };
+              }
+            } else {
+              // Update target in case it changed
+              this._bonfireCameraTarget = { x: bonfireCenterX, y: bonfireCenterY };
+            }
+            
+            // Smoothly interpolate towards target (lerp with factor 0.1 for smooth movement)
+            var lerpFactor = 0.1;
+            this._bonfireCameraCurrent.x += (this._bonfireCameraTarget.x - this._bonfireCameraCurrent.x) * lerpFactor;
+            this._bonfireCameraCurrent.y += (this._bonfireCameraTarget.y - this._bonfireCameraCurrent.y) * lerpFactor;
+            
+            camX = this._bonfireCameraCurrent.x;
+            camY = this._bonfireCameraCurrent.y;
+          } else {
+            // Not sitting - clear bonfire camera state and follow player
+            this._bonfireCameraTarget = null;
+            this._bonfireCameraCurrent = null;
+            camX = pos.x;
+            camY = pos.y;
+          }
 
           // Optional micro-adjust to fine-tune visual centering
           var NUDGE_X = 0; // negative shifts camera left; adjust as needed
           var NUDGE_Y = 0;  // negative shifts camera up; adjust as needed
 
+          // Always apply camera offset - it allows free panning even when snapped
           var newMarginLeft =
             viewportCenterX - camX * EFFECTIVE_MAP_SCALE + this._cameraOffset.x + NUDGE_X;
           var newMarginTop =
@@ -355,6 +654,7 @@
           newMarginLeft = Math.round(newMarginLeft);
           newMarginTop = Math.round(newMarginTop);
 
+          // Normal clamping for all areas
           // Clamp so the camera never slides past the left or top page edges.
           if (newMarginLeft > 0) {
             newMarginLeft = 0;
@@ -394,8 +694,16 @@
       if (this._colliderDebugEnabled) {
         this.renderColliderDebugOverlays();
         this._colliderDebugRendered = true;
+        // Also enable z-index debug visualization
+        if (typeof ZIndexManager !== "undefined") {
+          ZIndexManager.setDebugEnabled(true, this.sceneName);
+        }
       } else {
         this.clearColliderDebugOverlays();
+        // Disable z-index debug visualization
+        if (typeof ZIndexManager !== "undefined") {
+          ZIndexManager.setDebugEnabled(false);
+        }
       }
     }
 
@@ -492,6 +800,27 @@
         }
       }
 
+      // Timeline sign z-index transition points (show where z-index changes)
+      if (this.sceneName === "cave" && typeof TIMELINE_ENTRIES !== "undefined") {
+        TIMELINE_ENTRIES.forEach(function(entry, idx) {
+          var signY = (entry.y || 0) - 10;
+          // Show the Y position where z-index transitions (at signY)
+          var $zIndexDebug = $(
+            "<div class='world-collider-debug' style='border: 2px dashed rgba(255, 255, 0, 0.8); background-color: rgba(255, 255, 0, 0.1);'></div>"
+          );
+          $zIndexDebug.css({
+            position: "absolute",
+            left: "0px",
+            top: signY + "px",
+            width: "2000px",
+            height: "2px"
+          });
+          $zIndexDebug.attr("title", "Z-Index Transition: Sign " + idx + " (" + (entry.year || "") + ") - Player behind above this line, in front below");
+          $parent.append($zIndexDebug);
+          this._colliderDebugEls.push($zIndexDebug[0]);
+        }.bind(this));
+      }
+
       // Player hitbox (for reference)
       if (this.player) {
         var pos = this.player.getPosition();
@@ -574,10 +903,82 @@
         $("#tent1").css("display", "block");
         $("#map").css("display", "none");
         $("#cave").css("display", "none");
+        // Close timeline modal if open when leaving cave
+        if (typeof closeTimelineModal === "function") {
+          closeTimelineModal();
+        }
       } else {
         $("#map").css("display", "block");
         $("#tent1").css("display", "none");
         $("#cave").css("display", "none");
+        // Close timeline modal if open when leaving cave
+        if (typeof closeTimelineModal === "function") {
+          closeTimelineModal();
+        }
+        // Re-apply visibility state of collectible items based on inventory
+        this._updateCollectibleVisibility();
+      }
+    }
+
+    /**
+     * Update visibility of collectible items based on inventory state.
+     * This ensures items that have been collected remain hidden when returning to the map.
+     */
+    _updateCollectibleVisibility() {
+      if (typeof inventory === "undefined") return;
+      
+      // Fishing rod
+      if (inventory.fishingRod) {
+        $(".fishing-rod").css("display", "none");
+      } else {
+        $(".fishing-rod").css("display", "block");
+      }
+      
+      // Matchbox
+      if (inventory.matchbox) {
+        $(".matchbox").css("display", "none");
+      } else {
+        $(".matchbox").css("display", "block");
+      }
+      
+      // Resume/Paper
+      if (inventory.resume) {
+        $(".paper").css("display", "none");
+      } else {
+        $(".paper").css("display", "block");
+      }
+      
+      // Minimap
+      if (inventory.minimap) {
+        $(".scroll").css("display", "none");
+      } else {
+        $(".scroll").css("display", "block");
+      }
+      
+      // Axe (stump state)
+      if (inventory.axe) {
+        $("#stump").css("background-image", "url(" + (typeof URL !== "undefined" ? URL.getNature() : "") + "/stump.png)");
+      } else {
+        $("#stump").css("background-image", "url(" + (typeof URL !== "undefined" ? URL.getNature() : "") + "/stump-with-axe.png)");
+      }
+      
+      // Wood log
+      if (inventory.wood) {
+        $("#wood-log").css("display", "none");
+      }
+      
+      // Fishbook
+      if (inventory.fishbook) {
+        $(".book-item").css("display", "none");
+      } else {
+        $(".book-item").css("display", "block");
+      }
+      
+      // Coins - hide collected coins
+      if (inventory.coins && Array.isArray(inventory.coins)) {
+        inventory.coins.forEach(function(coinId) {
+          $(".coin-item[data-coin-id='" + coinId + "']").remove();
+        });
       }
     }
 
@@ -767,7 +1168,10 @@
     
     // Add the main tentInterior background container
     $tent.append('<div class="tentInterior tent1"></div>');
-    $tent.append('<a><div onClick="takeMatchbox()" class="matchbox"></div></a>');
+    // Only add matchbox if it hasn't been collected yet
+    if (typeof inventory !== "undefined" && !inventory.matchbox) {
+      $tent.append('<a><div onClick="takeMatchbox()" class="matchbox"></div></a>');
+    }
     $tent.append('<div class="divider"></div>');
     $tent.append('<div class="tentInterior tent1 door front"></div>');
     $tent.append('<div class="tentInterior tent1 backwall"></div>');
@@ -788,7 +1192,7 @@
     $tent.append('<div class="kitchen-table"></div>');
     
     // Center
-    $tent.append('<div class="painting"></div>');
+    $tent.append('<a><div onClick="openPaintingLightbox()" class="painting"></div></a>');
     $tent.append('<div class="doormat front"></div>');
     
     // Den
@@ -822,7 +1226,8 @@
     $cave.append($exit);
 
     if (typeof TIMELINE_ENTRIES !== "undefined") {
-      TIMELINE_ENTRIES.forEach(function (entry) {
+      // Create desktop timeline signs (absolute positioned)
+      TIMELINE_ENTRIES.forEach(function (entry, idx) {
         var side = entry.side === "right" ? "right" : "left";
         var $sign = $('<div class="cave-sign ' + side + '"></div>');
         var year = entry.year || "";
@@ -841,7 +1246,76 @@
         $sign.append("<div class='desc'>" + desc + "</div>");
         $sign.css("top", (entry.y || 0) + "px");
         $cave.append($sign);
+        
+        // Add interactive sign aligned with each timeline entry
+        // Position on left or right side of bridge based on entry side
+        var $interactiveSign = $('<div class="cave-timeline-sign-interact"></div>');
+        // Cave hall is at left: 940px, width: 120px (center at 1000px)
+        // Position signs closer to center, on the appropriate side
+        var signX;
+        if (side === "left") {
+          signX = 940; // Left side of bridge
+        } else {
+          signX = 1028; // Right side of bridge, closer to center
+        }
+        // Align sign vertically with the timeline entry (same Y position, adjusted 4px up)
+        var signY = (entry.y || 0) - 10;
+        $interactiveSign.css({
+          "left": signX + "px",
+          "top": signY + "px",
+          "z-index": "9998" // Default z-index (behind player's 9999)
+        });
+        $interactiveSign.attr("data-timeline-index", idx);
+        $interactiveSign.attr("data-sign-y", signY); // Store Y position for z-index calculation
+        
+        $cave.append($interactiveSign);
       });
+      
+      // Create timeline modal
+      var $timelineModal = $('<div class="timeline-modal"></div>');
+      var $timelineModalOverlay = $('<div class="timeline-modal-overlay"></div>');
+      var $timelineModalContent = $('<div class="timeline-modal-content"></div>');
+      var $timelineModalClose = $('<a class="timeline-modal-close" onClick="closeTimelineModal()"><i class="nes-icon close"></i></a>');
+      
+      $timelineModalContent.append($timelineModalClose);
+      $timelineModal.append($timelineModalOverlay);
+      $timelineModal.append($timelineModalContent);
+      $('body').append($timelineModal);
+      
+      // Add click handlers for interactive signs using event delegation
+      // Use native addEventListener to avoid jQuery dependency issues
+      document.addEventListener('click', function(e) {
+        var target = e.target;
+        var signElement = null;
+        
+        // Check if clicked element or its parent is the interactive sign
+        while (target && target !== document.body) {
+          if (target.classList && target.classList.contains('cave-timeline-sign-interact')) {
+            signElement = target;
+            break;
+          }
+          target = target.parentElement;
+        }
+        
+        if (signElement) {
+          var index = parseInt(signElement.getAttribute("data-timeline-index"));
+          if (!isNaN(index) && typeof TIMELINE_ENTRIES !== "undefined" && TIMELINE_ENTRIES[index]) {
+            if (typeof openTimelineModal === "function") {
+              openTimelineModal(TIMELINE_ENTRIES[index]);
+            }
+          }
+        }
+      });
+      
+      // Close modal on overlay click
+      var overlayElement = $timelineModalOverlay[0] || $timelineModalOverlay;
+      if (overlayElement && overlayElement.addEventListener) {
+        overlayElement.addEventListener('click', function() {
+          if (typeof closeTimelineModal === "function") {
+            closeTimelineModal();
+          }
+        });
+      }
     }
   }
 

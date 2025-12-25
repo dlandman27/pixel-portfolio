@@ -187,70 +187,83 @@ body {
   /* Will be updated via JavaScript to follow map margins */
 }
 
-/* Individual Cloud */
+/* Individual Cloud - 8-bit pixelated style */
 .cloud {
   position: absolute;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 50px;
-  opacity: 0.3;
-  filter: blur(1px);
+  background: #ffffff;
+  opacity: 0.4;
   will-change: transform;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  /* No blur, no border-radius for pixelated look */
+  border-radius: 0;
+  filter: none;
 }
 
-/* Cloud shapes using box-shadow for fluffy appearance */
+/* Cloud shapes using box-shadow for pixelated cloud appearance */
 .cloud::before,
 .cloud::after {
   content: '';
   position: absolute;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 50px;
+  background: #ffffff;
+  border-radius: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
-/* Small cloud */
+/* Small cloud - pixelated 8-bit style */
 .cloud-small {
-  width: 50px;
-  height: 18px;
+  width: 48px;
+  height: 16px;
   box-shadow: 
-    15px 0 0 -4px rgba(255, 255, 255, 0.4),
-    30px 0 0 -8px rgba(255, 255, 255, 0.4),
-    8px -8px 0 -4px rgba(255, 255, 255, 0.4),
-    25px -8px 0 -4px rgba(255, 255, 255, 0.4);
+    12px 0 0 -2px #ffffff,
+    24px 0 0 -4px #ffffff,
+    36px 0 0 -2px #ffffff,
+    6px -6px 0 -2px #ffffff,
+    18px -6px 0 -2px #ffffff,
+    30px -6px 0 -2px #ffffff;
 }
 
-/* Medium cloud */
+/* Medium cloud - pixelated 8-bit style */
 .cloud-medium {
-  width: 70px;
-  height: 25px;
+  width: 64px;
+  height: 24px;
   box-shadow: 
-    22px 0 0 -6px rgba(255, 255, 255, 0.4),
-    44px 0 0 -12px rgba(255, 255, 255, 0.4),
-    12px -12px 0 -6px rgba(255, 255, 255, 0.4),
-    35px -12px 0 -6px rgba(255, 255, 255, 0.4);
+    16px 0 0 -4px #ffffff,
+    32px 0 0 -8px #ffffff,
+    48px 0 0 -4px #ffffff,
+    8px -8px 0 -4px #ffffff,
+    24px -8px 0 -4px #ffffff,
+    40px -8px 0 -4px #ffffff;
 }
 
-/* Large cloud */
+/* Large cloud - pixelated 8-bit style */
 .cloud-large {
-  width: 100px;
-  height: 40px;
+  width: 96px;
+  height: 32px;
   box-shadow: 
-    30px 0 0 -10px rgba(255, 255, 255, 0.4),
-    60px 0 0 -20px rgba(255, 255, 255, 0.4),
-    20px -20px 0 -10px rgba(255, 255, 255, 0.4),
-    50px -20px 0 -10px rgba(255, 255, 255, 0.4);
+    24px 0 0 -8px #ffffff,
+    48px 0 0 -16px #ffffff,
+    72px 0 0 -8px #ffffff,
+    12px -12px 0 -8px #ffffff,
+    36px -12px 0 -8px #ffffff,
+    60px -12px 0 -8px #ffffff;
 }
 
-/* Cloud Animations - Float across screen */
+/* Cloud Animations - Float across screen (8-bit style) */
 /* Note: Animation uses translateX which is combined with map position updates */
 @keyframes floatCloud {
   0% {
     transform: translateX(0);
     opacity: 0;
   }
-  10% {
-    opacity: 0.3;
+  5% {
+    opacity: 0.4;
   }
-  90% {
-    opacity: 0.3;
+  95% {
+    opacity: 0.4;
   }
   100% {
     transform: translateX(calc(100vw + 200px));
@@ -1062,6 +1075,47 @@ body {
 .sign.t2 {
   margin-top: 696px;
   margin-left: 1660px;
+}
+
+#bonfire-light {
+  width: 700px;
+  height: 700px;
+  position: absolute;
+  margin-top: 326px;
+  left: 50%;
+  margin-left: -350px;
+  z-index: 9;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 180, 50, 0.4) 0%,
+    rgba(255, 150, 40, 0.3) 20%,
+    rgba(255, 120, 30, 0.2) 35%,
+    rgba(255, 100, 20, 0.1) 55%,
+    rgba(0, 0, 0, 0) 75%
+  );
+}
+
+#bonfire-light.active {
+  opacity: 1;
+  animation: bonfire-flicker 2s ease-in-out infinite;
+}
+
+@keyframes bonfire-flicker {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.01);
+  }
+  50% {
+    transform: scale(0.99);
+  }
+  75% {
+    transform: scale(1.005);
+  }
 }
 
 #bonfire {
@@ -1947,9 +2001,11 @@ body {
 }
 
 .tentdoor {
-  background-color: burlywood;
+  /* background-color: burlywood; */
+  background-image: url("../images/tiles/triangles.png");
   /* background-image: linear-gradient(beige, burlywood); */
   width: 45px;
+  background-size: 32px;
   position: absolute;
   /* height: 4px; */
   height: 38px;
@@ -1957,7 +2013,7 @@ body {
 
 .tentdoor.tent1 {
   margin-top: 485px;
-  margin-left: 286px;
+  margin-left: 285px;
 }
 
 
@@ -2120,6 +2176,7 @@ body {
   left: 212px;
   top: 44px;
   z-index: 804;
+  cursor: pointer;
 }
 
 .tv.front {
@@ -2594,6 +2651,7 @@ body {
   top: 340px;
   width: 62px;
   height: 476px;
+  z-index: 5;
 }
 
 .tall-tree.walls.left {
@@ -2635,6 +2693,254 @@ body {
   left: 752px;
 }
 
+.bonfire-floor {
+  position: absolute;
+  width: 478px;
+  height: 408px;
+  top: 456px;
+  left: 50%;
+  margin-left: -239px;
+  background-image: url("../images/tiles/sand_1.png");
+  background-repeat: repeat;
+  background-size: 16px;
+  z-index: 1;
+  filter: brightness(0.6);
+}
+
+.bonfire-vignette {
+  position: absolute;
+  width: 2000px;
+  height: 1600px;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  background: radial-gradient(
+    ellipse 400px 360px at 984px 720px,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 30%,
+    rgba(0, 0, 0, 0.2) 45%,
+    rgba(0, 0, 0, 0.5) 65%,
+    rgba(0, 0, 0, 0.7) 85%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+}
+
+.bonfire-vignette-bottom {
+  z-index: 1;
+}
+
+.bonfire-vignette-middle {
+  z-index: 10;
+}
+
+.bonfire-vignette-top {
+  z-index: 9998;
+}
+
+.bonfire-vignette.active {
+  opacity: 1;
+}
+
+/* Bonfire Stars */
+.bonfire-stars {
+  position: absolute;
+  width: 2000px;
+  height: 1200px;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 9999;
+}
+
+.bonfire-stars.active {
+  opacity: 1;
+}
+
+.bonfire-star {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  opacity: 0;
+  animation: star-flicker-and-fade 4s ease-in-out forwards;
+}
+
+.bonfire-star::before,
+.bonfire-star::after {
+  content: "";
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.bonfire-star::before {
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.bonfire-star::after {
+  width: 100%;
+  height: 1px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.bonfire-star.bright {
+  width: 10px;
+  height: 10px;
+}
+
+.bonfire-star.bright::before,
+.bonfire-star.bright::after {
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes star-flicker-and-fade {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.3;
+  }
+  10% {
+    opacity: 0.1;
+  }
+  15% {
+    opacity: 0.4;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  30% {
+    opacity: 0.2;
+  }
+  35% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 0.1;
+  }
+  45% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Shooting Stars */
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.3) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform-origin: center bottom;
+  opacity: 0;
+  animation: shooting-star-trail 2s ease-out forwards;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+  z-index: 10000;
+}
+
+.shooting-star::before {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 50%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes shooting-star-trail {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-45deg) scaleY(0);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(-45deg) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(800px, 800px) rotate(-45deg) scaleY(0.5);
+  }
+}
+
+/* Exit Lights */
+.exit-light {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1000;
+  border-radius: 50%;
+  animation: exit-light-pulse 2s ease-in-out infinite;
+}
+
+.cave-entrance-light {
+  width: 80px;
+  height: 80px;
+  left: 964px;
+  top: 28px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 244, 200, 0.6) 0%,
+    rgba(255, 220, 150, 0.4) 30%,
+    rgba(255, 200, 100, 0.2) 50%,
+    transparent 70%
+  );
+  box-shadow: 0 0 20px rgba(255, 244, 200, 0.5),
+              0 0 40px rgba(255, 220, 150, 0.3);
+}
+
+.tent-entrance-light {
+  width: 60px;
+  height: 60px;
+  left: 308px;
+  top: 730px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 244, 200, 0.6) 0%,
+    rgba(255, 220, 150, 0.4) 30%,
+    rgba(255, 200, 100, 0.2) 50%,
+    transparent 70%
+  );
+  box-shadow: 0 0 15px rgba(255, 244, 200, 0.5),
+              0 0 30px rgba(255, 220, 150, 0.3);
+}
+
+@keyframes exit-light-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
 .rocks_top.campfire {
   position: absolute;
   width: 478px;
@@ -2645,6 +2951,7 @@ body {
   background: url("../images/tiles/rocks.jpg");
   background-size: 32px;
   z-index: 1;
+  filter: brightness(0.8);
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.4) inset;
 }
 
@@ -2658,14 +2965,17 @@ body {
   background: url("../images/tiles/rocks.jpg");
   background-size: 32px;
   z-index: 1;
+  filter: brightness(0.8);
   box-shadow: 0px -5px 10px rgba(0, 0, 0, 0.4) inset;
 }
 .rocks_top.campfire.bottom.b2 {
   top: 848px;
+  filter: brightness(0.8);
 }
 
 .rocks_top.campfire.t2 {
   top: 456px;
+  filter: brightness(0.8);
 }
 
 .rocks_top.beach {
@@ -2683,6 +2993,7 @@ body {
   background: url("../images/tiles/rocks.jpg");
   background-size: 32px;
   z-index: 2;
+  filter: brightness(0.8);
   box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.4) inset;
 }
 
@@ -2694,6 +3005,7 @@ body {
 
 .rocks_vert.left.layer2 {
   top: 456px;
+  filter: brightness(0.8);
   margin-left: -224px;
   height: 408px;
 }
@@ -2707,6 +3019,7 @@ body {
 .rocks_vert.right {
   left: 50%;
   margin-left: 222px;
+  filter: brightness(0.8);
   box-shadow: -5px 0px 10px rgba(0, 0, 0, 0.4) inset;
 }
 
@@ -2714,6 +3027,7 @@ body {
   top: 456px;
   margin-left: 206px;
   height: 408px;
+  filter: brightness(0.8);
 }
 
 .rocks_vert.right.layer3 {
@@ -5888,4 +6202,52 @@ body.unified-panel-open {
 
 .inventory-item.missing:hover {
   filter: grayscale(1) brightness(1.15);
+}
+
+/* Painting Lightbox */
+.painting-lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 111112;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.painting-lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.painting-lightbox-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.painting-lightbox-description {
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+.painting-lightbox .nes-icon.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  color: white;
+  font-size: 1.5rem;
 }

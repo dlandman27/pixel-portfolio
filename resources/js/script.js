@@ -251,7 +251,34 @@ var woodOnFire = false;
 var fireEnabled = 0;
 
 function togglefire() {
-  if(parseInt($("#dylan").css("top")) >= 712 && parseInt($("#dylan").css("top")) <= 868 && parseInt($("#dylan").css("left")) >= 860 && parseInt($("#dylan").css("top")) <= 1124){
+  // Check if player is anywhere in the bonfire area
+  // Bonfire area bounds: x: 680-1292, y: 650-1068 (world coordinates)
+  
+  // Try to get player position from GameWorld if available
+  var playerPos = null;
+  if (typeof global !== "undefined" && global.playerController && global.playerController.gameWorld && global.playerController.gameWorld.player) {
+    playerPos = global.playerController.gameWorld.player.getPosition();
+  }
+  
+  // If we have world position, use it directly
+  var inBonfireArea = false;
+  if (playerPos) {
+    inBonfireArea = playerPos.x >= 680 && playerPos.x <= 1292 && 
+                    playerPos.y >= 650 && playerPos.y <= 1068;
+  } else {
+    // Fallback: convert CSS position to approximate world coordinates
+    // CSS left = pos.x - PLAYER_SPRITE_WIDTH/2, so pos.x = left + 16
+    // CSS top = (pos.y + PLAYER_COLLIDER_HEIGHT/2) - PLAYER_SPRITE_HEIGHT, so pos.y = top + 64 - 20 = top + 44
+    var dylanLeft = parseInt($("#dylan").css("left")) || 0;
+    var dylanTop = parseInt($("#dylan").css("top")) || 0;
+    var worldX = dylanLeft + 16; // Approximate world X
+    var worldY = dylanTop + 44;  // Approximate world Y (foot position)
+    
+    inBonfireArea = worldX >= 680 && worldX <= 1292 && 
+                    worldY >= 650 && worldY <= 1068;
+  }
+  
+  if(inBonfireArea){
     if(woodOnFire && inventory.matchbox){
       // var x = document.getElementById("crackle-fire");
       // x.volume = .5; 
@@ -266,6 +293,8 @@ function togglefire() {
         //   x.play();
         // }
         fireOn = true;
+        // Turn on the bonfire light glow
+        $("#bonfire-light").addClass("active");
         var i = 0;
         fireInterval = setInterval(function () {
           ++i;
@@ -274,19 +303,22 @@ function togglefire() {
           }
           fire.css('background-image', url + fireArr[i] + ")");
         }, 100);
-        if(!fireEnabled){
-          $(".achievement").css({display:"block",backgroundColor: "#c99200"}).fadeIn();
-          $(".achievement-name").text('Light It Up!');
-          $(".achievement-description").text('Turn on the Fireplace');
-          setTimeout(function(){
-            $(".achievement").fadeOut().css("display","block");
-          },3000);
-        }
+        // Achievement temporarily disabled
+        // if(!fireEnabled){
+        //   $(".achievement").css({display:"block",backgroundColor: "#c99200"}).fadeIn();
+        //   $(".achievement-name").text('Light It Up!');
+        //   $(".achievement-description").text('Turn on the Fireplace');
+        //   setTimeout(function(){
+        //     $(".achievement").fadeOut().css("display","block");
+        //   },3000);
+        // }
       }
       else {
         fireEnabled = true;
         // x.pause();
         fireOn = false;
+        // Turn off the bonfire light glow
+        $("#bonfire-light").removeClass("active");
         clearInterval(fireInterval);
         fire.css('background-image', url + '/bonfire-empty.png)');
       }
@@ -1118,270 +1150,650 @@ var onLogTop = false,
 var initX = 0;
 var initY = 0;
 
-function sitOnLog(location) {
-  if (location == 'top') {
-    if(parseInt($("#dylan").css("left")) > 928 && parseInt($("#dylan").css("left")) < 1040 && parseInt($("#dylan").css("top")) <= 780 && parseInt($("#dylan").css("top")) >= 664) {
-      if (!onLog) {
-        
-        initY = parseInt($("#map").css("margin-top"));
-        initX = parseInt($("#map").css("margin-left"));
-
-        $("#map").animate({
-          marginTop: -1812 + "px",
-          marginLeft: "-12px"
-        })
-        $(".bench").css("z-index", "10");
-        var url = URL.getDylan();
-        $("#dylan").css({
-          top: "712px"
-        })
-        $("#dylan").css("background-image", url + "/dylan-front-1.png)");
-
-        sitting = true;
-        onLog = true;
-        onLogTop = true;
-      }
-      else if (onLogTop) {
-        onLog = false;
-        sitting = false;
+/**
+ * Stand up from any log/bench
+ * Exposed globally so PlayerController can call it
+ */
+function standUpFromLog() {
+  if (!onLog || !sitting) return;
   
-        $("#dylan").css({
-          top: "740px"
-        })
-        $("#dylan").css("background-image", url + "/dylan-front-1.png)");
-        $("#map").animate({
-          marginTop: -1644 + "px",
-          marginLeft: initX
-        });
-        onLogTop = false;
+  // Get playerController and gameWorld
+  var playerController = null;
+  if (typeof window !== "undefined" && window.playerController) {
+    playerController = window.playerController;
+  } else if (typeof global !== "undefined" && global.playerController) {
+    playerController = global.playerController;
+  }
+  
+  if (!playerController || !playerController.gameWorld) return;
+  
+  var gameWorld = playerController.gameWorld;
+  var player = gameWorld.player;
+  if (!player) return;
+  
+  var pos = player.getPosition();
+  var MAP_SCALE = 3;
+  
+  // Stand up based on which log we're on
+  if (onLogTop) {
+    onLog = false;
+    sitting = false;
+    
+    var standWorldX = 1001;
+    var standWorldY = 749 + 20;
+    player.setPosition({ x: standWorldX, y: standWorldY });
+    
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("front", 1);
+    } else {
+      var url = URL.getDylan();
+      $("#dylan").css("background-image", url + "/dylan-front-1.png)");
+    }
+    
+    // Re-enable input AFTER setting position
+    playerController.disableInput = false;
+    
+    gameWorld.setCameraOffset(initX, initY);
+    gameWorld.syncToDom();
+    onLogTop = false;
+  }
+  else if (onLogBottom) {
+    onLog = false;
+    sitting = false;
+    
+    $(".bench").css("z-index", "100");
+    
+    var standWorldX = 999;
+    var standWorldY = 907 - 20;
+    player.setPosition({ x: standWorldX, y: standWorldY });
+    
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("back", 1);
+    } else {
+      var url = URL.getDylan();
+      $("#dylan").css("background-image", url + "/dylan-back-1.png)");
+    }
+    
+    // Re-enable input AFTER setting position
+    playerController.disableInput = false;
+    
+    gameWorld.setCameraOffset(initX, initY);
+    gameWorld.syncToDom();
+    onLogBottom = false;
+  }
+  else if (onLogLeft) {
+    onLog = false;
+    sitting = false;
+    
+    var standWorldX = 890 + 20;
+    var standWorldY = 836;
+    player.setPosition({ x: standWorldX, y: standWorldY });
+    
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("right", 1);
+    } else {
+      $("#dylan").css("background-image", URL.getDylan() + "/dylan-right-1.png)");
+    }
+    
+    // Re-enable input AFTER setting position
+    playerController.disableInput = false;
+    
+    gameWorld.setCameraOffset(initX, initY);
+    gameWorld.syncToDom();
+    onLogLeft = false;
+  }
+  else if (onLogRight) {
+    onLog = false;
+    sitting = false;
+    
+    var standWorldX = 1100;
+    var standWorldY = 836;
+    player.setPosition({ x: standWorldX, y: standWorldY });
+    
+    if (typeof SpriteManager !== "undefined") {
+      SpriteManager.setSpriteFrame("left", 1);
+    } else {
+      $("#dylan").css("background-image", URL.getDylan() + "/dylan-left-1.png)");
+    }
+    
+    // Re-enable input AFTER setting position
+    playerController.disableInput = false;
+    
+    gameWorld.setCameraOffset(initX, initY);
+    gameWorld.syncToDom();
+    onLogRight = false;
+  }
+}
+
+function sitOnLog(location) {
+  console.log("sitOnLog called with location:", location);
+  
+  // Get GameWorld from playerController (same pattern as togglefire function)
+  // Try both window and global
+  var playerController = null;
+  if (typeof window !== "undefined" && window.playerController) {
+    playerController = window.playerController;
+  } else if (typeof global !== "undefined" && global.playerController) {
+    playerController = global.playerController;
+  }
+  
+  if (!playerController) {
+    console.log("PlayerController not available yet");
+    // Wait a bit for it to initialize (it's initialized in $(function() {...}))
+    // For now, just return - the user needs to wait for the system to initialize
+    console.log("Please wait for the game to fully load, or refresh the page");
+    return;
+  }
+  
+  if (!playerController || !playerController.gameWorld) {
+    console.log("GameWorld not available, playerController:", playerController);
+    return;
+  }
+  
+  var gameWorld = playerController.gameWorld;
+  var player = gameWorld.player;
+  
+  if (!player) {
+    console.log("Player not found");
+    return;
+  }
+  
+  // Only work on main map
+  if (gameWorld.sceneName !== "mainMap") {
+    console.log("Not on main map, scene:", gameWorld.sceneName);
+    return;
+  }
+  
+  var pos = player.getPosition();
+  console.log("Player position:", pos);
+  var MAP_SCALE = 3; // Match GameWorld MAP_SCALE
+  
+  // Bonfire area boundaries (world coordinates)
+  var bonfireMinX = 680;
+  var bonfireMaxX = 1292;
+  var bonfireMinY = 650;
+  var bonfireMaxY = 1068;
+  
+  // Check if player is in bonfire area
+  var inBonfireArea = pos.x >= bonfireMinX && pos.x <= bonfireMaxX &&
+                     pos.y >= bonfireMinY && pos.y <= bonfireMaxY;
+  console.log("In bonfire area:", inBonfireArea);
+  
+  // Convert old CSS pixel positions to world coordinates
+  // Old positions were in CSS pixels, new system uses world coords (divide by scale)
+  
+  if (location == 'top') {
+    // Old check: left > 928 && left < 1040, top <= 780 && top >= 664
+    // World coords: left > 928/3 && left < 1040/3, top <= 780/3 && top >= 664/3
+    var worldLeft = pos.x;
+    var worldTop = pos.y;
+      var $dylan = $("#dylan");
+      if (!$dylan.length) {
+        console.log("Dylan element not found");
+        return;
       }
-    }    
+      var cssLeft = parseInt($dylan.css("left")) || 0;
+      var cssTop = parseInt($dylan.css("top")) || 0;
+      // Check using CSS positions for compatibility OR if in bonfire area
+      var canSit = inBonfireArea || (cssLeft > 928 && cssLeft < 1040 && cssTop <= 780 && cssTop >= 664);
+      console.log("Can sit on top bench:", canSit, "cssLeft:", cssLeft, "cssTop:", cssTop);
+      if (canSit) {
+        if (!onLog) {
+          // Save current camera offset
+          var cameraOffset = gameWorld.getCameraOffset();
+          initX = cameraOffset.x;
+          initY = cameraOffset.y;
+          
+          // Bonfire center in world coordinates
+          var bonfireCenterX = 984;
+          var bonfireCenterY = 720;
+          
+          // Set camera offset to 0 when sitting
+          // syncToDom will use bonfireCenterX/Y for camX/camY when sitting, so offset should be 0
+          // This ensures the camera stays centered on bonfire
+          gameWorld.setCameraOffset(0, 0);
+          
+          // Immediately update camera position (syncToDom will handle the animation smoothly)
+          gameWorld.syncToDom();
+          
+          $(".bench").css("z-index", "10");
+          
+          // Set player position for top bench (facing front, sitting)
+          // Using exact world coordinates from collider points
+          var sitWorldX = 1001;
+          var sitWorldY = 749;
+          player.setPosition({ x: sitWorldX, y: sitWorldY });
+          
+          // Set sprite
+          if (typeof SpriteManager !== "undefined") {
+            SpriteManager.setSpriteFrame("front", 1);
+          } else {
+            var url = URL.getDylan();
+            $("#dylan").css("background-image", url + "/dylan-front-1.png)");
+          }
+          
+          // Disable input
+          playerController.disableInput = true;
+          
+          sitting = true;
+          onLog = true;
+          onLogTop = true;
+        }
+        else if (onLogTop) {
+          // Stand up
+          onLog = false;
+          sitting = false;
+          playerController.disableInput = false;
+          
+          // Stand up position: slightly in front of the bench (below it)
+          var standWorldX = 1001; // Same X as sitting
+          var standWorldY = 749 + 20; // Slightly below sitting position
+          player.setPosition({ x: standWorldX, y: standWorldY });
+          
+          // Set sprite
+          if (typeof SpriteManager !== "undefined") {
+            SpriteManager.setSpriteFrame("front", 1);
+          } else {
+            var url = URL.getDylan();
+            $("#dylan").css("background-image", url + "/dylan-front-1.png)");
+          }
+          
+          // Restore camera to follow player
+          gameWorld.setCameraOffset(initX, initY);
+          // Trigger camera update
+          gameWorld.syncToDom();
+          
+          onLogTop = false;
+        }
+      }
   }
   else if (location == "bottom") {
-    if(parseInt($("#dylan").css("left")) > 928 && parseInt($("#dylan").css("left")) < 1040 && parseInt($("#dylan").css("top")) >= 824 && parseInt($("#dylan").css("top")) <= 940) {
-      if(!onLog){
-
-        initY = parseInt($("#map").css("margin-top"));
-        initX = parseInt($("#map").css("margin-left"));
-
-        $("#map").animate({
-          marginTop: -1812 + "px",
-          marginLeft: "-12px"
-        })
+    var $dylan = $("#dylan");
+    if (!$dylan.length) {
+      console.log("Dylan element not found");
+      return;
+    }
+    var cssLeft = parseInt($dylan.css("left")) || 0;
+    var cssTop = parseInt($dylan.css("top")) || 0;
+    var canSit = inBonfireArea || (cssLeft > 928 && cssLeft < 1040 && cssTop >= 824 && cssTop <= 940);
+    console.log("Can sit on bottom bench:", canSit);
+      if (canSit) {
+      if (!onLog) {
+        var cameraOffset = gameWorld.getCameraOffset();
+        initX = cameraOffset.x;
+        initY = cameraOffset.y;
+        
+        // Bonfire center in world coordinates
+        var bonfireCenterX = 984;
+        var bonfireCenterY = 720;
+        
+        // Set camera offset to 0 when sitting
+        // syncToDom will use bonfireCenterX/Y for camX/camY when sitting, so offset should be 0
+        gameWorld.setCameraOffset(0, 0);
+        
+        // Immediately update camera position (syncToDom will handle it)
+        gameWorld.syncToDom();
+        
         $(".bench").css("z-index", "100");
-        var url = URL.getDylan();
-        $("#dylan").css({
-          top: "868px"
-        })
-        $("#dylan").css("background-image", url + "/dylan-back-1.png)");
-
+        
+        // Bottom bench position (facing back, sitting)
+        // Using exact world coordinates from collider points
+        var sitWorldX = 999;
+        var sitWorldY = 907;
+        player.setPosition({ x: sitWorldX, y: sitWorldY });
+        
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("back", 1);
+        } else {
+          var url = URL.getDylan();
+          $("#dylan").css("background-image", url + "/dylan-back-1.png)");
+        }
+        
+        playerController.disableInput = true;
+        
         sitting = true;
         onLog = true;
         onLogBottom = true;
-      }  
-      else if (onLogBottom) {
-        var url = URL.getDylan();
-        onLog = false;
-        sitting = false;
-        $(".bench").css("z-index", "100");
-
-        $("#dylan").css({
-          top: "860px"
-        })
-        $("#map").animate({
-          marginTop: -1968 + "px",
-          marginLeft: initX
-        });
-        $("#dylan").css("background-image", url + "/dylan-back-1.png)");
-
-        onLogBottom = false;
       }
+        else if (onLogBottom) {
+          onLog = false;
+          sitting = false;
+          playerController.disableInput = false;
+          
+          $(".bench").css("z-index", "100");
+          
+          // Stand up position: slightly in front of the bench (above it)
+          var standWorldX = 999; // Same X as sitting
+          var standWorldY = 907 - 20; // Slightly above sitting position
+          player.setPosition({ x: standWorldX, y: standWorldY });
+          
+          if (typeof SpriteManager !== "undefined") {
+            SpriteManager.setSpriteFrame("back", 1);
+          } else {
+            var url = URL.getDylan();
+            $("#dylan").css("background-image", url + "/dylan-back-1.png)");
+          }
+          
+          // Restore camera to follow player
+          gameWorld.setCameraOffset(initX, initY);
+          gameWorld.syncToDom();
+          
+          onLogBottom = false;
+        }
     }
   }
-
   else if (location == "left" && window.innerWidth > 600) {
-    if (parseInt($("#dylan").css("top")) >= 740 && parseInt($("#dylan").css("top")) <= 868 && parseInt($("#dylan").css("left")) >= 788 && parseInt($("#dylan").css("left")) <= 938) {
+    var $dylan = $("#dylan");
+    if (!$dylan.length) {
+      console.log("Dylan element not found");
+      return;
+    }
+    var cssLeft = parseInt($dylan.css("left")) || 0;
+    var cssTop = parseInt($dylan.css("top")) || 0;
+    var canSit = inBonfireArea || (cssTop >= 740 && cssTop <= 868 && cssLeft >= 788 && cssLeft <= 938);
+    console.log("Can sit on left stump:", canSit);
+      if (canSit) {
       if (!onLog) {
-
-        $("#map").animate({
-          marginTop: -1812 + "px",
-          marginLeft: "-12px"
-        })
-
-
-        $("#dylan").css({
-          top: "800px",
-          left: "872px"
-        })
-
-        $("#dylan").css("background-image", URL.getDylan()+"/dylan-right-1.png)");
-
+        // Bonfire center
+        var bonfireCenterX = 984;
+        var bonfireCenterY = 720;
+        
+        // Set camera offset to 0 when sitting
+        // syncToDom will use bonfireCenterX/Y for camX/camY when sitting, so offset should be 0
+        gameWorld.setCameraOffset(0, 0);
+        
+        // Immediately update camera position (syncToDom will handle it)
+        gameWorld.syncToDom();
+        
+        // Left stump position (facing right, sitting)
+        // Using exact world coordinates from collider points
+        var sitWorldX = 890;
+        var sitWorldY = 836;
+        player.setPosition({ x: sitWorldX, y: sitWorldY });
+        
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("right", 1);
+        } else {
+          $("#dylan").css("background-image", URL.getDylan() + "/dylan-right-1.png)");
+        }
+        
         $(".tree-stump").css("z-index", "10");
-
+        
+        playerController.disableInput = true;
+        
         sitting = true;
         onLog = true;
         onLogLeft = true;
       }
-      else if (onLogLeft) {
-
-        onLog = false;
-        sitting = false;
-        $("#dylan").css({
-          top: "812px",
-          left: "908px"
-        })
-        $("#map").animate({
-          marginTop: -1812 + "px",
-          marginLeft: "204px"
-        });
-        $("#dylan").css("background-image", URL.getDylan()+"/dylan-right-1.png)")
-
-        onLogLeft = false;
-      }
+        else if (onLogLeft) {
+          onLog = false;
+          sitting = false;
+          playerController.disableInput = false;
+          
+          // Stand up position: slightly to the right of the stump
+          var standWorldX = 890 + 20; // Slightly to the right of sitting position
+          var standWorldY = 836; // Same Y as sitting
+          player.setPosition({ x: standWorldX, y: standWorldY });
+          
+          if (typeof SpriteManager !== "undefined") {
+            SpriteManager.setSpriteFrame("right", 1);
+          } else {
+            $("#dylan").css("background-image", URL.getDylan() + "/dylan-right-1.png)");
+          }
+          
+          // Restore camera
+          gameWorld.setCameraOffset(initX, initY);
+          gameWorld.syncToDom();
+          
+          onLogLeft = false;
+        }
     }
   }
-
   else if (location == "right" && window.innerWidth > 600) {
-    if (parseInt($("#dylan").css("top")) >= 740 && parseInt($("#dylan").css("top")) <= 868 && parseInt($("#dylan").css("left")) >= 1032 && parseInt($("#dylan").css("left")) <= 1176) {
+    var $dylan = $("#dylan");
+    if (!$dylan.length) {
+      console.log("Dylan element not found");
+      return;
+    }
+    var cssLeft = parseInt($dylan.css("left")) || 0;
+    var cssTop = parseInt($dylan.css("top")) || 0;
+    var canSit = inBonfireArea || (cssTop >= 740 && cssTop <= 868 && cssLeft >= 1032 && cssLeft <= 1176);
+    console.log("Can sit on right stump:", canSit);
+      if (canSit) {
       if (!onLog) {
-
-        $("#map").animate({
-          marginTop: -1812 + "px",
-          marginLeft: "-12px"
-        })
-
-
-        $("#dylan").css({
-          top: "800px",
-          left: "1100px"
-        })
-
-        $("#dylan").css("background-image", URL.getDylan()+"/dylan-left-1.png)");
-
+        // Bonfire center
+        var bonfireCenterX = 984;
+        var bonfireCenterY = 720;
+        
+        // Set camera offset to 0 when sitting
+        // syncToDom will use bonfireCenterX/Y for camX/camY when sitting, so offset should be 0
+        gameWorld.setCameraOffset(0, 0);
+        
+        // Immediately update camera position (syncToDom will handle it)
+        gameWorld.syncToDom();
+        
+        // Right stump position (facing left, sitting)
+        // Swapped: sitting position is now where standing was
+        var sitWorldX = 1120; // 20px to the right (swapped from standing position)
+        var sitWorldY = 836; // Same Y as left stump
+        player.setPosition({ x: sitWorldX, y: sitWorldY });
+        
+        if (typeof SpriteManager !== "undefined") {
+          SpriteManager.setSpriteFrame("left", 1);
+        } else {
+          $("#dylan").css("background-image", URL.getDylan() + "/dylan-left-1.png)");
+        }
+        
         $(".tree-stump").css("z-index", "10");
-
+        
+        playerController.disableInput = true;
+        
         sitting = true;
         onLog = true;
         onLogRight = true;
       }
-
-      else if (onLogRight) {
-
-        onLog = false;
-        sitting = false;
-
-        $("#dylan").css({
-          top: "812px",
-          left: "1060px"
-        })
-        $("#map").animate({
-          marginTop: -1812 + "px",
-          marginLeft: "-228px"
-        });
-        $("#dylan").css("background-image", URL.getDylan()+"/dylan-left-1.png)")
-
-        onLogRight = false;
-      }
+        else if (onLogRight) {
+          onLog = false;
+          sitting = false;
+          playerController.disableInput = false;
+          
+          // Stand up position: swapped - now at original sitting position
+          var standWorldX = 1100; // Original sitting position (swapped)
+          var standWorldY = 836; // Same Y as sitting
+          player.setPosition({ x: standWorldX, y: standWorldY });
+          
+          if (typeof SpriteManager !== "undefined") {
+            SpriteManager.setSpriteFrame("left", 1);
+          } else {
+            $("#dylan").css("background-image", URL.getDylan() + "/dylan-left-1.png)");
+          }
+          
+          // Restore camera
+          gameWorld.setCameraOffset(initX, initY);
+          gameWorld.syncToDom();
+          
+          onLogRight = false;
+        }
     }
   }
 }
 
 function openTent1(side){
-  $('#dylan').remove(); 
-  // Remove tooltip class to prevent visibility issues - tooltip is only needed for speech bubbles
-  $('#tent1').append("<div id='dylan'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
-
-  tentOpen = true;
-
-  $("#dylan").css("z-index","9999").css("display","block").css("visibility","visible");
-  $(".cover-screen.tent1").show();
-
-  if(side == "front"){
-    $("#dylan").css({
-      left: "192px",
-      top: "152px",
-      visibility: "visible"
-    });
-    // Use frame 2 instead of 1 (frame 1 has wrong height)
+  // Use GameWorld if available, otherwise fall back to old system
+  if (typeof gameWorld !== "undefined" && gameWorld && typeof gameWorld.changeScene === "function") {
+    // Convert CSS positions to world coordinates
+    // Front door: CSS left: 192px, top: 152px -> world coords
+    // Back door: CSS left: 156px, top: -36px -> world coords
+    var spawnPos;
+    if (side === "front") {
+      // Front door spawn - default spawn position (near front doormat)
+      spawnPos = { x: 208, y: 94 }; // Default front spawn
+    } else if (side === "back") {
+      // Back door spawn - position near back door (top of tent)
+      // Back door trigger is at x: 152, y: -58, doormat.back is centered
+      // CSS position was left: 156px, top: -36px
+      // Convert to world coordinates: tent is 416px wide, center is 208
+      // For back door, spawn near the top where back door is located
+      spawnPos = { x: 208, y: -45 }; // Near back door area (centered, near top)
+    } else {
+      // Default to front if side is not specified
+      spawnPos = { x: 208, y: 94 };
+    }
+    
+    console.log("openTent1: side =", side, "spawnPos =", spawnPos);
+    gameWorld.changeScene("tent1", { spawnOverride: spawnPos });ssd
+    tentOpen = true;
+    
+    // Ensure player position is set correctly after scene change
+    // Use setTimeout to ensure scene change has completed
+    setTimeout(function() {
+      if (gameWorld.player && typeof gameWorld.player.setPosition === "function") {
+        console.log("Setting player position to:", spawnPos);
+        gameWorld.player.setPosition(spawnPos);
+        // Force sync to update DOM immediately
+        gameWorld.syncToDom();
+      }
+    }, 0);
+    
+    // Set z-index and visibility
+    $("#dylan").css("z-index", "9999").css("display", "block").css("visibility", "visible");
+    $(".cover-screen.tent1").show();
+    
+    // Set sprite frame
     if (typeof SpriteManager !== "undefined") {
       SpriteManager.setSpriteFrame("front", 2);
     } else {
       $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
     }
-    $("#dylan").fadeIn();
+  } else {
+    // Old system fallback
+    $('#dylan').remove(); 
+    // Remove tooltip class to prevent visibility issues - tooltip is only needed for speech bubbles
+    $('#tent1').append("<div id='dylan'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
 
-    $("#map").css({
-      marginLeft: 0,
-      marginTop: "-1824px"
-    });
-  }
-  else{
-    $("#dylan").css({
-      left: "156px",
-      top: "-36px",
-      visibility: "visible"
-    });
-    // Use frame 2 instead of 1 (frame 1 has wrong height)
-    if (typeof SpriteManager !== "undefined") {
-      SpriteManager.setSpriteFrame("front", 2);
-    } else {
-      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+    tentOpen = true;
+
+    $("#dylan").css("z-index","9999").css("display","block").css("visibility","visible");
+    $(".cover-screen.tent1").show();
+
+    if(side == "front"){
+      $("#dylan").css({
+        left: "192px",
+        top: "152px",
+        visibility: "visible"
+      });
+      // Use frame 2 instead of 1 (frame 1 has wrong height)
+      if (typeof SpriteManager !== "undefined") {
+        SpriteManager.setSpriteFrame("front", 2);
+      } else {
+        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      }
+      $("#dylan").fadeIn();
+
+      $("#map").css({
+        marginLeft: 0,
+        marginTop: "-1824px"
+      });
     }
-    $("#dylan").fadeIn();
+    else{
+      $("#dylan").css({
+        left: "156px",
+        top: "-36px",
+        visibility: "visible"
+      });
+      // Use frame 2 instead of 1 (frame 1 has wrong height)
+      if (typeof SpriteManager !== "undefined") {
+        SpriteManager.setSpriteFrame("front", 2);
+      } else {
+        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      }
+      $("#dylan").fadeIn();
 
-    $("#map").css({
-      marginLeft: 108+"px",
-      marginTop: "-1260px"
-    });
+      $("#map").css({
+        marginLeft: 108+"px",
+        marginTop: "-1260px"
+      });
+    }
   }
-  
- 
 }
 
 function leaveTent1(dir){
-  $('#dylan').remove();
-  // Remove tooltip class to prevent visibility issues - tooltip is only needed for speech bubbles
-  $('#map').append("<div id='dylan'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
-  $("#dylan").css("z-index","9999").css("display","block").css("visibility","visible");
-  tentOpen = false;
-  
-  if(dir == 1){
-    $("#dylan").css({
-      left: "292px",
-      top: "648px",
-      visibility: "visible"
-    });
-    // Use frame 2 instead of 1 (frame 1 has wrong height)
+  // Use GameWorld if available, otherwise fall back to old system
+  if (typeof gameWorld !== "undefined" && gameWorld && typeof gameWorld.changeScene === "function") {
+    // Determine spawn position based on exit direction
+    var spawnPos;
+    if (dir == 1) {
+      // Front door exit
+      spawnPos = { x: 308, y: 730 };
+    } else {
+      // Back door exit
+      spawnPos = { x: 290, y: 640 };
+    }
+    
+    // Change scene back to mainMap with correct spawn position
+    gameWorld.changeScene("mainMap", { spawnOverride: spawnPos });
+    tentOpen = false;
+    
+    // Set z-index to 49 for main map (correct z-index for player on main map)
+    $("#dylan").css("z-index", "49").css("display", "block").css("visibility", "visible");
+    $(".cover-screen.tent1").hide();
+    
+    // Close tent door if exiting front
+    if (dir == 1) {
+      $(".tentdoor.tent1").height(0);
+    }
+    
+    // Set sprite frame
     if (typeof SpriteManager !== "undefined") {
       SpriteManager.setSpriteFrame("front", 2);
     } else {
       $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
     }
-    $("#map").css({
-      marginLeft: "2064px",
-      marginTop: "-1344px"
-    });
-    $(".tentdoor.tent1").height(0);
-  }
-  else{
-    $("#dylan").css({
-      left: "260px",
-      top: "584px",
-      visibility: "visible"
-    });
-    // Use frame 2 instead of 1 (frame 1 has wrong height)
-    if (typeof SpriteManager !== "undefined") {
-      SpriteManager.setSpriteFrame("front", 2);
-    } else {
-      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+  } else {
+    // Old system fallback
+    $('#dylan').remove();
+    // Remove tooltip class to prevent visibility issues - tooltip is only needed for speech bubbles
+    $('#map').append("<div id='dylan'> <img class='animation'/><div class='nes-balloon from-left'><p>HELLO WORLD</p></div></div>");
+    $("#dylan").css("z-index","49").css("display","block").css("visibility","visible");
+    tentOpen = false;
+    
+    if(dir == 1){
+      $("#dylan").css({
+        left: "292px",
+        top: "648px",
+        visibility: "visible"
+      });
+      // Use frame 2 instead of 1 (frame 1 has wrong height)
+      if (typeof SpriteManager !== "undefined") {
+        SpriteManager.setSpriteFrame("front", 2);
+      } else {
+        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      }
+      $("#map").css({
+        marginLeft: "2064px",
+        marginTop: "-1344px"
+      });
+      $(".tentdoor.tent1").height(0);
     }
-    $("#map").css({
-      marginLeft: "2160px",
-      marginTop: "-1164px"
-    });
+    else{
+      $("#dylan").css({
+        left: "260px",
+        top: "584px",
+        visibility: "visible"
+      });
+      // Use frame 2 instead of 1 (frame 1 has wrong height)
+      if (typeof SpriteManager !== "undefined") {
+        SpriteManager.setSpriteFrame("front", 2);
+      } else {
+        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      }
+      $("#map").css({
+        marginLeft: "2160px",
+        marginTop: "-1164px"
+      });
+    }
+    $(".cover-screen.tent1").hide();
   }
-  $(".cover-screen.tent1").hide();
-  $("#dylan").css("z-index","49");
 }
 
 function openSettings(){
@@ -1516,6 +1928,23 @@ function openPortfolioWithLogoFilter(){
 
 function closePortfolio(){
   $(".portfolio-container").css("display","none");
+  eventOccurence = false;
+  if(inventory.minimap)
+    $(".minimap-icon").css("display","block");
+  if(window.innerWidth <= 600)
+    $(".mobile-controller").css("display","flex");
+}
+
+function openPaintingLightbox(){
+  $(".painting-lightbox").css("display","flex");
+  eventOccurence = true;
+  $(".minimap-icon").css("display","none");
+  if(window.innerWidth <= 600)
+    $(".mobile-controller").css("display","none");
+}
+
+function closePaintingLightbox(){
+  $(".painting-lightbox").css("display","none");
   eventOccurence = false;
   if(inventory.minimap)
     $(".minimap-icon").css("display","block");
@@ -2131,6 +2560,41 @@ function openFishbook(){
 
 function closeFishbook(){
   $(".fishbook").css("display","none");
+  eventOccurence = false;
+}
+
+function openTimelineModal(entry) {
+  var $modal = $(".timeline-modal");
+  var $content = $(".timeline-modal-content");
+  
+  if (!$modal.length) return;
+  
+  // Clear previous content
+  $content.find(".timeline-entry-content").remove();
+  
+  // Build content
+  var $entryContent = $('<div class="timeline-entry-content"></div>');
+  
+  if (entry.image) {
+    var $img = $('<div class="timeline-entry-img"></div>');
+    $img.css("background-image", "url(" + entry.image + ")");
+    $entryContent.append($img);
+  }
+  
+  $entryContent.append('<div class="timeline-entry-year">' + (entry.year || "") + '</div>');
+  $entryContent.append('<div class="timeline-entry-title">' + (entry.title || "") + '</div>');
+  $entryContent.append('<div class="timeline-entry-desc">' + (entry.description || "") + '</div>');
+  
+  // Insert content after close button
+  $content.find(".timeline-modal-close").after($entryContent);
+  
+  // Show modal
+  $modal.addClass("active");
+  eventOccurence = true;
+}
+
+function closeTimelineModal() {
+  $(".timeline-modal").removeClass("active");
   eventOccurence = false;
 }
 

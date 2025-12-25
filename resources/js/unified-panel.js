@@ -722,13 +722,14 @@ var UnifiedPanel = (function () {
       }
 
       debugBtn.textContent = debugOn
-        ? "Hide Collision Boxes"
-        : "Show Collision Boxes";
+        ? "Hide Debug Overlays"
+        : "Show Debug Overlays";
 
       debugBtn.addEventListener("click", function () {
         debugOn = !debugOn;
 
         // Toggle WORLD_COLLIDERS-based debug via GameWorld (if available)
+        // This also toggles z-index debug visualization
         if (
           window.playerController &&
           window.playerController.gameWorld &&
@@ -739,8 +740,8 @@ var UnifiedPanel = (function () {
         }
 
         debugBtn.textContent = debugOn
-          ? "Hide Collision Boxes"
-          : "Show Collision Boxes";
+          ? "Hide Debug Overlays"
+          : "Show Debug Overlays";
       });
     }
 
