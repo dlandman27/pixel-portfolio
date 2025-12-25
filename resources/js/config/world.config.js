@@ -38,10 +38,14 @@ var WORLD_COLLIDERS = {
       
       // Bonfire
       { x: 708, y: 620, width: 82, height: 270, tag: "bottomBorderWall1" },
+      { x: 752, y: 866, width: 38, height: 66, tag: "bonfireStairsTop" },
+      { x: 752, y: 996, width: 38, height: 66, tag: "bonfireStairsBottom" },
       { x: 708, y: 620, width: 266, height: 24, tag: "bottomBorderWall1" },
       { x: 1030, y: 620, width: 258, height: 24, tag: "bottomBorderWall1" },
       { x: 1210, y: 620, width: 84, height: 466, tag: "bottomBorderWall1" },
       { x: 708, y: 1044, width: 584, height: 42, tag: "bottomBorderWall1" },
+      { x: 788, y: 930, width: 44, height: 8, tag: "bonfireStairsRightTop" },
+      { x: 788, y: 1004, width: 44, height: 42, tag: "bonfireStairsRightBottom" },
     ],
     triggers: [
       {

@@ -262,19 +262,148 @@
     update(deltaMs, input) {
       if (!this.collisionWorld) return;
       var effectiveInput = input || { x: 0, y: 0 };
+      
+      // Check if input is disabled
+      var inputDisabled = false;
       if (global.playerController && global.playerController.disableInput) {
         effectiveInput = { x: 0, y: 0 };
+        inputDisabled = true;
         if (this.player && typeof this.player.setVelocity === "function") {
           this.player.setVelocity({ x: 0, y: 0 });
         }
       }
-      this.collisionWorld.update(deltaMs, effectiveInput);
+      
+      // Store original input BEFORE any modifications (use the raw input parameter)
+      var originalInput = input ? { x: input.x || 0, y: input.y || 0 } : { x: 0, y: 0 };
+      
+      // Apply bonfire stairs modifier (migrated from old navigation.js)
+      // Bottom stairs: left/right movement also moves up/down (diagonal)
+      // Top stairs: vertical speed is increased when moving
+      // We bypass applyInput and set velocity directly when on stairs
+      var onStairs = false;
+      var stairsVelocity = null;
+      
+      if (this.sceneName === "mainMap" && this.player) {
+        var pos = this.player.getPosition();
+        var maxSpeed = this.player.maxSpeed || 4;
+        
+        // Bottom/Left stairs area: world coordinates converted from old CSS coordinates
+        // Old CSS: left 736-816, top 908-952 (exclusive: top < 952)
+        // World: x = CSS left + 16, y = CSS top + 44
+        var stairsBottomMinX = 752;
+        var stairsBottomMaxX = 832;
+        var stairsBottomMinY = 952;
+        var stairsBottomMaxY = 996;
+        
+        // Top/Front stairs area - exact coordinates: x: 972, y: 602, w: 56, h: 68
+        var stairsTopMinX = 972;
+        var stairsTopMaxX = 972 + 56;
+        var stairsTopMinY = 602;
+        var stairsTopMaxY = 602 + 68;
+        
+        // Check bottom stairs (diagonal movement: left+up, right+down)
+        if (pos.x >= stairsBottomMinX && pos.x <= stairsBottomMaxX &&
+            pos.y >= stairsBottomMinY && pos.y < stairsBottomMaxY) {
+          // On bottom bonfire stairs - set velocity directly for diagonal movement
+          // Only apply when moving horizontally (matches old behavior)
+          if (originalInput.x !== 0) {
+            onStairs = true;
+            // Calculate velocity maintaining 3:1 ratio from old frame-based movement
+            // Old: 12px/frame horizontal, 4px/frame vertical = 3:1 ratio
+            var stairsSpeed = maxSpeed * 2.5; // Scale to match old frame-based speed
+            var vx = originalInput.x * stairsSpeed;
+            // Vertical: left (x < 0) moves up (y < 0), right (x > 0) moves down (y > 0)
+            var vy = originalInput.x * stairsSpeed / 3; // 1/3 of horizontal speed
+            stairsVelocity = { x: vx, y: vy };
+          }
+        }
+        // Check top stairs (increased vertical speed)
+        else if (pos.x >= stairsTopMinX && pos.x <= stairsTopMaxX &&
+                 pos.y >= stairsTopMinY && pos.y <= stairsTopMaxY) {
+          // On top bonfire stairs - increase vertical speed when moving up/down
+          // Horizontal movement should work normally (no vertical component)
+          if (originalInput.y !== 0 || originalInput.x !== 0) {
+            onStairs = true;
+            // Calculate velocity with increased vertical speed
+            var stairsSpeed = maxSpeed * 2.5;
+            var vx = originalInput.x * stairsSpeed;
+            var vy = 0;
+            if (originalInput.y !== 0) {
+              // Moving up or down - increase vertical speed
+              vy = originalInput.y * stairsSpeed;
+            }
+            // If only moving horizontally, just use normal horizontal speed (no vertical component)
+            stairsVelocity = { x: vx, y: vy };
+          }
+        }
+      }
+      
+      // If on stairs, set velocity directly and skip applyInput
+      // Otherwise, use normal input
+      if (onStairs && stairsVelocity) {
+        // Set velocity BEFORE physics update so it's used during the update
+        if (this.player && typeof this.player.setVelocity === "function") {
+          this.player.setVelocity(stairsVelocity);
+        }
+        // Update physics with zero input (velocity already set above)
+        // But we need to prevent applyInput from overriding it
+        // So we'll manually update the engine without calling applyInput
+        if (this.collisionWorld && this.collisionWorld.engine) {
+          // Skip applyInput and just update the engine
+          var Engine = Matter.Engine;
+          Engine.update(this.collisionWorld.engine, deltaMs);
+        } else {
+          this.collisionWorld.update(deltaMs, { x: 0, y: 0 });
+        }
+        // Re-apply velocity after update in case it was modified
+        if (this.player && typeof this.player.setVelocity === "function") {
+          this.player.setVelocity(stairsVelocity);
+        }
+      } else {
+        // Normal movement - use regular input
+        this.collisionWorld.update(deltaMs, effectiveInput);
+      }
       this.updateAnimation(deltaMs, effectiveInput);
       this.syncToDom();
       this.updateDoors();
       this.updateZIndexes();
+      
+      // Update player debug box position every frame if debug is enabled
+      if (this._colliderDebugEnabled && this.player) {
+        this._updatePlayerDebugBox();
+      }
 
       // Do not re-render debug overlays every frame; only on enable/scene change
+    }
+    
+    /**
+     * Update player debug box position to follow the character
+     */
+    _updatePlayerDebugBox() {
+      if (!this.player) return;
+      
+      // Find the player debug element
+      var $playerDebug = null;
+      for (var i = 0; i < this._colliderDebugEls.length; i++) {
+        var el = this._colliderDebugEls[i];
+        if (el && el.classList && el.classList.contains("world-collider-debug-player")) {
+          $playerDebug = $(el);
+          break;
+        }
+      }
+      
+      if (!$playerDebug || !$playerDebug.length) return;
+      
+      // Update position based on current player position
+      var pos = this.player.getPosition();
+      var footY = pos.y + PLAYER_COLLIDER_HEIGHT / 2;
+      var left = pos.x - PLAYER_COLLIDER_WIDTH / 2;
+      var top = footY - PLAYER_COLLIDER_HEIGHT;
+      
+      $playerDebug.css({
+        left: left + "px",
+        top: top + "px"
+      });
     }
 
     /**
@@ -533,14 +662,33 @@
           top: top + "px"
         };
         // Set z-index based on scene: 9999 in tent and cave, 49 on main map
+        // Special case: when sitting on any log/bench, set player z-index to 100
+        var isSittingOnTopBench = typeof window !== "undefined" && 
+                                   typeof window.onLogTop !== "undefined" && 
+                                   window.onLogTop === true;
+        var isSittingOnLeftStump = typeof window !== "undefined" && 
+                                   typeof window.onLogLeft !== "undefined" && 
+                                   window.onLogLeft === true;
+        var isSittingOnRightStump = typeof window !== "undefined" && 
+                                    typeof window.onLogRight !== "undefined" && 
+                                    window.onLogRight === true;
+        var isSittingOnAnyLog = isSittingOnTopBench || isSittingOnLeftStump || isSittingOnRightStump;
+        
         if (this.sceneName === "tent1" || this.sceneName === "cave") {
           if (currentZIndex !== "9999") {
             cssUpdate["z-index"] = "9999";
           }
         } else if (this.sceneName === "mainMap") {
-          // Reset to 49 when on main map (correct z-index for player on main map)
-          if (currentZIndex !== "49") {
-            cssUpdate["z-index"] = "49";
+          // When sitting on any log/bench, player should be above (z-index 100)
+          if (isSittingOnAnyLog) {
+            if (currentZIndex !== "100") {
+              cssUpdate["z-index"] = "100";
+            }
+          } else {
+            // Reset to 49 when on main map (correct z-index for player on main map)
+            if (currentZIndex !== "49") {
+              cssUpdate["z-index"] = "49";
+            }
           }
         }
         $dylan.css(cssUpdate);
@@ -753,6 +901,60 @@
         this.sceneName === "tent1" ? "#tent1" : this.sceneName === "cave" ? "#cave" : "#map";
       var $parent = $(parentSelector);
       if (!$parent.length) return;
+      
+      // Add purple debug overlay for bonfire stairs areas
+      if (this.sceneName === "mainMap") {
+        // Bottom/Left stairs area (stairs-left.campfire at CSS top: 752px, left: 752px)
+        // Old code checked: left 736-816, top 908-952
+        // World coordinates: x = CSS left + 16, y = CSS top + 44
+        var stairsLeftMinX = 752;
+        var stairsLeftMaxX = 832;
+        var stairsLeftMinY = 952;
+        var stairsLeftMaxY = 996;
+        var stairsLeftWidth = stairsLeftMaxX - stairsLeftMinX;
+        var stairsLeftHeight = stairsLeftMaxY - stairsLeftMinY;
+        
+        var $stairsLeftDebug = $("<div class='world-collider-debug world-collider-debug-stairs'></div>");
+        $stairsLeftDebug.css({
+          position: "absolute",
+          left: stairsLeftMinX + "px",
+          top: stairsLeftMinY + "px",
+          width: stairsLeftWidth + "px",
+          height: stairsLeftHeight + "px",
+          border: "2px dashed rgba(168, 85, 247, 0.9)", // purple
+          backgroundColor: "rgba(168, 85, 247, 0.25)", // purple with transparency
+          pointerEvents: "none",
+          zIndex: 999998
+        });
+        $stairsLeftDebug.attr("title", "Bonfire Left Stairs Area");
+        $parent.append($stairsLeftDebug);
+        this._colliderDebugEls.push($stairsLeftDebug[0]);
+        
+        // Top/Front stairs area - exact coordinates provided by user
+        // x: 972, y: 602, width: 56, height: 68
+        var stairsFrontMinX = 972;
+        var stairsFrontMaxX = 972 + 56;
+        var stairsFrontMinY = 602;
+        var stairsFrontMaxY = 602 + 68;
+        var stairsFrontWidth = 56;
+        var stairsFrontHeight = 68;
+        
+        var $stairsFrontDebug = $("<div class='world-collider-debug world-collider-debug-stairs'></div>");
+        $stairsFrontDebug.css({
+          position: "absolute",
+          left: stairsFrontMinX + "px",
+          top: stairsFrontMinY + "px",
+          width: stairsFrontWidth + "px",
+          height: stairsFrontHeight + "px",
+          border: "2px dashed rgba(168, 85, 247, 0.9)", // purple
+          backgroundColor: "rgba(168, 85, 247, 0.25)", // purple with transparency
+          pointerEvents: "none",
+          zIndex: 999998
+        });
+        $stairsFrontDebug.attr("title", "Bonfire Front/Top Stairs Area");
+        $parent.append($stairsFrontDebug);
+        this._colliderDebugEls.push($stairsFrontDebug[0]);
+      }
 
       // Solids
       if (cfg.solids && cfg.solids.length) {

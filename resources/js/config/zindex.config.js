@@ -133,8 +133,8 @@ var ZINDEX_RULES = {
     },
     {
       selector: "#bonfire",
-      whenAbove: { top: { max: 804 }, zIndex: 100 },
-      whenBelow: { top: { min: 804 }, zIndex: 10 }
+      whenAbove: { top: { max: 820 }, zIndex: 100 },
+      whenBelow: { top: { min: 820 }, zIndex: 10 }
     },
     {
       selector: ".tall-tree.walls.left",
@@ -155,19 +155,19 @@ var ZINDEX_RULES = {
     },
     {
       selector: ".bench",
-      whenAbove: { top: { max: 740 }, zIndex: 100 },
-      whenBelow: { top: { min: 844, max: 900 }, zIndex: 100 },
+      whenAbove: { top: { max: 764 }, zIndex: 100 },
+      whenBelow: { top: { min: 868, max: 924 }, zIndex: 100 },
       default: { zIndex: 10 }
     },
     {
       selector: ".tree-stump",
-      whenAbove: { top: { max: 796 }, zIndex: 100 },
-      whenBelow: { top: { min: 796 }, zIndex: 10 }
+      whenAbove: { top: { max: 852 }, zIndex: 100 },
+      whenBelow: { top: { min: 852 }, zIndex: 10 }
     },
     {
       selector: "#stump",
-      whenAbove: { top: { max: 376 }, zIndex: 100 },
-      whenBelow: { top: { min: 376 }, zIndex: 10 }
+      whenAbove: { top: { max: 400 }, zIndex: 100 },
+      whenBelow: { top: { min: 400 }, zIndex: 10 }
     },
     {
       selector: "#falling-tree",
@@ -176,8 +176,8 @@ var ZINDEX_RULES = {
     },
     {
       selector: "#wood-log",
-      whenAbove: { top: { max: 472 }, zIndex: 100 },
-      whenBelow: { top: { min: 472 }, zIndex: 10 }
+      whenAbove: { top: { max: 496 }, zIndex: 100 },
+      whenBelow: { top: { min: 496 }, zIndex: 10 }
     },
     {
       selector: ".s4",

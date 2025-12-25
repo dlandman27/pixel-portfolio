@@ -1676,11 +1676,17 @@ body {
 .yellow-flowers.y1 {
   margin-top: 320px;
   margin-left: 192px;
+  width: 28px;
+  height: 28px;
+  background-size: 28px;
 }
 
 .yellow-flowers.y2 {
   margin-top: 1082px;
   margin-left: 192px;
+  width: 30px;
+  height: 30px;
+  background-size: 30px;
 }
 
 .yellow-flowers.y4 {
@@ -1778,7 +1784,7 @@ body {
 .yellow-flowers.y3 {
   margin-top: 180px;
   margin-left: 1082px;
-  background-size: 24px;
+  background-size: 22px;
   background-repeat: space;
   width: 352px;
   height: 84px;
@@ -1788,7 +1794,7 @@ body {
 .yellow-flowers.y8 {
   margin-top: 180px;
   margin-left: 462px;
-  background-size: 24px;
+  background-size: 26px;
   background-repeat: space;
   width: 462px;
   height: 84px;
@@ -2500,7 +2506,7 @@ body {
 }
 
 
-.yellow-flowers::after, .pink-tulips::after {
+.yellow-flowers::after, .pink-tulips::after, .small-grass::after, .mushroom-yellow::after, .mushroom-purple::after {
   content: "";
   position: absolute;
   left: 0px;
@@ -3022,6 +3028,19 @@ body {
   filter: brightness(0.8);
   box-shadow: -5px 0px 10px rgba(0, 0, 0, 0.4) inset;
 }
+
+/* Tile 0044 inside campfire area */
+.campfire-tile.tile-0044 {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-image: url("../images/tiles/tile_0044.png");
+  background-size: 16px;
+  background-repeat: no-repeat;
+  z-index: 6;
+}
+
+/* Tile 0044 base styles - positioning done in HTML */
 
 .rocks_vert.right.layer2 {
   top: 456px;

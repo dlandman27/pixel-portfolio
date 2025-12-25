@@ -1378,6 +1378,23 @@ function sitOnLog(location) {
           sitting = true;
           onLog = true;
           onLogTop = true;
+          
+          // Set top bench z-index to 10 with !important (player will be 100)
+          var $topBench = $(".bench.top");
+          if ($topBench.length && $topBench[0]) {
+            $topBench[0].style.setProperty("z-index", "10", "important");
+          }
+          // Also set player z-index to 100
+          var $dylan = $("#dylan");
+          if ($dylan.length && $dylan[0]) {
+            $dylan[0].style.setProperty("z-index", "100", "important");
+          }
+          
+          // Force z-index update immediately to ensure it sticks
+          if (typeof ZIndexManager !== "undefined" && player) {
+            var pos = player.getPosition();
+            ZIndexManager.update(pos.y, pos.x, gameWorld.sceneName);
+          }
         }
         else if (onLogTop) {
           // Stand up
@@ -1398,10 +1415,27 @@ function sitOnLog(location) {
             $("#dylan").css("background-image", url + "/dylan-front-1.png)");
           }
           
+          // Remove !important from z-index to restore normal z-index rules
+          var $topBench = $(".bench.top");
+          if ($topBench.length && $topBench[0]) {
+            $topBench[0].style.removeProperty("z-index");
+          }
+          // Restore player z-index to normal (will be set by game-world.js)
+          var $dylan = $("#dylan");
+          if ($dylan.length && $dylan[0]) {
+            $dylan[0].style.removeProperty("z-index");
+          }
+          
           // Restore camera to follow player
           gameWorld.setCameraOffset(initX, initY);
           // Trigger camera update
           gameWorld.syncToDom();
+          
+          // Force z-index update to restore normal rules
+          if (typeof ZIndexManager !== "undefined" && player) {
+            var pos = player.getPosition();
+            ZIndexManager.update(pos.y, pos.x, gameWorld.sceneName);
+          }
           
           onLogTop = false;
         }
@@ -1517,13 +1551,28 @@ function sitOnLog(location) {
           $("#dylan").css("background-image", URL.getDylan() + "/dylan-right-1.png)");
         }
         
-        $(".tree-stump").css("z-index", "10");
-        
         playerController.disableInput = true;
         
         sitting = true;
         onLog = true;
         onLogLeft = true;
+        
+        // Set left stump z-index to 10 with !important (player will be 100)
+        var $leftStump = $(".tree-stump.left");
+        if ($leftStump.length && $leftStump[0]) {
+          $leftStump[0].style.setProperty("z-index", "10", "important");
+        }
+        // Also set player z-index to 100
+        var $dylan = $("#dylan");
+        if ($dylan.length && $dylan[0]) {
+          $dylan[0].style.setProperty("z-index", "100", "important");
+        }
+        
+        // Force z-index update immediately to ensure it sticks
+        if (typeof ZIndexManager !== "undefined" && player) {
+          var pos = player.getPosition();
+          ZIndexManager.update(pos.y, pos.x, gameWorld.sceneName);
+        }
       }
         else if (onLogLeft) {
           onLog = false;
@@ -1541,9 +1590,25 @@ function sitOnLog(location) {
             $("#dylan").css("background-image", URL.getDylan() + "/dylan-right-1.png)");
           }
           
+          // Remove !important from z-index to restore normal z-index rules
+          var $leftStump = $(".tree-stump.left");
+          if ($leftStump.length && $leftStump[0]) {
+            $leftStump[0].style.removeProperty("z-index");
+          }
+          // Restore player z-index to normal (will be set by game-world.js)
+          if ($dylan.length && $dylan[0]) {
+            $dylan[0].style.removeProperty("z-index");
+          }
+          
           // Restore camera
           gameWorld.setCameraOffset(initX, initY);
           gameWorld.syncToDom();
+          
+          // Force z-index update to restore normal rules
+          if (typeof ZIndexManager !== "undefined" && player) {
+            var pos = player.getPosition();
+            ZIndexManager.update(pos.y, pos.x, gameWorld.sceneName);
+          }
           
           onLogLeft = false;
         }
@@ -1584,13 +1649,28 @@ function sitOnLog(location) {
           $("#dylan").css("background-image", URL.getDylan() + "/dylan-left-1.png)");
         }
         
-        $(".tree-stump").css("z-index", "10");
-        
         playerController.disableInput = true;
         
         sitting = true;
         onLog = true;
         onLogRight = true;
+        
+        // Set right stump z-index to 10 with !important (player will be 100)
+        var $rightStump = $(".tree-stump.right");
+        if ($rightStump.length && $rightStump[0]) {
+          $rightStump[0].style.setProperty("z-index", "10", "important");
+        }
+        // Also set player z-index to 100
+        var $dylan = $("#dylan");
+        if ($dylan.length && $dylan[0]) {
+          $dylan[0].style.setProperty("z-index", "100", "important");
+        }
+        
+        // Force z-index update immediately to ensure it sticks
+        if (typeof ZIndexManager !== "undefined" && player) {
+          var pos = player.getPosition();
+          ZIndexManager.update(pos.y, pos.x, gameWorld.sceneName);
+        }
       }
         else if (onLogRight) {
           onLog = false;
@@ -1608,9 +1688,26 @@ function sitOnLog(location) {
             $("#dylan").css("background-image", URL.getDylan() + "/dylan-left-1.png)");
           }
           
+          // Remove !important from z-index to restore normal z-index rules
+          var $rightStump = $(".tree-stump.right");
+          if ($rightStump.length && $rightStump[0]) {
+            $rightStump[0].style.removeProperty("z-index");
+          }
+          // Restore player z-index to normal (will be set by game-world.js)
+          var $dylan = $("#dylan");
+          if ($dylan.length && $dylan[0]) {
+            $dylan[0].style.removeProperty("z-index");
+          }
+          
           // Restore camera
           gameWorld.setCameraOffset(initX, initY);
           gameWorld.syncToDom();
+          
+          // Force z-index update to restore normal rules
+          if (typeof ZIndexManager !== "undefined" && player) {
+            var pos = player.getPosition();
+            ZIndexManager.update(pos.y, pos.x, gameWorld.sceneName);
+          }
           
           onLogRight = false;
         }

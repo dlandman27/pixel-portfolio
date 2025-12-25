@@ -96,13 +96,15 @@
     var left = condition.left ? (condition.left.max || condition.left.min || condition.left.exact || 0) : 0;
 
     // Set position (adjust based on condition type)
+    // Add 32px offset to push all z-index debug overlays down
+    var topOffset = 32;
     if (condition.top) {
       if (condition.top.max !== undefined) {
-        $rect.css({ top: 0, height: condition.top.max + "px" });
+        $rect.css({ top: topOffset + "px", height: (condition.top.max + topOffset) + "px" });
       } else if (condition.top.min !== undefined) {
-        $rect.css({ top: condition.top.min + "px", bottom: 0 });
+        $rect.css({ top: (condition.top.min + topOffset) + "px", bottom: 0 });
       } else if (condition.top.exact !== undefined) {
-        $rect.css({ top: condition.top.exact + "px", height: "2px" });
+        $rect.css({ top: (condition.top.exact + topOffset) + "px", height: "2px" });
       }
     }
 
@@ -216,14 +218,60 @@
       var rules = ZINDEX_RULES[sceneName || currentScene];
       if (!rules || !Array.isArray(rules)) return;
 
+      // Check if player is sitting on any log/bench
+      var isSittingOnTopBench = typeof window !== "undefined" && 
+                                 typeof window.onLogTop !== "undefined" && 
+                                 window.onLogTop === true;
+      var isSittingOnLeftStump = typeof window !== "undefined" && 
+                                 typeof window.onLogLeft !== "undefined" && 
+                                 window.onLogLeft === true;
+      var isSittingOnRightStump = typeof window !== "undefined" && 
+                                  typeof window.onLogRight !== "undefined" && 
+                                  window.onLogRight === true;
+      var isSittingOnAnyLog = isSittingOnTopBench || isSittingOnLeftStump || isSittingOnRightStump;
+
+      // Special case: when sitting on any log/bench, ensure player z-index is high
+      if (isSittingOnAnyLog) {
+        var $dylan = $("#dylan");
+        if ($dylan.length) {
+          var currentPlayerZIndex = parseInt($dylan.css("z-index"), 10);
+          // Set player z-index to 100 to ensure they're above the log/bench
+          if (isNaN(currentPlayerZIndex) || currentPlayerZIndex !== 100) {
+            $dylan.css("z-index", 100);
+          }
+        }
+      }
+
       rules.forEach(function (rule) {
         var $elements = $(rule.selector);
         if (!$elements.length) return;
+
+        // Special case: when sitting on top bench, completely skip bench rule
+        if (isSittingOnTopBench && rule.selector === ".bench") {
+          return; // Skip this rule entirely - will handle below
+        }
+
+        // Special case: when sitting on left or right stump, completely skip tree-stump rule
+        if ((isSittingOnLeftStump || isSittingOnRightStump) && rule.selector === ".tree-stump") {
+          return; // Skip this rule entirely - will handle below
+        }
 
         var zIndex = getZIndexForRule(rule, playerY, playerX);
         if (zIndex !== null) {
           $elements.each(function () {
             var $el = $(this);
+            // Skip top bench if sitting on it
+            if (isSittingOnTopBench && $el.hasClass("top") && $el.hasClass("bench")) {
+              return; // Will be handled below
+            }
+            // Skip left stump if sitting on it
+            if (isSittingOnLeftStump && $el.hasClass("left") && $el.hasClass("tree-stump")) {
+              return; // Will be handled below
+            }
+            // Skip right stump if sitting on it
+            if (isSittingOnRightStump && $el.hasClass("right") && $el.hasClass("tree-stump")) {
+              return; // Will be handled below
+            }
             var currentZIndex = parseInt($el.css("z-index"), 10);
             if (isNaN(currentZIndex) || currentZIndex !== zIndex) {
               $el.css("z-index", zIndex);
@@ -231,6 +279,51 @@
           });
         }
       });
+
+      // Special case: when sitting on top bench, force top bench to z-index 10 AFTER all rules
+      if (isSittingOnTopBench) {
+        var $topBench = $(".bench.top");
+        if ($topBench.length) {
+          $topBench.each(function () {
+            var $el = $(this);
+            // Force z-index to 10 so player appears above (player z-index is 100)
+            if ($el[0] && $el[0].style) {
+              $el[0].style.setProperty("z-index", "10", "important");
+            }
+            $el.css("z-index", "10");
+          });
+        }
+      }
+
+      // Special case: when sitting on left stump, force left stump to z-index 10 AFTER all rules
+      if (isSittingOnLeftStump) {
+        var $leftStump = $(".tree-stump.left");
+        if ($leftStump.length) {
+          $leftStump.each(function () {
+            var $el = $(this);
+            // Force z-index to 10 so player appears above (player z-index is 100)
+            if ($el[0] && $el[0].style) {
+              $el[0].style.setProperty("z-index", "10", "important");
+            }
+            $el.css("z-index", "10");
+          });
+        }
+      }
+
+      // Special case: when sitting on right stump, force right stump to z-index 10 AFTER all rules
+      if (isSittingOnRightStump) {
+        var $rightStump = $(".tree-stump.right");
+        if ($rightStump.length) {
+          $rightStump.each(function () {
+            var $el = $(this);
+            // Force z-index to 10 so player appears above (player z-index is 100)
+            if ($el[0] && $el[0].style) {
+              $el[0].style.setProperty("z-index", "10", "important");
+            }
+            $el.css("z-index", "10");
+          });
+        }
+      }
     },
 
     /**
