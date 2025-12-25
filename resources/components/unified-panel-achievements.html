@@ -2,36 +2,92 @@
   <div class="tab-header-with-subtitle">
     <h2 class="tab-content-title">Achievements &amp; Challenges</h2>
     <p class="tab-subtitle">
-      Future toast popups and badges for doing fun, optional things across the
-      map.
+      Track your progress exploring the map and completing challenges.
     </p>
   </div>
 
-  <div class="achievements-list">
-    <div class="achievement-row is-placeholder">
-      <div class="achievement-icon-slot"></div>
-      <div class="achievement-copy">
-        <p class="achievement-title">Campfire Storyteller</p>
-        <p class="achievement-description">
-          Sit by the bonfire with every required item collected.
-        </p>
+  <div class="achievements-sections">
+    <!-- Completed Achievements Section -->
+    <div class="achievements-section completed-section" data-role="completed-achievements">
+      <h3 class="achievements-section-title">✓ Completed</h3>
+      <div class="achievements-list" data-role="completed-list">
+        <!-- Completed achievements will be dynamically added here -->
       </div>
     </div>
 
-    <div class="achievement-row is-placeholder">
-      <div class="achievement-icon-slot"></div>
-      <div class="achievement-copy">
-        <p class="achievement-title">Perfect Catch</p>
-        <p class="achievement-description">
-          Fill the entire fishbook with unique catches.
-        </p>
+    <!-- In Progress Achievements Section -->
+    <div class="achievements-section in-progress-section" data-role="in-progress-achievements">
+      <h3 class="achievements-section-title">In Progress</h3>
+      <div class="achievements-list" data-role="in-progress-list">
+        
+        <!-- Collect All Items -->
+        <div class="achievement-card" data-achievement-key="collect-all-items">
+          <div class="achievement-header">
+            <div class="achievement-icon">🎒</div>
+            <div class="achievement-info">
+              <p class="achievement-title">Item Collector</p>
+              <p class="achievement-description">
+                Find all items scattered around the map.
+              </p>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <progress 
+              class="nes-progress" 
+              value="0" 
+              max="6"
+              data-progress-items
+            ></progress>
+            <span class="achievement-progress-text" data-progress-text-items>0 / 6</span>
+          </div>
+        </div>
+
+        <!-- Collect All Coins -->
+        <div class="achievement-card" data-achievement-key="collect-all-coins">
+          <div class="achievement-header">
+            <div class="achievement-icon">🪙</div>
+            <div class="achievement-info">
+              <p class="achievement-title">Treasure Hunter</p>
+              <p class="achievement-description">
+                Collect all coins hidden throughout the world.
+              </p>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <progress 
+              class="nes-progress" 
+              value="0" 
+              max="20"
+              data-progress-coins
+            ></progress>
+            <span class="achievement-progress-text" data-progress-text-coins>0 / 20</span>
+          </div>
+        </div>
+
+        <!-- Collect All Fish -->
+        <div class="achievement-card" data-achievement-key="collect-all-fish">
+          <div class="achievement-header">
+            <div class="achievement-icon">🎣</div>
+            <div class="achievement-info">
+              <p class="achievement-title">Master Angler</p>
+              <p class="achievement-description">
+                Catch every type of fish in Fishing Frenzy.
+              </p>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <progress 
+              class="nes-progress" 
+              value="0" 
+              max="10"
+              data-progress-fish
+            ></progress>
+            <span class="achievement-progress-text" data-progress-text-fish>0 / 10</span>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <p class="achievement-footnote">
-      More challenges coming soon &mdash; the system is wired, the goals just
-      need to be minted.
-    </p>
   </div>
 </div>
 

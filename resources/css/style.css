@@ -1278,18 +1278,6 @@ body {
   top: 208px;
 }
 
-#backpack {
-  background-image: url("../images/misc/backpack.png");
-  position: absolute;
-  background-repeat: no-repeat;
-  background-size: 32px;
-  width: 32px;
-  height: 32px;
-  z-index: 48;
-  left: 1544px;
-  top: 752px;
-}
-
 #backpack-icon {
   background-image: url("../images/misc/backpack-icon.png");
   position: fixed;
@@ -3644,10 +3632,6 @@ body.status-menu-open .status-menu-panel {
   opacity: 0.9;
 }
 
-.status-item.status-backpack::before {
-  background-image: url("../images/misc/backpack2.png");
-}
-
 .status-item.status-minimap::before {
   background-image: url("../images/misc/map-icon.png");
 }
@@ -4777,7 +4761,8 @@ body.dusk {
   flex: 1;
   overflow-y: auto;
   padding: 1.5rem 1.75rem 2rem;
-  background: radial-gradient(circle at top left, #1f2933 0, #0a0f13 55%, #05070a 100%);
+  background: url(../images/tiles/blackboard.png) repeat;
+  background-size: 16px;
   border: 4px solid #f5d6a1;
   box-shadow: inset 0 0 0 2px #6b4226;
 }
@@ -4822,27 +4807,43 @@ body.dusk {
 }
 
 /* Backpack/Inventory Content */
+.backpack-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex: 1;
+  flex-direction: column;
+}
+
 .backpack-layout {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
   flex: 1;
 }
 
 .backpack-detail {
   display: flex;
-  gap: 1.25rem;
-  flex: 1;
+  gap: 2rem;
   align-items: flex-start;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid rgba(245, 214, 161, 0.3);
+  flex: 1;
 }
 
 .backpack-detail-image {
-  width: 30%;
-  height: 100%;
+  width: 35%;
+  min-height: 280px;
   border: 3px solid #f5d6a1;
   box-shadow: inset 0 0 0 2px #6b4226, 0 6px 0 #000;
   background-color: #111827;
-  background-size: 80%;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   flex-shrink: 0;
@@ -4850,27 +4851,36 @@ body.dusk {
 
 .backpack-detail-text {
   flex: 1;
-  padding: 0.5rem;
+  min-width: 0;
 }
 
 .backpack-detail-title {
   font-family: "Press Start 2P", monospace;
-  font-size: 2rem;
+  font-size: 1.3rem;
   color: #fef3c7;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.5;
 }
 
 .backpack-detail-description {
-  font-size: 0.6rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.1rem;
   color: #e5e7eb;
-  line-height: 1.6;
-  margin: 0 0 0.35rem 0;
+  line-height: 1.7;
+  margin: 0 0 1rem 0;
+  font-weight: 400;
 }
 
 .backpack-detail-status {
-  font-size: 0.6rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.95rem;
   color: #e5e7eb;
   margin: 0;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .backpack-detail-status.owned {
@@ -4882,14 +4892,17 @@ body.dusk {
 }
 
 .backpack-strip-wrapper {
-  margin-top: auto;
+  margin-top: 0;
+  padding: 0.5rem 0;
+  overflow: hidden;
 }
 
 .inventory-strip {
   display: flex;
   gap: 0.75rem;
-  padding: 0.5rem 0.25rem 0.25rem;
+  padding: 0.5rem 0.25rem;
   overflow-x: scroll;
+  overflow-y: visible;
 }
 
 .inventory-strip::-webkit-scrollbar {
@@ -4926,36 +4939,51 @@ body.dusk {
 }
 
 .inventory-item.missing {
-  border-color: #4b5563;
-  opacity: 0.55;
+  border-color: #6b7280;
+  opacity: 0.85;
 }
 
 .inventory-item.missing .inventory-item-icon {
-  filter: grayscale(1);
-  opacity: 0.7;
+  filter: grayscale(1) brightness(0.9);
+  opacity: 1;
+}
+
+.inventory-item.missing .inventory-item-name {
+  color: #9ca3af;
 }
 
 .backpack-detail-image.missing {
-  filter: grayscale(1);
-  opacity: 0.75;
+  filter: grayscale(1) brightness(0.9);
+  opacity: 1;
 }
 
 @media (max-width: 640px) {
+  .backpack-content {
+    padding: 1rem;
+  }
+
   .backpack-detail {
     flex-direction: column;
-    align-items: stretch;
+    padding: 1.5rem;
   }
 
   .backpack-detail-image {
     width: 100%;
-    height: 180px;
-    margin-bottom: 0.75rem;
+    height: 240px;
+    margin-bottom: 0;
   }
 
-  .backpack-detail-text {
-    flex: 1;
-    max-height: 40vh;
-    overflow-y: auto;
+  .backpack-detail-title {
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+
+  .backpack-detail-description {
+    font-size: 1rem;
+  }
+
+  .backpack-detail-status {
+    font-size: 0.9rem;
   }
 
   .backpack-strip-wrapper {
@@ -4993,30 +5021,172 @@ body.dusk {
 }
 
 /* Games Content */
-.games-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.game-button {
+.games-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  justify-content: center;
+  height: 100%;
+  flex: 1;
+  flex-direction: column;
+}
+
+.games-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   width: 100%;
-  justify-content: flex-start;
+  max-width: 100%;
+  justify-content: center;
+  flex: 1;
 }
 
-.game-icon {
-  font-size: 2rem;
+.game-detail {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid rgba(245, 214, 161, 0.3);
+  flex: 1;
 }
 
-.game-name {
+.game-detail-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.game-detail-title {
   font-family: "Press Start 2P", monospace;
-  font-size: 0.7rem;
+  font-size: 1.3rem;
+  color: #fef3c7;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+}
+
+.game-detail-location {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  color: #facc6b;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.game-detail-description {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1rem;
+  color: #e5e7eb;
+  line-height: 1.7;
+  margin: 0 0 1rem 0;
+  font-weight: 400;
+}
+
+.game-detail-rules {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  color: #d1d5db;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 3px solid #fef3c7;
+}
+
+.game-detail-score {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1rem;
+  color: #4ade80;
+  margin: 0 0 1.5rem 0;
+  font-weight: 600;
+}
+
+.game-detail-actions {
+  margin-top: 1rem;
+}
+
+.games-grid-wrapper {
+  margin-top: 0;
+  padding: 0.5rem 0;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.game-card {
+  background: #3b2414;
+  border: 2px solid #f5d6a1;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: all 0.2s;
+  box-shadow: inset 0 0 0 2px #6b4226;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.game-card:hover {
+  filter: brightness(1.15);
+  border-color: #facc6b;
+}
+
+.game-card.selected {
+  filter: brightness(1.2);
+  border-color: #fef3c7;
+  box-shadow: 0 0 0 3px #fef3c7;
+}
+
+.game-card-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.game-card-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+  color: #fff;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .games-content {
+    padding: 1rem;
+  }
+  
+  .game-detail {
+    padding: 1.5rem;
+  }
+  
+  .game-detail-title {
+    font-size: 1rem;
+  }
+  
+  .game-detail-description {
+    font-size: 0.95rem;
+  }
+  
+  .game-detail-rules {
+    font-size: 0.85rem;
+  }
+  
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .game-card-icon {
+    font-size: 2.5rem;
+  }
+  
+  .game-card-name {
+    font-size: 0.6rem;
+  }
 }
 
 /* Settings Content */
@@ -5040,28 +5210,36 @@ body.dusk {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
-  padding: 2rem;
+  height: 100%;
+  flex: 1;
 }
 
 .home-layout {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
-  max-width: 900px;
+  max-width: 100%;
+  justify-content: center;
+  flex: 1;
 }
 
 .home-detail {
   display: flex;
-  gap: 1.25rem;
+  gap: 2rem;
   align-items: flex-start;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  border: 2px solid rgba(245, 214, 161, 0.3);
 }
 
 .home-detail-image {
-  width: 30%;
+  width: 35%;
   height: 100%;
-  min-height: 160px;
+  min-height: 280px;
   border: 3px solid #f5d6a1;
   box-shadow: inset 0 0 0 2px #6b4226, 0 6px 0 #000;
   background-color: #111827;
@@ -5072,17 +5250,20 @@ body.dusk {
   background-repeat: no-repeat;
   image-rendering: pixelated;
   position: relative;
+  flex-shrink: 0;
 }
 
 .home-detail-text {
   flex: 1;
+  min-width: 0;
 }
 
 .home-greeting {
   font-family: "Press Start 2P", monospace;
   font-size: 1.5rem;
   color: #fff;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.5;
 }
 
 .home-name {
@@ -5093,34 +5274,35 @@ body.dusk {
 }
 
 .home-description {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.7rem;
-  color: #fff;
-  line-height: 1.8;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.05rem;
+  color: #e5e7eb;
+  line-height: 1.7;
   margin: 0 0 2rem 0;
+  font-weight: 400;
 }
 
 .home-highlights {
   list-style: none;
   padding: 0;
-  margin: 1.25rem 0 0 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
 }
 
 .home-highlight {
   display: flex;
   flex-direction: column;
-  padding-left: 1.2rem;
+  padding-left: 1.5rem;
   position: relative;
 }
 
 .home-highlight::before {
-  content: "•";
+  content: "▸";
   position: absolute;
   left: 0;
-  top: 0.2rem;
+  top: 0;
   font-size: 1rem;
   color: #fef3c7;
 }
@@ -5129,24 +5311,49 @@ body.dusk {
   font-family: "Press Start 2P", monospace;
   font-size: 0.7rem;
   color: #fef3c7;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
 }
 
 .home-highlight-description {
-  font-size: 0.6rem;
-  color: #e5e7eb;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  color: #d1d5db;
   line-height: 1.6;
+  font-weight: 400;
 }
 
 @media (max-width: 640px) {
+  .home-content {
+    padding: 1rem;
+  }
+  
   .home-detail {
     flex-direction: column;
+    padding: 1.5rem;
   }
 
   .home-detail-image {
     width: 100%;
-    height: 180px;
-    margin-bottom: 0.75rem;
+    height: 240px;
+    margin-bottom: 0;
+  }
+  
+  .home-greeting {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+  
+  .home-description {
+    font-size: 0.95rem;
+  }
+  
+  .home-highlight-title {
+    font-size: 0.65rem;
+  }
+  
+  .home-highlight-description {
+    font-size: 0.85rem;
   }
 }
 
@@ -5261,19 +5468,20 @@ body.dusk {
 
 /* Shared tab headers */
 .tab-header-with-subtitle {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .tab-header-with-subtitle .tab-content-title {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .tab-subtitle {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.55rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1rem;
   color: #fef3c7;
   opacity: 0.9;
   line-height: 1.6;
+  font-weight: 400;
 }
 
 /* Home split layout */
@@ -5365,25 +5573,184 @@ body.dusk {
   }
 }
 
-/* Games tab extra meta */
-.game-meta {
-  width: 100%;
-  font-size: 0.6rem;
-  opacity: 0.85;
-  margin-top: 0.25rem;
+
+/* Achievements Tab */
+.achievements-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem 0;
 }
 
-/* Achievements metrics */
-.achievement-metrics {
+.achievements-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0.5rem;
+}
+
+.achievements-section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.achievement-metric {
-  background: #1f2933;
-  border: 2px solid #f5d6a1;
-  padding: 0.75rem;
+.achievements-section-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85rem;
+  color: #fef3c7;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(245, 214, 161, 0.3);
+}
+
+.completed-section .achievements-section-title {
+  color: #4ade80;
+}
+
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.achievement-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(245, 214, 161, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.achievement-card.completed {
+  border-color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.achievement-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.achievement-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.achievement-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.achievement-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.9rem;
+  color: #fef3c7;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.achievement-card.completed .achievement-title {
+  color: #4ade80;
+}
+
+.achievement-description {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  color: #d1d5db;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.achievement-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.achievement-progress .nes-progress {
+  margin: 0;
+  height: 32px;
+  background-color: #212529;
+}
+
+.achievement-progress .nes-progress::-webkit-progress-bar {
+  background-color: #212529;
+}
+
+.achievement-progress .nes-progress::-webkit-progress-value {
+  background-color: #209cee;
+}
+
+.achievement-progress .nes-progress::-moz-progress-bar {
+  background-color: #209cee;
+}
+
+.achievement-progress .nes-progress::-ms-fill {
+  background-color: #209cee;
+  border: none;
+}
+
+.achievement-progress-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #fef3c7;
+  text-align: right;
+}
+
+.achievement-card.completed .achievement-progress-text {
+  color: #4ade80;
+}
+
+.achievement-completed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(74, 222, 128, 0.2);
+  border: 2px solid #4ade80;
+  border-radius: 4px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #4ade80;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .achievements-content {
+    padding: 0.5rem;
+  }
+  
+  .achievement-card {
+    padding: 1rem;
+  }
+  
+  .achievement-icon {
+    font-size: 2rem;
+  }
+  
+  .achievement-title {
+    font-size: 0.75rem;
+  }
+  
+  .achievement-description {
+    font-size: 0.85rem;
+  }
+  
+  .achievement-progress-text {
+    font-size: 0.65rem;
+  }
 }
 
 .achievement-metric-title {
@@ -5473,4 +5840,33 @@ body.dusk {
 /* Prevent body scroll when panel is open */
 body.unified-panel-open {
   overflow: hidden;
+}
+
+/* Backpack/Inventory Styles */
+.inventory-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-item.missing {
+  filter: grayscale(1);
+}
+
+.inventory-item.selected {
+  filter: brightness(1.2);
+  border-color: #fef3c7;
+  box-shadow: 0 0 0 3px #fef3c7;
+}
+
+.inventory-item.missing.selected {
+  filter: grayscale(1) brightness(1.2);
+}
+
+.inventory-item:hover {
+  filter: brightness(1.15);
+  border-color: #facc6b;
+}
+
+.inventory-item.missing:hover {
+  filter: grayscale(1) brightness(1.15);
 }

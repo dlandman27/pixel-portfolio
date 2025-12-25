@@ -7,26 +7,53 @@
     </p>
   </div>
 
-  <div class="games-list">
-    <button
-      type="button"
-      class="nes-btn is-primary game-button"
-      data-role="launch-fishing"
-    >
-      <span class="game-icon">🎣</span>
-      <span class="game-name">Fishing Frenzy</span>
-      <span class="game-meta">Relaxed timing · High score chase</span>
-    </button>
+  <div class="games-layout">
+    <section class="game-detail" data-role="game-detail">
+      <div class="game-detail-content">
+        <h3 class="game-detail-title" data-role="game-detail-title">
+          Select a Game
+        </h3>
+        <div class="game-detail-location" data-role="game-detail-location"></div>
+        <p class="game-detail-description" data-role="game-detail-description">
+          Choose a game from below to see details, rules, and your high scores.
+        </p>
+        <div class="game-detail-rules" data-role="game-detail-rules"></div>
+        <div class="game-detail-score" data-role="game-detail-score"></div>
+        <div class="game-detail-actions" data-role="game-detail-actions">
+          <button class="nes-btn is-primary" data-role="game-action" style="display: none;">
+            Play Now
+          </button>
+        </div>
+      </div>
+    </section>
 
-    <button
-      type="button"
-      class="nes-btn is-primary game-button"
-      data-role="launch-soccer"
-    >
-      <span class="game-icon">⚽</span>
-      <span class="game-name">Soccer Shootout</span>
-      <span class="game-meta">Fast shots · 30 second rounds</span>
-    </button>
+    <section class="games-grid-wrapper">
+      <div class="games-grid" data-role="games-grid">
+        <div
+          class="game-card"
+          data-game-key="fishing"
+          data-game-title="Fishing Frenzy"
+          data-game-location="📍 At the Dock"
+          data-game-description="Cast your line and catch as many fish as you can! Each fish has different point values and rarity. Build your fishbook collection as you play."
+          data-game-rules="Click to cast your line when fish swim by. Timing is key! Rarer fish are worth more points but are harder to catch."
+        >
+          <div class="game-card-icon">🎣</div>
+          <div class="game-card-name">Fishing Frenzy</div>
+        </div>
+
+        <div
+          class="game-card"
+          data-game-key="soccer"
+          data-game-title="Soccer Shootout"
+          data-game-location="📍 At the Soccer Field"
+          data-game-description="Test your penalty kick skills! You have 30 seconds to score as many goals as possible. Aim carefully and time your shots perfectly."
+          data-game-rules="Click and drag to aim your shot, then release to kick. The goalkeeper will try to block your shots. Score as many as you can before time runs out!"
+        >
+          <div class="game-card-icon">⚽</div>
+          <div class="game-card-name">Soccer Shootout</div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 

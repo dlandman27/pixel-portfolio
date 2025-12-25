@@ -162,15 +162,6 @@ $(window).resize(function () {
   ) {
     WORLD.centerMap();
   }
-
-  if(window.innerWidth <= 600 && inventory.backpack){
-    $("#backpack-icon").css("visibility","hidden");
-    $(".inventory-slot").css("display","none");
-  }
-  else if(window.innerWidth > 600 && inventory.backpack) {
-    $("#backpack-icon").css("visibility","visible");
-    $(".inventory-slot").css("display","block");
-  }
 });
 
 var x = 0;

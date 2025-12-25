@@ -36,7 +36,6 @@ let inventory = {
   axe: false,
   wood: false,
   minimap: false,
-  backpack: false,
   matchbox: false,
   resume: false,
   fishingRod: false,
@@ -202,13 +201,6 @@ var FISHREP = new FishBook();
 // Restore inventory from cookies
 // ----------------------
 function setVariables() {
-  if (getCookie("backpack") != "") {
-    inventory.backpack = true;
-    $("#backpack").css("opacity", "0");
-    if (window.innerWidth > 600)
-      $("#backpack-icon").css("visibility", "visible");
-  }
-
   if (getCookie("axe") != "") {
     inventory.axe = true;
     $("#stump").css(
@@ -549,7 +541,6 @@ function openInventory() {
       marginLeft: "0px",
     });
   }
-  inventory.backpack = true;
 }
 
 // ----------------------
@@ -562,7 +553,7 @@ function takeBook() {
     parseInt($("#dylan").css("top")) >= 1068 &&
     parseInt($("#dylan").css("top")) <= 1240
   ) {
-    if (inventory.backpack && !inventory.fishbook) {
+    if (!inventory.fishbook) {
       $(".book-item").css("visibility", "hidden");
       inventory.fishbook = true;
 
@@ -591,7 +582,7 @@ function takeBook() {
 
 function takeMatchbox() {
   if (parseInt($("#dylan").css("left")) <= 168) {
-    if (inventory.backpack && !inventory.matchbox) {
+    if (!inventory.matchbox) {
       inventory.matchbox = true;
       setCookie("matchbox", true);
       $(".achievement").css("background-color", "#3EB489");
@@ -619,7 +610,7 @@ function takeMatchbox() {
 
 function takeFishingRod() {
   if (parseInt($("#dylan").css("top")) >= 1208) {
-    if (inventory.backpack && !inventory.fishingRod) {
+    if (!inventory.fishingRod) {
       inventory.fishingRod = true;
       setCookie("fishing-rod", true);
       $(".fishing-rod").css("display", "none");
@@ -650,7 +641,7 @@ function takeAxe() {
     parseInt($("#dylan").css("left")) <= 412 &&
     parseInt($("#dylan").css("top")) <= 492
   ) {
-    if (inventory.backpack && !inventory.axe) {
+    if (!inventory.axe) {
       $("#dylan").css({
         left: 412 + "px",
         top: 396 + "px",
@@ -758,7 +749,7 @@ function takeResume() {
     parseInt($("#dylan").css("top")) >= 952 &&
     parseInt($("#dylan").css("top")) <= 1100
   ) {
-    if (inventory.backpack && !inventory.resume) {
+    if (!inventory.resume) {
       $(".paper").css("visibility", "hidden");
       inventory.resume = true;
       setCookie("resume", "true");
@@ -784,19 +775,6 @@ function takeResume() {
   }
 }
 
-function enableBackpack() {
-  if (
-    parseInt($("#dylan").css("top")) > 680 &&
-    parseInt($("#dylan").css("left")) >= 1348
-  ) {
-    inventory.backpack = true;
-    setCookie("backpack", true);
-    $("#backpack").css("opacity", "0");
-    if (window.innerWidth > 600)
-      $("#backpack-icon").css("visibility", "visible");
-    showItemPickupAnimation("backpack");
-  }
-}
 
 // ----------------------
 // Item pickup animation (Totem of Undying style)
@@ -859,11 +837,6 @@ function showItemPickupAnimation(itemType) {
       icon: URL.getMisc() + "/fishbook.png)",
       slot: ".inventory-slot.book",
       name: "Fishbook"
-    },
-    "backpack": {
-      icon: URL.getMisc() + "/backpack.png)",
-      slot: "#backpack-icon",
-      name: "Backpack"
     }
   };
 
@@ -1095,7 +1068,6 @@ function deleteCookie(cname) {
 function resetAllItems() {
   // List of all inventory-related cookies to delete
   var cookiesToDelete = [
-    "backpack",
     "axe",
     "matchbox",
     "resume",
@@ -1127,7 +1099,6 @@ function resetAllItems() {
     axe: false,
     wood: false,
     minimap: false,
-    backpack: false,
     matchbox: false,
     resume: false,
     fishingRod: false,
@@ -1162,8 +1133,6 @@ function resetAllItems() {
   };
 
   // Reset UI elements
-  $("#backpack").css("opacity", "1");
-  $("#backpack-icon").css("visibility", "hidden");
   $(".inventory-slot").css("visibility", "hidden");
   $(".inventory-slot").css({
     "background-image": "url(" + URL.getMisc() + "/inventory-slot-empty.png)"

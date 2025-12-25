@@ -289,7 +289,7 @@ var UnifiedPanel = (function () {
         hydrateFishbookTab(rootEl);
         break;
       case "achievements":
-        // No dynamic behavior yet
+        hydrateAchievementsTab(rootEl);
         break;
       case "games":
         hydrateGamesTab(rootEl);
@@ -329,6 +329,9 @@ var UnifiedPanel = (function () {
     }
 
     var items = rootEl.querySelectorAll(".inventory-item");
+    var firstItem = null;
+    
+    // Update item display and add click handlers
     for (var i = 0; i < items.length; i++) {
       var itemEl = items[i];
       var key = itemEl.getAttribute("data-item-key");
@@ -336,7 +339,7 @@ var UnifiedPanel = (function () {
 
       var hasItem = !!(inventory && key && inventory[key]);
 
-      itemEl.classList.remove("owned", "missing");
+      itemEl.classList.remove("owned", "missing", "selected");
       itemEl.classList.add(hasItem ? "owned" : "missing");
 
       var statusEl = itemEl.querySelector(".inventory-item-status");
@@ -350,7 +353,8 @@ var UnifiedPanel = (function () {
       }
 
       var iconEl = itemEl.querySelector(".inventory-item-icon");
-      if (iconEl && hasItem && icon) {
+      if (iconEl && icon) {
+        // Always show the icon, whether owned or missing
         iconEl.style.backgroundImage =
           "url(resources/images/misc/" + icon + ")";
         iconEl.style.backgroundSize = "contain";
@@ -359,6 +363,75 @@ var UnifiedPanel = (function () {
         iconEl.style.width = "64px";
         iconEl.style.height = "64px";
       }
+      
+      // Add click handler to show item details
+      (function(el) {
+        el.addEventListener("click", function() {
+          selectInventoryItem(rootEl, el);
+        });
+      })(itemEl);
+      
+      // Track the first item for auto-selection
+      if (!firstItem) {
+        firstItem = itemEl;
+      }
+    }
+    
+    // Auto-select the first item
+    if (firstItem) {
+      selectInventoryItem(rootEl, firstItem);
+    }
+  }
+  
+  function selectInventoryItem(rootEl, itemEl) {
+    // Remove selected class from all items
+    var allItems = rootEl.querySelectorAll(".inventory-item");
+    for (var i = 0; i < allItems.length; i++) {
+      allItems[i].classList.remove("selected");
+    }
+    
+    // Add selected class to clicked item
+    itemEl.classList.add("selected");
+    
+    // Update detail panel
+    var detailImageEl = rootEl.querySelector('[data-role="detail-image"]');
+    var detailTitleEl = rootEl.querySelector('[data-role="detail-title"]');
+    var detailDescEl = rootEl.querySelector('[data-role="detail-description"]');
+    var detailStatusEl = rootEl.querySelector('[data-role="detail-status"]');
+    
+    var key = itemEl.getAttribute("data-item-key");
+    var icon = itemEl.getAttribute("data-icon");
+    var title = itemEl.getAttribute("data-item-title");
+    var description = itemEl.getAttribute("data-item-description");
+    var hasItem = !!(inventory && key && inventory[key]);
+    
+    if (detailImageEl && icon) {
+      // Always show the icon, whether owned or missing
+      detailImageEl.style.backgroundImage = "url(resources/images/misc/" + icon + ")";
+      detailImageEl.style.backgroundSize = "contain";
+      detailImageEl.style.backgroundRepeat = "no-repeat";
+      detailImageEl.style.backgroundPosition = "center";
+      
+      // Add/remove missing class for grayscale effect
+      if (hasItem) {
+        detailImageEl.classList.remove("missing");
+      } else {
+        detailImageEl.classList.add("missing");
+      }
+    }
+    
+    if (detailTitleEl) {
+      detailTitleEl.textContent = title || "Unknown Item";
+    }
+    
+    if (detailDescEl) {
+      detailDescEl.textContent = description || "No description available.";
+    }
+    
+    if (detailStatusEl) {
+      detailStatusEl.textContent = hasItem ? "✓ You own this item" : "✗ You haven't found this yet";
+      detailStatusEl.style.color = hasItem ? "#4ade80" : "#f87171";
+      detailStatusEl.style.fontWeight = "bold";
     }
   }
 
@@ -375,24 +448,243 @@ var UnifiedPanel = (function () {
   }
 
   function hydrateGamesTab(rootEl) {
-    var fishingBtn = rootEl.querySelector('[data-role="launch-fishing"]');
-    if (fishingBtn) {
-      fishingBtn.addEventListener("click", function () {
-        if (typeof goFishing === "function") {
-          close();
-          goFishing();
-        }
-      });
+    var gameCards = rootEl.querySelectorAll(".game-card");
+    var firstCard = null;
+    
+    // Add click handlers to all game cards
+    for (var i = 0; i < gameCards.length; i++) {
+      var cardEl = gameCards[i];
+      
+      (function(el) {
+        el.addEventListener("click", function() {
+          selectGame(rootEl, el);
+        });
+      })(cardEl);
+      
+      // Track first card for auto-selection
+      if (!firstCard) {
+        firstCard = cardEl;
+      }
     }
-
-    var soccerBtn = rootEl.querySelector('[data-role="launch-soccer"]');
-    if (soccerBtn) {
-      soccerBtn.addEventListener("click", function () {
-        if (typeof choosePlayers === "function") {
-          close();
-          choosePlayers();
+    
+    // Auto-select the first game
+    if (firstCard) {
+      selectGame(rootEl, firstCard);
+    }
+  }
+  
+  function selectGame(rootEl, cardEl) {
+    // Remove selected class from all cards
+    var allCards = rootEl.querySelectorAll(".game-card");
+    for (var i = 0; i < allCards.length; i++) {
+      allCards[i].classList.remove("selected");
+    }
+    
+    // Add selected class to clicked card
+    cardEl.classList.add("selected");
+    
+    // Update detail panel
+    var detailTitleEl = rootEl.querySelector('[data-role="game-detail-title"]');
+    var detailLocationEl = rootEl.querySelector('[data-role="game-detail-location"]');
+    var detailDescEl = rootEl.querySelector('[data-role="game-detail-description"]');
+    var detailRulesEl = rootEl.querySelector('[data-role="game-detail-rules"]');
+    var detailScoreEl = rootEl.querySelector('[data-role="game-detail-score"]');
+    var detailActionsEl = rootEl.querySelector('[data-role="game-detail-actions"]');
+    
+    var gameKey = cardEl.getAttribute("data-game-key");
+    var gameTitle = cardEl.getAttribute("data-game-title");
+    var gameLocation = cardEl.getAttribute("data-game-location");
+    var gameDesc = cardEl.getAttribute("data-game-description");
+    var gameRules = cardEl.getAttribute("data-game-rules");
+    
+    if (detailTitleEl) {
+      detailTitleEl.textContent = gameTitle || "Game";
+    }
+    
+    if (detailLocationEl) {
+      detailLocationEl.textContent = gameLocation || "";
+    }
+    
+    if (detailDescEl) {
+      detailDescEl.textContent = gameDesc || "";
+    }
+    
+    if (detailRulesEl) {
+      detailRulesEl.innerHTML = "<strong>How to Play:</strong><br>" + (gameRules || "");
+    }
+    
+    if (detailScoreEl) {
+      // Get high score from cookies if available
+      var highScore = "";
+      if (gameKey === "fishing" && typeof Cookies !== "undefined") {
+        var fishScore = Cookies.get("fishscore");
+        if (fishScore) {
+          highScore = "🏆 High Score: " + fishScore + " points";
         }
-      });
+      } else if (gameKey === "soccer" && typeof Cookies !== "undefined") {
+        var soccerScore = Cookies.get("soccerscore");
+        if (soccerScore) {
+          highScore = "🏆 High Score: " + soccerScore + " goals";
+        }
+      }
+      detailScoreEl.textContent = highScore;
+      detailScoreEl.style.display = highScore ? "block" : "none";
+    }
+    
+    // Update action button
+    if (detailActionsEl) {
+      detailActionsEl.innerHTML = "";
+      
+      var actionBtn = document.createElement("button");
+      actionBtn.className = "nes-btn is-primary";
+      actionBtn.style.marginRight = "0.5rem";
+      
+      if (gameKey === "fishing") {
+        actionBtn.textContent = "Play Fishing";
+        actionBtn.addEventListener("click", function() {
+          if (typeof goFishing === "function") {
+            close();
+            goFishing();
+          }
+        });
+        detailActionsEl.appendChild(actionBtn);
+        
+        // Add fishbook button
+        var fishbookBtn = document.createElement("button");
+        fishbookBtn.className = "nes-btn";
+        fishbookBtn.textContent = "View Fishbook";
+        fishbookBtn.addEventListener("click", function() {
+          if (typeof openFishbook === "function") {
+            close();
+            openFishbook();
+          }
+        });
+        detailActionsEl.appendChild(fishbookBtn);
+        
+      } else if (gameKey === "soccer") {
+        actionBtn.textContent = "Play Soccer";
+        actionBtn.addEventListener("click", function() {
+          if (typeof choosePlayers === "function") {
+            close();
+            choosePlayers();
+          }
+        });
+        detailActionsEl.appendChild(actionBtn);
+      }
+    }
+  }
+
+  function hydrateAchievementsTab(rootEl) {
+    // Get achievement data
+    var itemsCollected = 0;
+    var totalItems = 6;
+    var coinsCollected = 0;
+    var totalCoins = 20;
+    var fishCaught = 0;
+    var totalFish = 10;
+    
+    // Count collected items (inventory)
+    if (typeof inventory !== "undefined") {
+      if (inventory.axe) itemsCollected++;
+      if (inventory.wood) itemsCollected++;
+      if (inventory.matchbox) itemsCollected++;
+      if (inventory.minimap) itemsCollected++;
+      if (inventory.resume) itemsCollected++;
+      if (inventory.fishingRod) itemsCollected++;
+      
+      // Count collected coins
+      coinsCollected = inventory.coinCount || 0;
+    }
+    
+    // Count caught fish
+    if (typeof FISHREP !== "undefined") {
+      var fishCollection = FISHREP.getCollection();
+      for (var fishKey in fishCollection) {
+        if (fishCollection[fishKey] === true) {
+          fishCaught++;
+        }
+      }
+    }
+    
+    // Update progress bars and text
+    var itemsProgress = rootEl.querySelector('[data-progress-items]');
+    var itemsText = rootEl.querySelector('[data-progress-text-items]');
+    if (itemsProgress && itemsText) {
+      itemsProgress.value = itemsCollected;
+      itemsText.textContent = itemsCollected + ' / ' + totalItems;
+      
+      // Add success color if complete
+      if (itemsCollected >= totalItems) {
+        itemsProgress.classList.add('is-success');
+      }
+    }
+    
+    var coinsProgress = rootEl.querySelector('[data-progress-coins]');
+    var coinsText = rootEl.querySelector('[data-progress-text-coins]');
+    if (coinsProgress && coinsText) {
+      coinsProgress.value = coinsCollected;
+      coinsText.textContent = coinsCollected + ' / ' + totalCoins;
+      
+      // Add success color if complete
+      if (coinsCollected >= totalCoins) {
+        coinsProgress.classList.add('is-success');
+      }
+    }
+    
+    var fishProgress = rootEl.querySelector('[data-progress-fish]');
+    var fishText = rootEl.querySelector('[data-progress-text-fish]');
+    if (fishProgress && fishText) {
+      fishProgress.value = fishCaught;
+      fishText.textContent = fishCaught + ' / ' + totalFish;
+      
+      // Add success color if complete
+      if (fishCaught >= totalFish) {
+        fishProgress.classList.add('is-success');
+      }
+    }
+    
+    // Move completed achievements to completed section
+    var completedList = rootEl.querySelector('[data-role="completed-list"]');
+    var inProgressList = rootEl.querySelector('[data-role="in-progress-list"]');
+    var completedSection = rootEl.querySelector('[data-role="completed-achievements"]');
+    
+    if (completedList && inProgressList) {
+      // Check each achievement
+      var achievementCards = rootEl.querySelectorAll('.achievement-card');
+      var hasCompleted = false;
+      
+      for (var i = 0; i < achievementCards.length; i++) {
+        var card = achievementCards[i];
+        var achievementKey = card.getAttribute('data-achievement-key');
+        var isComplete = false;
+        
+        if (achievementKey === 'collect-all-items' && itemsCollected >= totalItems) {
+          isComplete = true;
+        } else if (achievementKey === 'collect-all-coins' && coinsCollected >= totalCoins) {
+          isComplete = true;
+        } else if (achievementKey === 'collect-all-fish' && fishCaught >= totalFish) {
+          isComplete = true;
+        }
+        
+        if (isComplete) {
+          hasCompleted = true;
+          card.classList.add('completed');
+          
+          // Remove progress bar and add completed badge
+          var progressEl = card.querySelector('.achievement-progress');
+          if (progressEl) {
+            progressEl.innerHTML = '<div class="achievement-completed-badge">✓ Completed!</div>';
+          }
+          
+          // Move to completed section
+          completedList.appendChild(card);
+        }
+      }
+      
+      // Show/hide completed section based on whether there are completed achievements
+      if (completedSection) {
+        completedSection.style.display = hasCompleted ? 'flex' : 'none';
+      }
     }
   }
 

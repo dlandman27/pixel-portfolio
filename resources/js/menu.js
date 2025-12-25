@@ -31,7 +31,6 @@ $(function () {
   function updateStatusPanel() {
     if (typeof inventory === "undefined") return;
     var items = [
-      { key: "backpack", selector: ".status-item.status-backpack" },
       { key: "minimap", selector: ".status-item.status-minimap" },
       { key: "axe", selector: ".status-item.status-axe" },
       { key: "wood", selector: ".status-item.status-wood" },
