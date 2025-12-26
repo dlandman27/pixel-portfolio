@@ -1,193 +1,229 @@
 <div class="portfolio-container">
-    <a onClick="closePortfolio()"><i class="nes-icon close"></i></a>
+  <a onClick="closePortfolio()"><i class="nes-icon close"></i></a>
+  
+  <div class="portfolio-header">
     <h1>Portfolio</h1>
-    <hr>
-    
-    <h3>Dylan Landman</h2>
-    
-    <div id=" portfolio-container myBtnContainer">
-        <button type="button" class=" nes-btn allButton is-primary" onclick="filterSelection('.all')">Show All</button>
-        <button type="button" class=" nes-btn logoButton" onclick="filterSelection('.logo')">Logos</button>
-        <button type="button" class=" nes-btn graphicButton" onclick="filterSelection('.graphic')">Graphics</button>
-        <button type="button" class=" nes-btn videoButton" onclick="filterSelection('.video')">Videos</button>
+    <h3>Dylan Landman</h3>
+  </div>
+  
+  <!-- Tab Navigation -->
+  <div class="portfolio-tabs" role="tablist">
+    <button class="portfolio-tab active" data-tab="about-me" role="tab">About Me</button>
+    <button class="portfolio-tab" data-tab="my-story" role="tab">My Story</button>
+    <button class="portfolio-tab" data-tab="projects" role="tab">My Projects</button>
+    <button class="portfolio-tab" data-tab="newsletter" role="tab">Newsletter</button>
+    <button class="portfolio-tab" data-tab="contact" role="tab">Contact Me</button>
+  </div>
+  
+  <!-- Tab Content -->
+  <div class="portfolio-content">
+    <!-- About Me Tab -->
+    <div class="portfolio-tab-content active" id="portfolio-tab-about-me" role="tabpanel">
+      <h2>About Me</h2>
+      <p>Dylan Landman</p>
+      <p>Welcome to my digital portfolio! I'm a developer and designer passionate about creating engaging digital experiences.</p>
     </div>
-    <br>
-    <!-- Portfolio Gallery Grid -->
-    <div class="grid-container">
-        <!-- Logos -->
-        <div class="nes-container portfolio-elem with-title is-centered logo">
+    
+    <!-- My Story Tab -->
+    <div class="portfolio-tab-content" id="portfolio-tab-my-story" role="tabpanel">
+      <h2>My Story</h2>
+      <p>My story content goes here...</p>
+    </div>
+    
+    <!-- Projects Tab -->
+    <div class="portfolio-tab-content" id="portfolio-tab-projects" role="tabpanel">
+      <h2>My Projects</h2>
+      <p>Discover my diverse range of projects, showcasing my skills in software development, logo design, web development, and user experience design.</p>
+      
+      <!-- Category Filters -->
+      <div class="portfolio-category-filters">
+        <button class="nes-btn portfolio-filter-btn active" data-category="all" onclick="filterPortfolioProjects('all')">Show All</button>
+        <button class="nes-btn portfolio-filter-btn" data-category="web-development" onclick="filterPortfolioProjects('web-development')">Web Development</button>
+        <button class="nes-btn portfolio-filter-btn" data-category="software-projects" onclick="filterPortfolioProjects('software-projects')">Software Projects</button>
+        <button class="nes-btn portfolio-filter-btn" data-category="ux-design" onclick="filterPortfolioProjects('ux-design')">UX Design</button>
+        <button class="nes-btn portfolio-filter-btn" data-category="logos" onclick="filterPortfolioProjects('logos')">Logos</button>
+      </div>
+      
+      <!-- Projects Grid -->
+      <div class="portfolio-projects-grid" id="portfolio-projects-grid">
+        <!-- Projects will be dynamically loaded from PORTFOLIO_PROJECTS -->
+      </div>
+      
+      <!-- Legacy Portfolio Items (Logos, Graphics, Videos) -->
+      <div class="portfolio-legacy-section">
+        <h3>Logos</h3>
+        <div class="grid-container">
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-senior-experience')">
             <p class="title">Senior Experience</p>
-            <img src="../resources/images/portfolio/logos/senior-experience.png" alt="DL" style="width:100%">
+            <img src="resources/images/portfolio/logos/senior-experience.png" alt="Senior Experience" style="width:100%">
             <p>Logo Design for High School Association</p>
-        </div>
-        <div class="nes-container portfolio-elem with-title is-centered logo">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-metny')">
             <p class="title">METNY USY</p>
-            <img src="../resources/images/portfolio/logos/METNY.jpg" alt="USY logo" style="width:100%">
+            <img src="resources/images/portfolio/logos/METNY.jpg" alt="USY logo" style="width:100%">
             <p>Logo Design for Jewish Youth Organization</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered logo">
-            <p class = "title">NYITCOM</p>
-            <img src="../resources/images/portfolio/logos/NYITCOM.png" alt="516" style="width:100%">
-            <p>Design for Osteopathic Medical Organization</p>  
-        </div>
-        <div class="nes-container portfolio-elem with-title is-centered logo">
-            <p class = "title">Area Code</p>
-            <img src="../resources/images/portfolio/logos/516.jpg" alt="516" style="width:100%">
-            <p>Logo Design</p>  
-        </div>
-          
-        <div class="nes-container portfolio-elem with-title is-centered logo">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-nyitcom')">
+            <p class="title">NYITCOM</p>
+            <img src="resources/images/portfolio/logos/NYITCOM.png" alt="NYITCOM" style="width:100%">
+            <p>Design for Osteopathic Medical Organization</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-area-code')">
+            <p class="title">Area Code</p>
+            <img src="resources/images/portfolio/logos/516.jpg" alt="Area Code" style="width:100%">
+            <p>Logo Design</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-dylan')">
             <p class="title">Dylan Landman</p>
-            <img src="../resources/images/portfolio/logos/dl-logo.png" alt="DL" style="width:100%">
+            <img src="resources/images/portfolio/logos/dl-logo.png" alt="DL" style="width:100%">
             <p>Logo Design</p>
-        </div>
-        
-        <div class="nes-container portfolio-elem with-title is-centered logo">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-love-hands')">
             <p class="title">Love Hands</p>
-            <img src="../resources/images/portfolio/logos/hand-holding.png" alt="Love Hands" style="width:100%">
+            <img src="resources/images/portfolio/logos/hand-holding.png" alt="Love Hands" style="width:100%">
             <p>Logo Design</p>
-        </div>
-        
-        <div class="nes-container portfolio-elem with-title is-centered logo">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-tee-time')">
             <p class="title">Tee Time</p>
-            <img src="../resources/images/portfolio/logos/tee-time.jpg" alt="Love Hands" style="width:100%">
+            <img src="resources/images/portfolio/logos/tee-time.jpg" alt="Tee Time" style="width:100%">
             <p>Logo Design</p>
-        </div>
-        
-        <div class="nes-container portfolio-elem with-title is-centered logo">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered logo" onclick="openProjectLightbox('logo-thespian')">
             <p class="title">Thespain Honor Society</p>
-            <img src="../resources/images/portfolio/logos/thespian.png" alt="USY logo" style="width:100%">
+            <img src="resources/images/portfolio/logos/thespian.png" alt="Thespian" style="width:100%">
             <p>Design for High School Honor Society</p>
-        </div>
-
-         <!-- Graphics -->
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
-            <p class="title">M&M Social Media</p>
-            <img src="../resources/images/portfolio/graphics/abstract copy.jpg" alt="Love Hands" style="width:100%">
-            <p>Instagram Graphic</p>
+          </div>
         </div>
         
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
+        <h3>Graphics</h3>
+        <div class="grid-container">
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
+            <p class="title">M&M Social Media</p>
+            <img src="resources/images/portfolio/graphics/abstract copy.jpg" alt="Abstract" style="width:100%">
+            <p>Instagram Graphic</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
             <p class="title">Canon Collision</p>
-            <img src="../resources/images/portfolio/graphics/gears copy.jpg" alt="USY logo" style="width:100%">
+            <img src="resources/images/portfolio/graphics/gears copy.jpg" alt="Gears" style="width:100%">
             <p>Instagram Graphic</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
             <p class="title">Schmidts Market</p>
-            <img src="../resources/images/portfolio/graphics/halloween.jpg" alt="Love Hands" style="width:100%">
+            <img src="resources/images/portfolio/graphics/halloween.jpg" alt="Halloween" style="width:100%">
             <p>Halloween Instagram Graphic</p>
-        </div>
-        
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
             <p class="title">M&M Social Media</p>
-            <img src="../resources/images/portfolio/graphics/let-your-business-shine copy.jpg" alt="USY logo" style="width:100%">
+            <img src="resources/images/portfolio/graphics/let-your-business-shine copy.jpg" alt="Business Shine" style="width:100%">
             <p>Instagram Graphic</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
             <p class="title">Alternative Approach</p>
-            <img src="../resources/images/portfolio/graphics/now-open copy.jpg" alt="Love Hands" style="width:100%">
+            <img src="resources/images/portfolio/graphics/now-open copy.jpg" alt="Now Open" style="width:100%">
             <p>Opening Company Instagram Graphic</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
+            <p class="title">M&M Social Media</p>
+            <img src="resources/images/portfolio/graphics/march-madness.jpg" alt="March Madness" style="width:100%">
+            <p>March Madness Graphic</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
+            <p class="title">Maximum Security</p>
+            <img src="resources/images/portfolio/graphics/our-services copy.jpg" alt="Our Services" style="width:100%">
+            <p>Instagram Graphic</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
+            <p class="title">M&M Social Media</p>
+            <img src="resources/images/portfolio/graphics/responsive copy.jpg" alt="Responsive" style="width:100%">
+            <p>Instagram Graphic</p>
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered graphic">
+            <p class="title">Highland Care Center</p>
+            <img src="resources/images/portfolio/graphics/spider-web copy.jpg" alt="Spider Web" style="width:100%">
+            <p>Halloween Instagram Graphic</p>
+          </div>
         </div>
         
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
-            <p class="title">M&M Social Media</p>
-            <img src="../resources/images/portfolio/graphics/march-madness.jpg" alt="USY logo" style="width:100%">
-            <p>March Madness Graphic</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
-            <p class="title">Maximum Security</p>
-            <img src="../resources/images/portfolio/graphics/our-services copy.jpg" alt="USY logo" style="width:100%">
-            <p>Instagram Graphic</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
-            <p class="title">M&M Social Media</p>
-            <img src="../resources/images/portfolio/graphics/responsive copy.jpg" alt="USY logo" style="width:100%">
-            <p>Instagram Graphic</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered graphic">
-            <p class="title">Highland Care Center</p>
-            <img src="../resources/images/portfolio/graphics/spider-web copy.jpg" alt="USY logo" style="width:100%">
-            <p>Halloween Instagram Graphic</p>
-        </div>
-
-        <!-- Videos -->
-        <div class="nes-container portfolio-elem with-title is-centered video">
+        <h3>Videos</h3>
+        <div class="grid-container">
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">SOMA Osteopathic</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/SOMA.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/SOMA.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
-            
             <p>Marketing Competition Winner</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">Freedom Boat Club</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/freedom-boat-club.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/freedom-boat-club.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>Facebook Run Advertisement</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">Cannon Collision</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/canon-collision.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/canon-collision.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>Facebook Run Advertisement</p>
-        </div>
-        
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">L.I Script</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/li-script.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/li-script.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>Facebook Run Advertisement</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">Maximum Security</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/maximum-security.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/maximum-security.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>Used for Company Facebook Cover Banner</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">Schmidts Market</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/schmidts.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/schmidts.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>Facebook Run Advertisement</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">M&M Social Media</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/SEO.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/SEO.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>SEO Services Explaining Video</p>
-        </div>
-
-        <div class="nes-container portfolio-elem with-title is-centered video">
+          </div>
+          <div class="nes-container portfolio-elem with-title is-centered video">
             <p class="title">M&M Social Media</p>
             <video controls width="100%">
-                <source src="../resources/images/portfolio/videos/social-media.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+              <source src="resources/images/portfolio/videos/social-media.mp4" type="video/mp4">
+              Your browser does not support the video tag.
             </video>
             <p>Social Media Services Explaining Video</p>
+          </div>
         </div>
+      </div>
     </div>
+    
+    <!-- Newsletter Tab -->
+    <div class="portfolio-tab-content" id="portfolio-tab-newsletter" role="tabpanel">
+      <h2>Newsletter</h2>
+      <p>Newsletter signup form goes here...</p>
+    </div>
+    
+    <!-- Contact Tab -->
+    <div class="portfolio-tab-content" id="portfolio-tab-contact" role="tabpanel">
+      <h2>Contact Me</h2>
+      <p>Contact form goes here...</p>
+    </div>
+  </div>
 </div>

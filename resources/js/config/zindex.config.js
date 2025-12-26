@@ -205,6 +205,26 @@ var ZINDEX_RULES = {
       selector: ".fishing-frenzy-sign",
       whenAbove: { top: { max: 1474 }, zIndex: 51 },
       whenBelow: { top: { min: 1474 }, zIndex: 48 }
+    },
+    
+    // Portfolio Gallery - Rose Garden Layout
+    {
+      selector: ".portfolio-garden-square",
+      whenAbove: { top: { max: 750 }, zIndex: 100 },
+      whenBelow: { top: { min: 750, max: 850 }, zIndex: 100 },
+      default: { zIndex: 3 }
+    },
+    {
+      selector: ".portfolio-yellow-flower",
+      whenAbove: { top: { max: 750 }, zIndex: 100 },
+      whenBelow: { top: { min: 750, max: 850 }, zIndex: 100 },
+      default: { zIndex: 5 }
+    },
+    {
+      selector: ".portfolio-rose-bush",
+      whenAbove: { top: { max: 780 }, zIndex: 100 },
+      whenBelow: { top: { min: 780, max: 880 }, zIndex: 100 },
+      default: { zIndex: 5 }
     }
   ],
   

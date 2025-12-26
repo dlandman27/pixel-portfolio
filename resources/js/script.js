@@ -189,6 +189,15 @@ function startGame() {
     }
   }
 
+  // Add click handlers for portfolio project stands
+  setupPortfolioStandHandlers();
+  
+  // Initialize portfolio gallery with project previews and position shrubs
+  // Use setTimeout to ensure DOM is fully rendered
+  setTimeout(function() {
+    initializePortfolioGallery();
+  }, 100);
+
   // Disable original walk-out entrance animation; start with movement enabled
   eventOccurence = false;
   $("#dylan").css("visibility", "visible");
@@ -2067,6 +2076,10 @@ function openPortfolio(){
     eventOccurence = true;
     $(".minimap-icon").css("display","none");
     $(".mobile-controller").css("display","none");
+    
+    // Initialize portfolio tabs and load projects
+    initPortfolioTabs();
+    loadPortfolioProjects();
 }
 
 function openPortfolioWithLogoFilter(){
@@ -2089,6 +2102,272 @@ function closePortfolio(){
     $(".mobile-controller").css("display","flex");
 }
 
+// Portfolio tab management
+function initPortfolioTabs() {
+  $(".portfolio-tab").on("click", function() {
+    var tabName = $(this).data("tab");
+    switchPortfolioTab(tabName);
+  });
+}
+
+function switchPortfolioTab(tabName) {
+  // Remove active class from all tabs and content
+  $(".portfolio-tab").removeClass("active");
+  $(".portfolio-tab-content").removeClass("active");
+  
+  // Add active class to selected tab and content
+  $(".portfolio-tab[data-tab='" + tabName + "']").addClass("active");
+  $("#portfolio-tab-" + tabName).addClass("active");
+}
+
+// Load portfolio projects from config
+function loadPortfolioProjects() {
+  if (typeof PORTFOLIO_PROJECTS === "undefined") {
+    console.error("PORTFOLIO_PROJECTS not defined");
+    return;
+  }
+  
+  var $grid = $("#portfolio-projects-grid");
+  if (!$grid.length) return;
+  
+  $grid.empty();
+  
+  PORTFOLIO_PROJECTS.forEach(function(project) {
+    var $project = $('<div class="portfolio-project-card nes-container with-title is-centered" data-category="' + project.category + '" onclick="openProjectLightbox(\'' + project.id + '\')">');
+    $project.append('<p class="title">' + (project.title || "") + '</p>');
+    if (project.image) {
+      $project.append('<img src="' + project.image + '" alt="' + (project.title || "") + '" style="width:100%; max-height:200px; object-fit:contain;">');
+    }
+    $project.append('<p>' + (project.description || "").substring(0, 100) + '...</p>');
+    $grid.append($project);
+  });
+}
+
+// Filter portfolio projects by category
+function filterPortfolioProjects(category) {
+  // Update filter buttons
+  $(".portfolio-filter-btn").removeClass("active");
+  $(".portfolio-filter-btn[data-category='" + category + "']").addClass("active");
+  
+  // Filter project cards
+  if (category === "all") {
+    $(".portfolio-project-card").show();
+  } else {
+    $(".portfolio-project-card").hide();
+    $(".portfolio-project-card[data-category='" + category + "']").show();
+  }
+}
+
+// Initialize portfolio gallery with project previews and labels
+function initializePortfolioGallery() {
+  if (typeof PORTFOLIO_PROJECTS === "undefined" || typeof PORTFOLIO_SQUARE_MAP === "undefined") {
+    return;
+  }
+  
+  // Track which squares are occupied by spans
+  var occupiedSquares = {};
+  
+  // Populate squares based on mapping
+  Object.keys(PORTFOLIO_SQUARE_MAP).forEach(function(squareId) {
+    var mapping = PORTFOLIO_SQUARE_MAP[squareId];
+    var $square = $('.portfolio-garden-square[data-square-id="' + squareId + '"]');
+    
+    if (!$square.length) return;
+    
+    // Skip if this square is already occupied by a span
+    if (occupiedSquares[squareId]) {
+      $square.hide(); // Hide the square that's part of a span
+      return;
+    }
+    
+    // Handle 2-column spans
+    if (mapping.span === 2) {
+      var parts = squareId.split('-');
+      var row = parseInt(parts[0]);
+      var col = parseInt(parts[1]);
+      // Mark the next square as occupied too
+      var nextSquareId = row + '-' + (col + 1);
+      occupiedSquares[nextSquareId] = true;
+      
+      // Hide the yellow flower between the two squares
+      var $row = $square.closest('.portfolio-garden-row');
+      var $rowChildren = $row.children();
+      var flowerIndex = $rowChildren.index($square) + 1;
+      if ($rowChildren.eq(flowerIndex).hasClass('portfolio-yellow-flower')) {
+        $rowChildren.eq(flowerIndex).hide();
+      }
+    }
+    
+    // Handle 2-row spans (vertical)
+    if (mapping.spanRows === 2) {
+      var parts = squareId.split('-');
+      var row = parseInt(parts[0]);
+      var col = parseInt(parts[1]);
+      // Mark the square below as occupied
+      var belowSquareId = (row + 1) + '-' + col;
+      occupiedSquares[belowSquareId] = true;
+      
+      // Hide the rose bush divider between the rows
+      var $gallery = $square.closest('.portfolio-gallery');
+      var $roseRow = $gallery.find('.portfolio-rose-row.row-divider-' + row);
+      if ($roseRow.length) {
+        $roseRow.hide();
+      }
+      
+      // Position absolutely to cover both rows
+      var $row = $square.closest('.portfolio-garden-row');
+      var rowTop = $row.position().top;
+      $square.css({
+        'position': 'absolute',
+        'top': rowTop + 'px',
+        'left': $square.position().left + 'px'
+      });
+    }
+    
+    // Apply span classes if needed
+    if (mapping.span === 2) {
+      $square.addClass('span-2');
+    }
+    if (mapping.spanRows === 2) {
+      $square.addClass('span-2-rows');
+    }
+    
+    // If there's a project assigned to this square
+    if (mapping.projectId) {
+      var project = getProjectById(mapping.projectId);
+      if (project) {
+        // Add preview image, video, or placeholder text
+        if (project.image) {
+          var $preview = $('<div class="project-preview"></div>');
+          // Ensure proper URL encoding for paths with spaces
+          var imageUrl = project.image.replace(/ /g, '%20');
+          $preview.css({
+            'background-image': 'url(' + imageUrl + ')'
+          });
+          $square.append($preview);
+        } else if (project.video) {
+          // Add video element for video projects
+          var $video = $('<video class="project-video" muted loop playsinline></video>');
+          var videoUrl = project.video.replace(/ /g, '%20');
+          $video.attr('src', videoUrl);
+          $video.css({
+            'width': '100%',
+            'height': '100%',
+            'object-fit': 'cover'
+          });
+          $square.append($video);
+          // Auto-play video on hover
+          $square.hover(
+            function() { $video[0].play(); },
+            function() { $video[0].pause(); }
+          );
+        } else if (project.placeholder) {
+          // Use placeholder text instead of image
+          var $placeholder = $('<div class="project-placeholder"></div>');
+          $placeholder.text(project.placeholder);
+          
+          // Special handling for Colorle - random color background
+          if (project.placeholderColor) {
+            var randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            $placeholder.css('background-color', randomColor);
+            // Calculate contrast color (white or black text based on brightness)
+            var r = parseInt(randomColor.substr(1, 2), 16);
+            var g = parseInt(randomColor.substr(3, 2), 16);
+            var b = parseInt(randomColor.substr(5, 2), 16);
+            var brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            var textColor = brightness > 128 ? '#000000' : '#ffffff';
+            $placeholder.css('color', textColor);
+            $placeholder.css('text-shadow', brightness > 128 ? 'none' : '2px 2px 0px rgba(0, 0, 0, 0.8)');
+          }
+          
+          // Special handling for Fractal - fractal pattern background
+          if (project.placeholderFractal) {
+            $placeholder.addClass('fractal-pattern');
+          }
+          
+          $square.append($placeholder);
+        }
+        
+        // Add project badge with type icon and color
+        var $badge = $('<div class="project-badge type-' + project.type + '"></div>');
+        
+        // FontAwesome icons for each type
+        var typeIcons = {
+          'mobile-app': 'fa-mobile-alt',
+          'website': 'fa-globe',
+          'logo': 'fa-palette',
+          'graphic': 'fa-image',
+          'research-paper': 'fa-file-alt'
+        };
+        
+        var iconClass = typeIcons[project.type] || 'fa-tag';
+        var $icon = $('<i class="fas ' + iconClass + ' project-badge-icon"></i>');
+        $badge.append($icon);
+        
+        $square.append($badge);
+        
+        // Add click handler (using .click() for older jQuery compatibility)
+        $square.click(function() {
+          openProjectLightbox(project.id);
+        });
+        
+        // Add data attribute for styling
+        $square.attr('data-project-id', project.id);
+      }
+    } else {
+      // Empty square - make it less prominent
+      $square.css('opacity', '0.5');
+    }
+  });
+}
+
+// Setup click handlers for portfolio project displays
+function setupPortfolioStandHandlers() {
+  // Use event delegation for portfolio project displays (both old and new class names)
+  document.addEventListener('click', function(e) {
+    var target = e.target;
+    var displayElement = null;
+    
+    // Check if clicked element or its parent is a portfolio project display
+    while (target && target !== document.body) {
+      if (target.classList && (
+          target.classList.contains('portfolio-project-display') || 
+          target.classList.contains('portfolio-project-stand') ||
+          target.classList.contains('portfolio-project-frame')
+        )) {
+        // Find the parent display element if we clicked on a child
+        var parent = target;
+        while (parent && parent !== document.body) {
+          if (parent.classList && parent.classList.contains('portfolio-project-display')) {
+            displayElement = parent;
+            break;
+          }
+          if (parent.classList && parent.classList.contains('portfolio-project-stand')) {
+            displayElement = parent;
+            break;
+          }
+          parent = parent.parentElement;
+        }
+        if (!displayElement && target.classList.contains('portfolio-project-display')) {
+          displayElement = target;
+        }
+        if (!displayElement && target.classList.contains('portfolio-project-stand')) {
+          displayElement = target;
+        }
+        break;
+      }
+      target = target.parentElement;
+    }
+    
+    if (displayElement) {
+      var projectId = displayElement.getAttribute("data-project-id");
+      if (projectId && typeof openProjectLightbox === "function") {
+        openProjectLightbox(projectId);
+      }
+    }
+  });
+}
+
 function openPaintingLightbox(){
   $(".painting-lightbox").css("display","flex");
   eventOccurence = true;
@@ -2104,6 +2383,110 @@ function closePaintingLightbox(){
     $(".minimap-icon").css("display","block");
   if(window.innerWidth <= 600)
     $(".mobile-controller").css("display","flex");
+}
+
+function openProjectLightbox(projectId){
+  if (typeof PORTFOLIO_PROJECTS === "undefined" || typeof getProjectById === "undefined") {
+    console.error("Portfolio config not loaded");
+    return;
+  }
+  
+  var project = getProjectById(projectId);
+  if (!project) {
+    console.error("Project not found:", projectId);
+    return;
+  }
+  
+  var $lightbox = $(".project-lightbox");
+  if (!$lightbox.length) {
+    console.error("Project lightbox element not found");
+    return;
+  }
+  
+  // Set project image or video
+  var $img = $("#project-lightbox-image");
+  var $video = $("#project-lightbox-video");
+  
+  if (project.video) {
+    // Show video instead of image
+    $img.hide();
+    if (!$video.length) {
+      // Create video element if it doesn't exist
+      $video = $('<video id="project-lightbox-video" class="project-lightbox-video" controls autoplay></video>');
+      $img.after($video);
+    }
+    var videoUrl = project.video.replace(/ /g, '%20');
+    $video.attr("src", videoUrl);
+    $video.show();
+  } else if (project.image) {
+    // Show image
+    $video.hide();
+    // Ensure proper URL encoding for paths with spaces
+    var imageUrl = project.image.replace(/ /g, '%20');
+    $img.attr("src", imageUrl);
+    $img.show();
+  } else {
+    $img.hide();
+    $video.hide();
+  }
+  
+  // Set project title
+  $("#project-lightbox-title").text(project.title || "");
+  
+  // Set category
+  var categoryNames = {
+    "web-development": "Web Development",
+    "software-projects": "Software Projects",
+    "ux-design": "UX Design",
+    "logos": "Logos"
+  };
+  $("#project-lightbox-category").text(categoryNames[project.category] || project.category || "");
+  
+  // Set description
+  $("#project-lightbox-description").text(project.description || "");
+  
+  // Set meta information
+  var $meta = $("#project-lightbox-meta");
+  $meta.empty();
+  if (project.type) {
+    var typeNames = {
+      "website": "Website",
+      "mobile-app": "Mobile App",
+      "research-paper": "Research Paper"
+    };
+    $meta.append('<div class="project-type">' + (typeNames[project.type] || project.type) + '</div>');
+  }
+  if (project.published) {
+    $meta.append('<div class="project-published">Published</div>');
+  }
+  if (project.awards && project.awards.length > 0) {
+    project.awards.forEach(function(award) {
+      $meta.append('<div class="project-award">🏆 ' + award + '</div>');
+    });
+  }
+  
+  // Set links
+  var $links = $("#project-lightbox-links");
+  $links.empty();
+  if (project.link) {
+    $links.append('<a href="' + project.link + '" target="_blank" class="nes-btn is-primary">Visit Project</a>');
+  }
+  
+  // Show lightbox
+  $lightbox.css("display", "flex");
+  eventOccurence = true;
+  $(".minimap-icon").css("display", "none");
+  if(window.innerWidth <= 600)
+    $(".mobile-controller").css("display", "none");
+}
+
+function closeProjectLightbox(){
+  $(".project-lightbox").css("display", "none");
+  eventOccurence = false;
+  if(inventory.minimap)
+    $(".minimap-icon").css("display", "block");
+  if(window.innerWidth <= 600)
+    $(".mobile-controller").css("display", "flex");
 }
 
 function turnOffTV(){

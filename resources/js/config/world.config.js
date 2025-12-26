@@ -20,8 +20,9 @@ var WORLD_COLLIDERS = {
       { x: 926, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
       { x: 1036, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
       
-      // Games section (top right) - block access
-      { x: 1440, y: 358, width: 400, height: 416, tag: "gamesSectionBlock" },
+      // Games section (top right) - block access (reduced to allow gallery access at y:708+)
+      // Gallery starts at y:708, so games block ends at y:700 to leave clear path
+      { x: 1440, y: 358, width: 400, height: 342, tag: "gamesSectionBlock" },
       
       // Block stairs with WIP barrier
       // { x: 752, y: 866, width: 38, height: 66, tag: "stairsBlocked" },
