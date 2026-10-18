@@ -1080,9 +1080,11 @@ function moveWood() {
 function openResume(){
   $("#resume").css("display","block")
 }
-// Test mode: set to 'dawn', 'day', 'dusk', or 'night' to force a time state
-// Set to null to use real-world time
-var DAY_CYCLE_TEST_MODE = 'day'; // Change this to test different times: 'dawn', 'day', 'dusk', 'night', or null
+// The park follows the visitor's local time. Force a state with ?time=dawn|day|dusk|night
+var DAY_CYCLE_TEST_MODE = (function () {
+  var match = /[?&]time=(dawn|day|dusk|night)\b/.exec(window.location.search);
+  return match ? match[1] : null;
+})();
 
 function dayCycle() {
   var timeState = '';
@@ -1132,12 +1134,13 @@ function dayCycle() {
       overlayOpacity = 0;
       break;
     case 'dusk':
-      brightness = 0.7;
-      overlayOpacity = 0.3;
+      brightness = 0.8;
+      overlayOpacity = 0.25;
       break;
     case 'night':
-      brightness = 0.35;
-      overlayOpacity = 0.7;
+      // Kept readable: a lantern glow around Dylan (ambient-life.js) does the mood work.
+      brightness = 0.6;
+      overlayOpacity = 0.5;
       break;
   }
   

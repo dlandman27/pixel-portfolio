@@ -40,6 +40,7 @@
   var recentering = false;
   var $recenterBtn = null;
   var $shadow = null;
+  var edgeHints = null; // { top, right, bottom, left } elements shown while edge-scrolling
   var panVelocity = null; // { x, y } px per frame while gliding after release
   var grabState = null; // { x, y, vx, angle, targetX, targetY } sprite box in world units
 
@@ -155,11 +156,33 @@
     grabState.vx = nx - grabState.x;
     grabState.x = nx;
     grabState.y = ny;
+    var vy = ny - (grabState.lastY === undefined ? ny : grabState.lastY);
+    grabState.lastY = ny;
+    kickLegs(grabState.vx, vy);
     var swing = Math.max(-GRAB_MAX_SWING_DEG, Math.min(GRAB_MAX_SWING_DEG, -grabState.vx * GRAB_SWING_PER_PX));
     grabState.angle += (swing - grabState.angle) * 0.25;
     gw._grabOverride = { left: grabState.x, top: grabState.y };
     var el = document.getElementById("dylan");
     if (el) el.style.rotate = grabState.angle.toFixed(2) + "deg";
+  }
+
+  // While carried fast, Dylan "runs" in the air toward where he's being taken.
+  function kickLegs(vx, vy) {
+    if (typeof SpriteManager === "undefined") return;
+    var speed = Math.abs(vx) + Math.abs(vy);
+    var dir = "front";
+    var frame = 2;
+    if (speed > 0.8) {
+      if (Math.abs(vx) > Math.abs(vy)) dir = vx > 0 ? "right" : "left";
+      else dir = vy > 0 ? "front" : "back";
+      grabState.legClock = (grabState.legClock || 0) + speed;
+      frame = 1 + (Math.floor(grabState.legClock / 6) % 7);
+    }
+    var key = dir + frame;
+    if (key !== grabState.legKey) {
+      grabState.legKey = key;
+      SpriteManager.setSpriteFrame(dir, frame);
+    }
   }
 
   function moveGrab(e) {
@@ -177,10 +200,31 @@
   function edgeScrollWhileGrabbing() {
     var dx = edgeSpeed(pointer.lastX, window.innerWidth);
     var dy = edgeSpeed(pointer.lastY, window.innerHeight);
+    showEdgeHints(dx, dy);
     if (!dx && !dy) return;
     applyPanDelta(dx, dy);
     // The world moved under a still pointer, so re-aim Dylan and his shadow.
     updateGrabTarget({ clientX: pointer.lastX, clientY: pointer.lastY });
+  }
+
+  // Pixel chevrons at the edges being scrolled toward; stronger and faster near the edge.
+  function showEdgeHints(dx, dy) {
+    if (!edgeHints) return;
+    setHint(edgeHints.left, dx > 0 ? dx : 0);
+    setHint(edgeHints.right, dx < 0 ? -dx : 0);
+    setHint(edgeHints.top, dy > 0 ? dy : 0);
+    setHint(edgeHints.bottom, dy < 0 ? -dy : 0);
+    // Slide each hint along its edge to sit next to the pointer.
+    var y = Math.max(80, Math.min(window.innerHeight - 80, pointer ? pointer.lastY : 0));
+    var x = Math.max(80, Math.min(window.innerWidth - 80, pointer ? pointer.lastX : 0));
+    edgeHints.left.style.top = edgeHints.right.style.top = y + "px";
+    edgeHints.top.style.left = edgeHints.bottom.style.left = x + "px";
+  }
+
+  function setHint(el, speed) {
+    var strength = speed / EDGE_SCROLL_MAX_SPEED;
+    el.style.opacity = strength > 0 ? (0.35 + strength * 0.65).toFixed(2) : "0";
+    el.style.setProperty("--edge-speed", (0.9 - strength * 0.6).toFixed(2) + "s");
   }
 
   function updateGrabTarget(e) {
@@ -200,6 +244,7 @@
 
   function endGrab(e) {
     var gw = world();
+    showEdgeHints(0, 0);
     grabState = null;
     document.getElementById("dylan").style.rotate = "";
     var target = dropTargetFor(e.clientX, e.clientY);
@@ -418,6 +463,15 @@
       recentering = true;
     });
     $("body").append($recenterBtn);
+
+    edgeHints = {};
+    ["top", "right", "bottom", "left"].forEach(function (side) {
+      var el = document.createElement("div");
+      el.className = "edge-scroll-hint edge-" + side;
+      el.setAttribute("aria-hidden", "true");
+      document.body.appendChild(el);
+      edgeHints[side] = el;
+    });
 
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("pointermove", onPointerMove, { passive: false });

@@ -769,16 +769,20 @@
         
         // Special handling for tent: center horizontally, follow vertically (no clamping)
         if (this.sceneName === "tent1") {
-          var newMarginLeft = (window.innerWidth - mapWidthPx) / 2;
-          
-          // Follow player vertically with camera offset (no clamping in tent)
+          var newMarginLeft = (window.innerWidth - mapWidthPx) / 2 + this._cameraOffset.x;
+
+          // Follow player vertically with camera offset
           var viewportCenterY = window.innerHeight / 2;
           var camY = pos.y;
           var newMarginTop = viewportCenterY - camY * EFFECTIVE_MAP_SCALE + this._cameraOffset.y;
           newMarginTop = Math.round(newMarginTop);
-          
-          // No clamping in tent - allow free camera movement
-          
+
+          // Panning (world-drag.js) may slide the room around, but keep at least
+          // half of it on screen.
+          var tentHeightPx = 188 * EFFECTIVE_MAP_SCALE;
+          newMarginLeft = Math.max(-mapWidthPx / 2, Math.min(window.innerWidth - mapWidthPx / 2, newMarginLeft));
+          newMarginTop = Math.max(-tentHeightPx / 2, Math.min(window.innerHeight - tentHeightPx / 2, newMarginTop));
+
           $parent.css({
             "margin-left": Math.round(newMarginLeft) + "px",
             "margin-top": newMarginTop + "px"
