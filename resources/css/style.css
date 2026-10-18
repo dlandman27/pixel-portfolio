@@ -35,6 +35,33 @@ body {
   gap: 0.9rem;
 }
 
+/* Pixel portrait above the name: hops in first, then the letters follow */
+.loader-avatar {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  margin-bottom: 0.35rem;
+  opacity: 0;
+  animation: avatarHop 0.5s ease-out forwards;
+}
+
+@keyframes avatarHop {
+  0% { opacity: 0; transform: translateY(12px) scale(0.85); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.loading-screen.is-leaving .loader-avatar {
+  opacity: 1;
+  animation: avatarLeave 0.38s ease-in forwards;
+}
+
+@keyframes avatarLeave {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-10%) rotate(-4deg); }
+  100% { transform: translateY(260%) rotate(-14deg); opacity: 0; }
+}
+
 /* DYLAN LANDMAN on one small line; letters fall in one by one (--i per letter) */
 .loader-name {
   display: flex;
@@ -60,7 +87,7 @@ body {
   opacity: 0;
   transform: translateY(-150%);
   animation: letterFall 0.45s ease-out forwards;
-  animation-delay: calc(var(--i) * 0.04s);
+  animation-delay: calc(0.15s + var(--i) * 0.04s);
 }
 
 @keyframes letterFall {
