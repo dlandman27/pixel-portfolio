@@ -4082,11 +4082,17 @@ body {
   height: 60px;
 }
 
-.mobile-btn-left {
+/* The pixel font only has bold up/down arrows, so turn the arrow itself
+   (not the whole button, which would also turn its shading). */
+.mobile-arrow {
+  display: inline-block;
+}
+
+.mobile-arrow.is-left {
   transform: rotate(-90deg);
 }
 
-.mobile-btn-right {
+.mobile-arrow.is-right {
   transform: rotate(90deg);
 }
 
