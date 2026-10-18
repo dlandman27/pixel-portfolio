@@ -253,7 +253,7 @@
       d.className = "v3d-part v3d-depth";
       d.style.setProperty("--v3d-depth-z", -(i * step) + "px");
       copyBackground(el, d, cs, box.offsetY, tileH);
-      if (cs.transform && cs.transform !== "none") d.style.setProperty("--v3d-base", cs.transform);
+      if (currentBase) d.style.setProperty("--v3d-base", currentBase);
       el.parentNode.insertBefore(d, el);
       registerOccluder(d, box);
     }
@@ -271,6 +271,10 @@
   }
 
   var currentSource = "";
+  // The element's own transform before we stand it up. getComputedStyle is
+  // live, so reading it afterwards would return the stand-up rotation too and
+  // the copies would get rotated twice (that mirrored the tent).
+  var currentBase = "";
   function placed(div, box) {
     if (currentSource) div.dataset.v3dSrc = currentSource; // which element a piece came from
     div.style.left = box.left + "px";
@@ -287,7 +291,7 @@
     c.className = "v3d-part v3d-upright";
     c.style.zIndex = cs.zIndex;
     copyBackground(el, c, cs, box.offsetY, tileH);
-    if (cs.transform && cs.transform !== "none") c.style.setProperty("--v3d-base", cs.transform);
+    if (currentBase) c.style.setProperty("--v3d-base", currentBase);
     el.parentNode.insertBefore(c, el);
     registerOccluder(c, box);
   }
@@ -351,7 +355,7 @@
     });
     wall.className = "v3d-part v3d-cliff";
     wall.style.setProperty("--v3d-lift", lift + "px");
-    if (cs.transform && cs.transform !== "none") wall.style.setProperty("--v3d-base", cs.transform);
+    if (currentBase) wall.style.setProperty("--v3d-base", currentBase);
     copyBackground(el, wall, cs, 0, tileH);
     el.parentNode.insertBefore(wall, el);
     el.classList.add("v3d-sliced");
@@ -360,15 +364,20 @@
   function setupUpright(el) {
     currentSource = (el.id ? "#" + el.id : "") + "." + Array.prototype.join.call(el.classList, ".");
     var cs = getComputedStyle(el);
+    currentBase = cs.transform && cs.transform !== "none" ? cs.transform : "";
+    var myBase = currentBase;
+    var mySource = currentSource;
+    // Pieces built after the async tile lookup must use this element's values.
+    function mine() { currentBase = myBase; currentSource = mySource; }
     if (!el.offsetWidth || !el.offsetHeight || cs.display === "none") return Promise.resolve();
     var cliff = cliffPartFor(el);
     if (cliff) {
-      return tileHeight(el, cs).then(function (th) { cliffPart(el, cs, cliff, th); });
+      return tileHeight(el, cs).then(function (th) { mine(); cliffPart(el, cs, cliff, th); });
     }
     var front = frontShareFor(el);
     // Small interactive things stay as themselves (a single standing card).
     if (el.matches(NEVER_SPLIT) && front === null) {
-      if (cs.transform && cs.transform !== "none") el.style.setProperty("--v3d-base", cs.transform);
+      if (currentBase) el.style.setProperty("--v3d-base", currentBase);
       el.classList.add("v3d-upright");
       var whole = { left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight, offsetY: 0 };
       if (el.id !== "dylan") {
@@ -379,6 +388,7 @@
       return Promise.resolve();
     }
     return tileHeight(el, cs).then(function (th) {
+      mine();
       rowsFor(el, th, cs).forEach(function (row) {
         if (front !== null) boxParts(el, cs, row, front, th);
         else card(el, cs, row, th);
