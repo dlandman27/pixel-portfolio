@@ -7451,9 +7451,10 @@ body.night #day-night-overlay {
 /* ===== Right-side button rail ===== */
 #game-menu.side-rail {
   flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
   top: 12px;
-  right: 12px;
+  right: 0; /* tiles sit flush against the screen edge */
 }
 
 .rail-btn {
@@ -7474,18 +7475,18 @@ body.night #day-night-overlay {
     inset 0 0 0 5px rgba(254, 243, 199, 0.75),
     0 4px 0 rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(2px);
-  transition: transform 0.12s ease-out, background 0.12s ease-out;
+  transition: width 0.12s ease-out, transform 0.12s ease-out, background 0.12s ease-out;
 }
 
 .rail-btn:hover,
 .rail-btn:focus-visible {
   background: rgba(62, 40, 70, 0.92);
-  transform: translateX(-3px);
+  width: 58px; /* grows out of the edge */
   outline: none;
 }
 
 .rail-btn:active {
-  transform: translateX(-3px) translateY(2px);
+  transform: translateY(2px);
   box-shadow:
     inset 0 0 0 4px rgba(31, 22, 38, 0.82),
     inset 0 0 0 5px rgba(254, 243, 199, 0.75),
@@ -7543,7 +7544,6 @@ body.is-grabbing .recenter-btn {
   #game-menu.side-rail {
     gap: 8px;
     top: 8px;
-    right: 8px;
   }
   .rail-btn {
     width: 44px;
