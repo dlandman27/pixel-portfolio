@@ -7244,3 +7244,255 @@ body.night #day-night-overlay {
     animation: none !important;
   }
 }
+
+/* ===== Wardrobe: hats on Dylan (skins.js) ===== */
+/* Head positions measured from the 32px-wide sprites, per facing direction. */
+.dylan-hat {
+  --hat-x: 14.5px;
+  --hat-y: 10px;
+  position: absolute;
+  left: var(--hat-x);
+  top: var(--hat-y);
+  transform: translate(-50%, -100%);
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#dylan[data-facing="back"] .dylan-hat { --hat-x: 15px; --hat-y: 12px; }
+#dylan[data-facing="left"] .dylan-hat { --hat-x: 18.5px; --hat-y: 12px; }
+#dylan[data-facing="right"] .dylan-hat { --hat-x: 13px; --hat-y: 12px; }
+
+#dylan.hat-hidden .dylan-hat {
+  display: none;
+}
+
+/* ===== Wardrobe tab ===== */
+#unified-panel-tab-wardrobe.unified-panel-tab.active {
+  background: #22d3ee; /* cyan */
+}
+
+.wardrobe-layout {
+  display: flex;
+  gap: 1.75rem;
+  align-items: flex-start;
+}
+
+.wardrobe-preview {
+  flex: 0 0 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 0.5rem;
+  background: #3eb489;
+  border: 3px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226, 0 4px 0 #000;
+  position: sticky;
+  top: 0;
+}
+
+/* Dylan at 4x: sprite is 32x54, hat offsets scale with it */
+.wardrobe-preview-dylan {
+  position: relative;
+  width: 128px;
+  height: 216px;
+  background-size: 128px auto;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  image-rendering: pixelated;
+}
+
+.wardrobe-preview-hat {
+  position: absolute;
+  left: 58px; /* 14.5px x 4 */
+  top: 20px; /* (10px - 5px sprite offset) x 4 */
+  width: auto;
+  transform: translate(-50%, -100%) scale(4);
+  transform-origin: 50% 100%;
+  image-rendering: pixelated;
+}
+
+.wardrobe-preview-name {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  line-height: 1.6;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 2px 0 #000;
+}
+
+.wardrobe-options {
+  flex: 1;
+  min-width: 0;
+}
+
+.wardrobe-section-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  color: #fef3c7;
+  margin: 0 0 0.75rem;
+}
+
+.wardrobe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.wardrobe-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.4rem 0.7rem;
+  background: #3b2414;
+  border: 2px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226, 0 4px 0 #000;
+  color: #fff;
+  transition: transform 0.12s ease-out;
+}
+
+.wardrobe-item:hover:not(.is-locked) {
+  transform: translateY(-2px);
+  border-color: #facc6b;
+}
+
+.wardrobe-item.is-current {
+  border-color: #22d3ee;
+  box-shadow: inset 0 0 0 2px #0e7490, 0 0 0 3px #22d3ee, 0 4px 0 #000;
+}
+
+.wardrobe-item.is-locked {
+  cursor: not-allowed;
+}
+
+.wardrobe-item.is-locked .wardrobe-item-art {
+  filter: brightness(0) opacity(0.45);
+}
+
+.wardrobe-item-art {
+  width: 48px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: 38px auto;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  image-rendering: pixelated;
+  color: #9ca3af;
+  font-size: 1.2rem;
+}
+
+.wardrobe-item-art img {
+  transform: scale(3);
+  image-rendering: pixelated;
+}
+
+.wardrobe-item-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.5rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.wardrobe-item-hint {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  color: #d1d5db;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .wardrobe-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .wardrobe-preview {
+    position: static;
+    flex-basis: auto;
+  }
+}
+
+/* ===== Unlock toast ===== */
+.unlock-toast {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 10000038;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.75rem 1rem;
+  background: #1f1a2e;
+  color: #fff;
+  border: 2px solid #fef3c7;
+  box-shadow: inset 0 0 0 2px #6b4226, 0 4px 0 #000;
+  text-align: left;
+  animation: toastIn 0.3s steps(4) both;
+}
+
+.unlock-toast.is-leaving {
+  animation: toastOut 0.3s steps(4) both;
+}
+
+.unlock-toast-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.5rem;
+  color: #22d3ee;
+}
+
+.unlock-toast-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.75rem;
+}
+
+.unlock-toast-hint {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.75rem;
+  color: #d1d5db;
+}
+
+@keyframes toastIn {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toastOut {
+  to { transform: translateY(24px); opacity: 0; }
+}
+
+/* ===== Wardrobe closet in the tent (opens the Wardrobe tab) ===== */
+.tent-closet {
+  position: absolute;
+  left: 8px;
+  top: 92px;
+  width: 28px;
+  height: 46px;
+  z-index: 50; /* above the tent floor (.tentInterior is 48) */
+  background:
+    linear-gradient(#4a2c12, #4a2c12) 13px 4px / 2px 40px no-repeat,
+    radial-gradient(circle, #facc15 0 1px, transparent 1.5px) 9px 22px / 4px 4px no-repeat,
+    radial-gradient(circle, #facc15 0 1px, transparent 1.5px) 15px 22px / 4px 4px no-repeat,
+    linear-gradient(#a0642f, #8b5a2b);
+  border: 2px solid #4a2c12;
+  border-top-width: 4px;
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.25);
+}
+
+.tent-closet::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: 8px;
+  height: 7px;
+  transform: translateX(-50%);
+  background: url(../images/characters/hats/tophat.png) center / contain no-repeat;
+  image-rendering: pixelated;
+}

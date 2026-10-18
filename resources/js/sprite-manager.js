@@ -6,25 +6,25 @@ var SpriteManager = (function() {
   // Each direction has its frames in a single image or we use CSS positioning
   var spriteSheets = {
     front: {
-      url: "resources/images/characters/dylan/dylan-front-",
+      file: "dylan-front-",
       frames: 7,
       width: 32,
       height: 64
     },
     back: {
-      url: "resources/images/characters/dylan/dylan-back-",
+      file: "dylan-back-",
       frames: 7,
       width: 32,
       height: 64
     },
     left: {
-      url: "resources/images/characters/dylan/dylan-left-",
+      file: "dylan-left-",
       frames: 7,
       width: 32,
       height: 64
     },
     right: {
-      url: "resources/images/characters/dylan/dylan-right-",
+      file: "dylan-right-",
       frames: 7,
       width: 32,
       height: 64
@@ -33,6 +33,18 @@ var SpriteManager = (function() {
 
   // Preload all sprite images to prevent flicker
   var preloadedImages = {};
+  var preloadedBase = null;
+  var lastDirection = "front";
+  var lastFrame = 2;
+
+  // Folder for the current outfit (skins.js); classic Dylan otherwise.
+  function spriteBase() {
+    return typeof Skins !== "undefined" ? Skins.base() : "resources/images/characters/dylan";
+  }
+
+  function sheetUrl(direction) {
+    return spriteBase() + "/" + spriteSheets[direction].file;
+  }
   
   function preloadSprites() {
     var directions = ['front', 'back', 'left', 'right'];
@@ -42,7 +54,7 @@ var SpriteManager = (function() {
       
       for (var i = 1; i <= sheet.frames; i++) {
         var img = new Image();
-        img.src = sheet.url + i + ".png";
+        img.src = sheetUrl(direction) + i + ".png";
         preloadedImages[direction].push(img);
       }
     });
@@ -57,8 +69,9 @@ var SpriteManager = (function() {
       return;
     }
 
-    // Ensure sprites are preloaded for this direction
-    if (!preloadedImages[direction] || !preloadedImages[direction].length) {
+    // Ensure sprites are preloaded for this direction (and for the current outfit)
+    if (preloadedBase !== spriteBase() || !preloadedImages[direction] || !preloadedImages[direction].length) {
+      preloadedBase = spriteBase();
       preloadSprites();
     }
 
@@ -73,7 +86,10 @@ var SpriteManager = (function() {
       preloadedImages[direction] && preloadedImages[direction][frame - 1]
         ? preloadedImages[direction][frame - 1]
         : null;
-    var imageUrl = sheet.url + frame + ".png";
+    var imageUrl = sheetUrl(direction) + frame + ".png";
+    lastDirection = direction;
+    lastFrame = frame;
+    if ($dylan[0]) $dylan[0].setAttribute("data-facing", direction);
     
     // Use the preloaded image if available, otherwise use URL
     // Setting background-image with the same URL pattern helps browser cache
@@ -94,6 +110,8 @@ var SpriteManager = (function() {
   return {
     init: init,
     setSpriteFrame: setSpriteFrame,
+    // Redraw the current frame, e.g. after the outfit changes.
+    refresh: function () { setSpriteFrame(lastDirection, lastFrame); },
     preloadSprites: preloadSprites
   };
 })();

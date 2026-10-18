@@ -12,6 +12,7 @@ var UnifiedPanel = (function () {
   var tabTemplatePaths = {
     home: "resources/components/unified-panel-home.html",
     work: "resources/components/unified-panel-work.html",
+    wardrobe: "resources/components/unified-panel-wardrobe.html",
     backpack: "resources/components/unified-panel-backpack.html",
     fishbook: "resources/components/unified-panel-fishbook.html",
     achievements: "resources/components/unified-panel-achievements.html",
@@ -22,6 +23,7 @@ var UnifiedPanel = (function () {
   var tabs = {
     home: { name: "Home" },
     work: { name: "Work" },
+    wardrobe: { name: "Wardrobe" },
     backpack: { name: "Backpack" },
     fishbook: { name: "Fishbook" },
     achievements: { name: "Achievements" },
@@ -287,6 +289,9 @@ var UnifiedPanel = (function () {
       case "work":
         hydrateWorkTab(rootEl);
         break;
+      case "wardrobe":
+        hydrateWardrobeTab(rootEl);
+        break;
       case "backpack":
         hydrateBackpackTab(rootEl);
         break;
@@ -424,6 +429,88 @@ var UnifiedPanel = (function () {
       b.classList.toggle("active", b.getAttribute("data-filter") === initial);
     });
     render(initial);
+  }
+
+  function hydrateWardrobeTab(rootEl) {
+    if (typeof Skins === "undefined") return;
+    var outfitGrid = rootEl.querySelector('[data-role="outfit-grid"]');
+    var hatGrid = rootEl.querySelector('[data-role="hat-grid"]');
+    var previewDylan = rootEl.querySelector('[data-role="preview-dylan"]');
+    var previewHat = rootEl.querySelector('[data-role="preview-hat"]');
+    var previewName = rootEl.querySelector('[data-role="preview-name"]');
+
+    function outfitFrame(outfitId) {
+      var folder = outfitId === "classic"
+        ? "resources/images/characters/dylan"
+        : "resources/images/characters/skins/" + outfitId;
+      return "url(" + folder + "/dylan-front-2.png)";
+    }
+
+    function card(item, kind, isCurrent) {
+      var unlocked = Skins.isUnlocked(item);
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "wardrobe-item" + (isCurrent ? " is-current" : "") + (unlocked ? "" : " is-locked");
+      btn.setAttribute("aria-pressed", isCurrent ? "true" : "false");
+
+      var art = document.createElement("span");
+      art.className = "wardrobe-item-art";
+      if (kind === "outfit") {
+        art.style.backgroundImage = outfitFrame(item.id);
+      } else if (item.id !== "none") {
+        var img = document.createElement("img");
+        img.src = "resources/images/characters/hats/" + item.id + ".png";
+        img.alt = "";
+        art.appendChild(img);
+      } else {
+        art.textContent = "—";
+      }
+      btn.appendChild(art);
+
+      var label = document.createElement("span");
+      label.className = "wardrobe-item-name";
+      label.textContent = unlocked ? item.name : "Locked";
+      btn.appendChild(label);
+
+      if (!unlocked) {
+        btn.title = Skins.hintFor(item);
+        var hint = document.createElement("span");
+        hint.className = "wardrobe-item-hint";
+        hint.textContent = Skins.hintFor(item);
+        btn.appendChild(hint);
+      }
+
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (kind === "outfit") Skins.setOutfit(item.id);
+        else Skins.setHat(item.id);
+      });
+      return btn;
+    }
+
+    function render() {
+      var current = Skins.current();
+      outfitGrid.innerHTML = "";
+      hatGrid.innerHTML = "";
+      Skins.OUTFITS.forEach(function (o) { outfitGrid.appendChild(card(o, "outfit", o.id === current.outfit)); });
+      Skins.HATS.forEach(function (h) { hatGrid.appendChild(card(h, "hat", h.id === current.hat)); });
+
+      previewDylan.style.backgroundImage = outfitFrame(current.outfit);
+      if (current.hat === "none") {
+        previewHat.style.display = "none";
+      } else {
+        previewHat.style.display = "";
+        previewHat.src = "resources/images/characters/hats/" + current.hat + ".png";
+      }
+      var outfitName = Skins.OUTFITS.filter(function (o) { return o.id === current.outfit; })[0];
+      var hatName = Skins.HATS.filter(function (h) { return h.id === current.hat; })[0];
+      previewName.textContent = (outfitName ? outfitName.name : "") + (current.hat !== "none" && hatName ? " + " + hatName.name : "");
+    }
+
+    Skins.onChange(function () {
+      if (document.body.contains(outfitGrid)) render();
+    });
+    render();
   }
 
   // Wrap the global lightbox close so the Work tab reopens after viewing a project.

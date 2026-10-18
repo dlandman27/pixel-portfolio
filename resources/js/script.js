@@ -29,7 +29,8 @@ class urlLabels{
     this.getSocials = () => this.tag + "/social-media";
     this.getTiles = () => this.tag + "/tiles";
     this.getWeather = () => this.tag + "/weather";
-    this.getDylan = () => this.getCharacters() + "/dylan";
+    // Follows the outfit chosen in the wardrobe (skins.js)
+    this.getDylan = () => typeof Skins !== "undefined" ? "url(" + Skins.base() : this.getCharacters() + "/dylan";
     this.getFallingTree = () => this.getNature() + "/falling-tree";
     this.getFishing = () => this.tag + "/fishing";
     this.getImgFormat = (imgName) => imgName + ")"
@@ -1822,7 +1823,7 @@ function openTent1(side){
     if (typeof SpriteManager !== "undefined") {
       SpriteManager.setSpriteFrame("front", 2);
     } else {
-      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
     }
   } else {
     // Old system fallback
@@ -1845,7 +1846,7 @@ function openTent1(side){
       if (typeof SpriteManager !== "undefined") {
         SpriteManager.setSpriteFrame("front", 2);
       } else {
-        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+        $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
       }
       $("#dylan").fadeIn();
 
@@ -1864,7 +1865,7 @@ function openTent1(side){
       if (typeof SpriteManager !== "undefined") {
         SpriteManager.setSpriteFrame("front", 2);
       } else {
-        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+        $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
       }
       $("#dylan").fadeIn();
 
@@ -1906,7 +1907,7 @@ function leaveTent1(dir){
     if (typeof SpriteManager !== "undefined") {
       SpriteManager.setSpriteFrame("front", 2);
     } else {
-      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
     }
   } else {
     // Old system fallback
@@ -1926,7 +1927,7 @@ function leaveTent1(dir){
       if (typeof SpriteManager !== "undefined") {
         SpriteManager.setSpriteFrame("front", 2);
       } else {
-        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+        $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
       }
       $("#map").css({
         marginLeft: "2064px",
@@ -1944,7 +1945,7 @@ function leaveTent1(dir){
       if (typeof SpriteManager !== "undefined") {
         SpriteManager.setSpriteFrame("front", 2);
       } else {
-        $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+        $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
       }
       $("#map").css({
         marginLeft: "2160px",
@@ -2018,7 +2019,7 @@ function sitOnCouch(){
     if (typeof SpriteManager !== "undefined") {
       SpriteManager.setSpriteFrame("back", 1);
     } else {
-      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-back-1.png)");
+      $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-back-1.png)");
     }
     $("#map").css({
       // marginLeft: "2160px",
@@ -2036,7 +2037,7 @@ function sitOnCouch(){
     if (typeof SpriteManager !== "undefined") {
       SpriteManager.setSpriteFrame("front", 2);
     } else {
-      $("#dylan").css("backgroundImage", "url(resources/images/characters/dylan/dylan-front-2.png)");
+      $("#dylan").css("backgroundImage", URL.getDylan() + "/dylan-front-2.png)");
     }
     $("#map").css({
       // marginLeft: "2160px",

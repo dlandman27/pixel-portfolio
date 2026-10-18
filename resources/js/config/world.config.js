@@ -123,7 +123,8 @@ var WORLD_COLLIDERS = {
       { x: 258, y: 190, width: 162, height: 12, tag: "tentBottomRight" },
       { x: -4, y: -44, width: 12, height: 244, tag: "tentLeft" },
       { x: 414, y: -44, width: 12, height: 244, tag: "tentRight" },
-      { x: 198, y: -44, width: 68, height: 114, tag: "tentCenter" }
+      { x: 198, y: -44, width: 68, height: 114, tag: "tentCenter" },
+      { x: 8, y: 112, width: 30, height: 26, tag: "tentCloset" }
     ],
     triggers: [
       // Front door exit (doormat.front at top: 182px, centered in 416px width)

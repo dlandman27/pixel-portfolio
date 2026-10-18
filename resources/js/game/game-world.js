@@ -1462,6 +1462,9 @@
     $tent.append('<a><div onClick="openPaintingLightbox()" class="painting"></div></a>');
     $tent.append('<div class="doormat front"></div>');
     
+    // Wardrobe closet: opens the Wardrobe tab (skins.js)
+    $tent.append('<a><div onClick="UnifiedPanel.open(\'wardrobe\')" class="tent-closet" title="Wardrobe"></div></a>');
+
     // Den
     $tent.append('<a><div onClick="sitOnCouch()" class="couch"></div></a>');
     $tent.append('<a><div onClick="openTVScreen()" class="tv back"><div class="tv front"><p style="position: absolute; left: 13px; color: darkgray; font-size: 0.4rem; top: 10px;">About Me</p></div></div></a>');
