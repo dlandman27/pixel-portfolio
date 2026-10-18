@@ -10,7 +10,7 @@
   // Tells GameWorld/startGame to leave the drop, reveal and tutorial to us.
   global.INTRO_SEQUENCE = true;
 
-  var LETTERS_LANDED_MS = 1150; // last letter's fall ends (see .loader-name span delays)
+  var LETTERS_LANDED_MS = 950; // last letter's fall ends (see .loader-name span delays)
   var SKIP_MIN_MS = 450; // never cut the letters off before they're readable
   var LEAVE_MS = 380; // letters tumbling away
   var IRIS_MS = 650; // circle wipe opening
