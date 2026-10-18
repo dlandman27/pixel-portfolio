@@ -454,15 +454,16 @@
 
   $(function () {
     $recenterBtn = $(
-      '<button type="button" class="nes-btn is-primary recenter-btn" aria-label="Back to Dylan">' +
-        '<i class="fas fa-crosshairs" aria-hidden="true"></i><span>Back to Dylan</span></button>'
+      '<button type="button" class="rail-btn recenter-btn" aria-label="Back to Dylan" data-label="Back to Dylan">' +
+        '<i class="fas fa-crosshairs" aria-hidden="true"></i></button>'
     );
     $recenterBtn.click(function (e) {
       e.stopPropagation();
       panVelocity = null;
       recentering = true;
     });
-    $("body").append($recenterBtn);
+    // Lives in the right-side button rail when there is one.
+    ($("#game-menu").length ? $("#game-menu") : $("body")).append($recenterBtn);
 
     edgeHints = {};
     ["top", "right", "bottom", "left"].forEach(function (side) {

@@ -6711,32 +6711,6 @@ body.unified-panel-open {
   font-size: 1.5rem;
 }
 
-/* ===== "My Work" shortcut (top-right, next to the menu toggle) ===== */
-.work-shortcut {
-  height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.85rem;
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.6rem;
-  white-space: nowrap;
-}
-
-.work-shortcut i {
-  font-size: 0.9rem;
-}
-
-@media (max-width: 480px) {
-  .work-shortcut span {
-    display: none;
-  }
-}
-
-body.unified-panel-open .work-shortcut {
-  visibility: hidden;
-}
-
 /* ===== Work tab ===== */
 #unified-panel-tab-work.unified-panel-tab.active {
   background: #fb7185; /* rose */
@@ -6990,29 +6964,6 @@ body.is-grabbing * {
 }
 
 /* "Back to Dylan" camera recenter button */
-.recenter-btn {
-  position: fixed;
-  top: 8px;
-  left: 8px;
-  z-index: 10000040;
-  height: 44px;
-  display: none;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.85rem;
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.6rem;
-}
-
-.recenter-btn.is-visible {
-  display: flex;
-}
-
-body.unified-panel-open .recenter-btn,
-body.is-grabbing .recenter-btn {
-  visibility: hidden;
-}
-
 /* Edge-scroll hints while carrying Dylan: pixel chevrons sliding toward the edge */
 .edge-scroll-hint {
   --edge-speed: 0.9s;
@@ -7495,4 +7446,111 @@ body.night #day-night-overlay {
   transform: translateX(-50%);
   background: url(../images/characters/hats/tophat.png) center / contain no-repeat;
   image-rendering: pixelated;
+}
+
+/* ===== Right-side button rail ===== */
+#game-menu.side-rail {
+  flex-direction: column;
+  gap: 10px;
+  top: 12px;
+  right: 12px;
+}
+
+.rail-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.15rem;
+  background: rgba(31, 22, 38, 0.82);
+  border: 0;
+  /* thin light frame inset from the edge, like a framed tile */
+  box-shadow:
+    inset 0 0 0 4px rgba(31, 22, 38, 0.82),
+    inset 0 0 0 5px rgba(254, 243, 199, 0.75),
+    0 4px 0 rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  transition: transform 0.12s ease-out, background 0.12s ease-out;
+}
+
+.rail-btn:hover,
+.rail-btn:focus-visible {
+  background: rgba(62, 40, 70, 0.92);
+  transform: translateX(-3px);
+  outline: none;
+}
+
+.rail-btn:active {
+  transform: translateX(-3px) translateY(2px);
+  box-shadow:
+    inset 0 0 0 4px rgba(31, 22, 38, 0.82),
+    inset 0 0 0 5px rgba(254, 243, 199, 0.75),
+    0 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.rail-btn .game-menu-icon {
+  width: 22px;
+  height: 16px;
+}
+
+.rail-btn .game-menu-icon span:nth-child(2) { top: 7px; }
+.rail-btn .game-menu-icon span:nth-child(3) { top: 14px; }
+
+/* Label slides out to the left on hover */
+.rail-btn::after {
+  content: attr(data-label);
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  padding: 0.5rem 0.65rem;
+  white-space: nowrap;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  color: #fff;
+  background: rgba(31, 22, 38, 0.92);
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(6px, -50%);
+  transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+}
+
+.rail-btn:hover::after,
+.rail-btn:focus-visible::after {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.recenter-btn {
+  display: none;
+}
+
+.recenter-btn.is-visible {
+  display: flex;
+  color: #22d3ee;
+}
+
+body.unified-panel-open .recenter-btn,
+body.is-grabbing .recenter-btn {
+  visibility: hidden;
+}
+
+@media (max-width: 600px) {
+  #game-menu.side-rail {
+    gap: 8px;
+    top: 8px;
+    right: 8px;
+  }
+  .rail-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+  }
+  .rail-btn::after {
+    display: none;
+  }
 }

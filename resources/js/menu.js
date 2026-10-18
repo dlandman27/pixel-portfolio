@@ -16,6 +16,13 @@ $(function () {
 //   #work            -> opens the Work tab
 //   #project=<id>    -> opens that project's lightbox (ids from portfolio.config.js)
 $(function () {
+  $("#wardrobe-shortcut").click(function (e) {
+    e.stopPropagation();
+    if (typeof UnifiedPanel === "undefined") return;
+    if (UnifiedPanel.isOpen()) UnifiedPanel.switchTab("wardrobe");
+    else UnifiedPanel.open("wardrobe");
+  });
+
   $("#work-shortcut").click(function (e) {
     e.stopPropagation();
     if (typeof UnifiedPanel === "undefined") return;
