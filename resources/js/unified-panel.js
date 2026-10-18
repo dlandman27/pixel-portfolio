@@ -166,7 +166,7 @@ var UnifiedPanel = (function () {
       return;
     }
 
-    // Add a 'closing' state so we can play a hinge-out animation
+    // Add a 'closing' state so the panel can fade out
     $panel.removeClass("active").addClass("closing").attr("aria-hidden", "true");
     $("body").removeClass("unified-panel-open");
     isOpen = false;
@@ -174,7 +174,7 @@ var UnifiedPanel = (function () {
     // After animation completes, fully hide and clear closing state
     setTimeout(function () {
       $panel.removeClass("closing");
-    }, 500);
+    }, 160); // matches unifiedPanelOut in style.css
   }
 
   /**
