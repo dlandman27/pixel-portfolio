@@ -113,7 +113,6 @@ function lazyLoad() {
 $(window).load(function () {
   setVariables();
   $(".cover-screen.tent1").hide();
-  document.title = "__________🔥__________";
   
   //Loads images used for animation
   lazyLoad();
@@ -1167,9 +1166,6 @@ function dayCycle() {
   } else {
     removeStars();
   }
-  
-  // Log current state for debugging
-  console.log('Day/Night Cycle:', timeState, 'Brightness:', brightness, 'Overlay:', overlayOpacity);
   
   // Schedule next update (check every minute, or every 5 seconds in test mode)
   var updateInterval = DAY_CYCLE_TEST_MODE ? 5000 : 60000;
