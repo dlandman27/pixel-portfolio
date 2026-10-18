@@ -172,7 +172,7 @@ var gameWorld = null;
 //Function called when the map is finished rendering
 function startGame() { 
 
-  document.title="Dylan Landman";
+  document.title = "Dylan Landman · Software Engineer";
 
   // Initialize sprite manager
   if (typeof SpriteManager !== "undefined") {

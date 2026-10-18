@@ -4076,7 +4076,7 @@ body {
   top: 32px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10000050; /* above most UI, below loader */
+  z-index: 10000030; /* above the world, below menu buttons, panel and lightboxes */
   max-width: 320px;
   text-align: center;
   margin: 0; /* override default nes-balloon margin so it's truly centered */
@@ -7015,7 +7015,7 @@ body.unified-panel-open {
   inset: 0;
   display: none;
   background-color: rgba(0, 0, 0, 0.95);
-  z-index: 111112;
+  z-index: 10000045; /* above menu buttons and tutorial bubble */
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -7106,4 +7106,305 @@ body.unified-panel-open {
     pointer !important;
   color: white;
   font-size: 1.5rem;
+}
+
+/* ===== "My Work" shortcut (top-right, next to the menu toggle) ===== */
+.work-shortcut {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.85rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  white-space: nowrap;
+}
+
+.work-shortcut i {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .work-shortcut span {
+    display: none;
+  }
+}
+
+body.unified-panel-open .work-shortcut {
+  visibility: hidden;
+}
+
+/* ===== Work tab ===== */
+#unified-panel-tab-work.unified-panel-tab.active {
+  background: #fb7185; /* rose */
+}
+
+.work-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.work-filter {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  color: #fef3c7;
+  background: #3b2414;
+  border: 2px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226;
+  padding: 0.6rem 0.8rem;
+}
+
+.work-filter:hover {
+  filter: brightness(1.2);
+}
+
+.work-filter.active {
+  background: #fef3c7;
+  color: #1f2933;
+  box-shadow: 0 3px 0 #000;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  text-align: left;
+  background: #3b2414;
+  border: 2px solid #f5d6a1;
+  box-shadow: inset 0 0 0 2px #6b4226, 0 4px 0 #000;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+}
+
+.work-card:hover,
+.work-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 2px #6b4226, 0 7px 0 #000;
+  border-color: #facc6b;
+  outline: none;
+}
+
+.work-card-thumb {
+  aspect-ratio: 4 / 3;
+  background-color: #111827;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 2px solid #f5d6a1;
+  overflow: hidden;
+  position: relative;
+}
+
+.work-card-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.work-card-thumb.is-video::after {
+  content: "\25B6";
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  font-size: 0.7rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+}
+
+.work-card-thumb.is-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8rem;
+  color: #fff;
+  background: linear-gradient(135deg, #f43f5e, #f59e0b, #10b981, #3b82f6);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.work-card-thumb.is-placeholder.fractal-pattern {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px),
+    repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px),
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.work-card-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  line-height: 1.5;
+  color: #fff;
+  padding: 0.7rem 0.75rem 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .work-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.home-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.home-actions .nes-btn {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+}
+
+.home-social {
+  font-size: 1.9rem;
+  color: #fef3c7;
+  line-height: 1;
+}
+
+.home-social:hover {
+  color: #facc6b;
+  text-decoration: none;
+}
+
+/* ===== Official Awwwards ribbon (right edge, vertically centered) ===== */
+#awwwards {
+  position: fixed;
+  z-index: 10000035; /* above the world and tutorial bubble, below menus/panels */
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  line-height: 0;
+}
+
+body.unified-panel-open #awwwards {
+  visibility: hidden;
+}
+
+@media (max-width: 600px) {
+  #awwwards {
+    transform: translateY(-50%) scale(0.7);
+    transform-origin: right center;
+  }
+}
+
+.home-award {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  color: #facc6b;
+}
+
+.home-award:hover {
+  color: #fef3c7;
+}
+
+/* ===== Drag the world / pick up Dylan (world-drag.js) ===== */
+#map,
+#cave,
+#tent1 {
+  touch-action: none;
+}
+
+/* Pixel fist cursor (matches the site's pixel pointer); only shown once a
+   drag has actually started, never on hover. */
+body.is-panning,
+body.is-panning *,
+body.is-grabbing,
+body.is-grabbing * {
+  cursor: url(../images/icons/cursor-grabbing.png) 16 16, grabbing !important;
+  user-select: none;
+}
+
+#dylan.is-grabbed {
+  z-index: 100000 !important;
+  transform-origin: 50% 20%; /* swings from the shoulders (rotation set in world-drag.js) */
+  filter: drop-shadow(0 6px 2px rgba(0, 0, 0, 0.25));
+}
+
+#dylan.is-grabbed::after {
+  display: none; /* the drop shadow on the ground takes over */
+}
+
+#dylan.grab-returning {
+  transition: left 0.3s ease-in-out, top 0.3s ease-in-out !important;
+  z-index: 100000 !important;
+}
+
+#dylan.grab-landed {
+  animation: dylanLand 0.4s ease-out;
+}
+
+@keyframes dylanLand {
+  0% { scale: 1.15 0.8; translate: 0 2px; }
+  45% { scale: 0.92 1.1; translate: 0 -3px; }
+  100% { scale: 1 1; translate: 0 0; }
+}
+
+.grab-drop-shadow {
+  position: absolute;
+  width: 24px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 48;
+  pointer-events: none;
+  transition: background 0.12s;
+}
+
+.grab-drop-shadow.is-invalid {
+  background: rgba(220, 38, 38, 0.55);
+  box-shadow: 0 0 0 1px rgba(254, 202, 202, 0.8);
+}
+
+.grab-dust-puff {
+  position: absolute;
+  width: 32px;
+  height: 14px;
+  z-index: 48;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 60%, rgba(255, 255, 255, 0.85) 0 3px, transparent 4px),
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.85) 0 4px, transparent 5px),
+    radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.85) 0 3px, transparent 4px);
+  animation: dustPuff 0.55s ease-out forwards;
+}
+
+@keyframes dustPuff {
+  from { opacity: 0.9; scale: 0.5 0.6; }
+  to { opacity: 0; scale: 1.6 1.2; translate: 0 -4px; }
+}
+
+/* "Back to Dylan" camera recenter button */
+.recenter-btn {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 10000040;
+  height: 44px;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.85rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+}
+
+.recenter-btn.is-visible {
+  display: flex;
+}
+
+body.unified-panel-open .recenter-btn {
+  visibility: hidden;
 }

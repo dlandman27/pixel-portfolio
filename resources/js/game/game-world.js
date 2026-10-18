@@ -704,7 +704,13 @@
         var footY = pos.y + PLAYER_COLLIDER_HEIGHT / 2;
         var left = pos.x - PLAYER_SPRITE_WIDTH / 2;
         var top = footY - PLAYER_SPRITE_HEIGHT;
-        
+        // While Dylan is picked up (world-drag.js) the sprite follows the pointer
+        // but the physics body and camera stay put.
+        if (this._grabOverride) {
+          left = this._grabOverride.left;
+          top = this._grabOverride.top;
+        }
+
         // Set z-index based on scene
         var currentZIndex = $dylan.css("z-index");
         var cssUpdate = {

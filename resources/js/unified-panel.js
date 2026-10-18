@@ -11,6 +11,7 @@ var UnifiedPanel = (function () {
 
   var tabTemplatePaths = {
     home: "resources/components/unified-panel-home.html",
+    work: "resources/components/unified-panel-work.html",
     backpack: "resources/components/unified-panel-backpack.html",
     fishbook: "resources/components/unified-panel-fishbook.html",
     achievements: "resources/components/unified-panel-achievements.html",
@@ -20,6 +21,7 @@ var UnifiedPanel = (function () {
 
   var tabs = {
     home: { name: "Home" },
+    work: { name: "Work" },
     backpack: { name: "Backpack" },
     fishbook: { name: "Fishbook" },
     achievements: { name: "Achievements" },
@@ -282,6 +284,9 @@ var UnifiedPanel = (function () {
       case "home":
         hydrateHomeTab(rootEl);
         break;
+      case "work":
+        hydrateWorkTab(rootEl);
+        break;
       case "backpack":
         hydrateBackpackTab(rootEl);
         break;
@@ -301,6 +306,14 @@ var UnifiedPanel = (function () {
   }
 
   function hydrateHomeTab(rootEl) {
+    var viewWorkBtn = rootEl.querySelector('[data-role="view-work"]');
+    if (viewWorkBtn) {
+      viewWorkBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        switchTab("work");
+      });
+    }
+
     var coinCount =
       typeof inventory !== "undefined" && inventory && inventory.coinCount
         ? inventory.coinCount
@@ -321,6 +334,97 @@ var UnifiedPanel = (function () {
       completeEl.style.display = showComplete ? "block" : "none";
     }
   }
+
+  var WORK_FILTERS = {
+    all: function () { return true; },
+    software: function (p) { return p.type === "website" || p.type === "mobile-app"; },
+    research: function (p) { return p.type === "research-paper"; },
+    logo: function (p) { return p.type === "logo"; },
+    motion: function (p) { return p.type === "graphic"; },
+  };
+
+  // Set when a project is opened from the Work tab so closing the lightbox
+  // brings the visitor back to the list instead of dropping them in the world.
+  var returnToWorkTab = false;
+
+  function buildWorkCard(project) {
+    var card = document.createElement("button");
+    card.type = "button";
+    card.className = "work-card";
+    card.setAttribute("data-project-id", project.id);
+
+    var thumb = document.createElement("div");
+    thumb.className = "work-card-thumb";
+    if (project.image) {
+      thumb.style.backgroundImage = "url(" + project.image.replace(/ /g, "%20") + ")";
+    } else if (project.video) {
+      var video = document.createElement("video");
+      video.src = project.video.replace(/ /g, "%20") + "#t=0.5";
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      thumb.appendChild(video);
+      card.addEventListener("mouseenter", function () { video.play().catch(function () {}); });
+      card.addEventListener("mouseleave", function () { video.pause(); });
+      thumb.classList.add("is-video");
+    } else {
+      thumb.textContent = project.placeholder || project.title;
+      thumb.classList.add("is-placeholder");
+      if (project.placeholderFractal) thumb.classList.add("fractal-pattern");
+    }
+    card.appendChild(thumb);
+
+    var title = document.createElement("span");
+    title.className = "work-card-title";
+    title.textContent = project.title;
+    card.appendChild(title);
+
+    card.addEventListener("click", function () {
+      if (typeof openProjectLightbox !== "function") return;
+      returnToWorkTab = true;
+      close();
+      openProjectLightbox(project.id);
+    });
+    return card;
+  }
+
+  function hydrateWorkTab(rootEl) {
+    var grid = rootEl.querySelector('[data-role="work-grid"]');
+    if (!grid || typeof PORTFOLIO_PROJECTS === "undefined") return;
+
+    function render(filterKey) {
+      grid.innerHTML = "";
+      PORTFOLIO_PROJECTS.filter(WORK_FILTERS[filterKey] || WORK_FILTERS.all).forEach(function (project) {
+        grid.appendChild(buildWorkCard(project));
+      });
+    }
+
+    var buttons = rootEl.querySelectorAll(".work-filter");
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        Array.prototype.forEach.call(buttons, function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        render(btn.getAttribute("data-filter"));
+      });
+    });
+
+    render("all");
+  }
+
+  // Wrap the global lightbox close so the Work tab reopens after viewing a project.
+  $(function () {
+    if (typeof closeProjectLightbox !== "function") return;
+    var originalClose = closeProjectLightbox;
+    window.closeProjectLightbox = function () {
+      originalClose.apply(this, arguments);
+      if (returnToWorkTab) {
+        returnToWorkTab = false;
+        open("work");
+      }
+    };
+  });
 
   function hydrateBackpackTab(rootEl) {
     if (typeof inventory === "undefined") {
