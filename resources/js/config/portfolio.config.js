@@ -306,43 +306,6 @@ var PORTFOLIO_SQUARE_MAP = {
   "8-4": { projectId: null, span: 1, spanRows: 1 }
 };
 
-// Portfolio sections for the main modal
-var PORTFOLIO_SECTIONS = {
-  aboutMe: {
-    title: "About Me",
-    content: "Dylan Landman"
-  },
-  myStory: {
-    title: "My Story",
-    content: "My Story content goes here..."
-  },
-  projects: {
-    title: "My Projects",
-    description: "Explore my diverse range of projects, showcasing my skills in software development, logo design, web development, and user experience design.",
-    categories: [
-      { id: "logos", name: "Logos" },
-      { id: "web-development", name: "Web Development" },
-      { id: "software-projects", name: "Software Projects" },
-      { id: "ux-design", name: "UX Design" }
-    ]
-  },
-  newsletter: {
-    title: "Newsletter",
-    content: "Newsletter signup form goes here..."
-  },
-  contact: {
-    title: "Contact Me",
-    content: "Contact form goes here..."
-  }
-};
-
-// Helper function to get projects by category
-function getProjectsByCategory(category) {
-  return PORTFOLIO_PROJECTS.filter(function(project) {
-    return project.category === category;
-  });
-}
-
 // Helper function to get project by ID
 function getProjectById(id) {
   return PORTFOLIO_PROJECTS.find(function(project) {

@@ -5,8 +5,6 @@ $(function () {
 
   $('#achievement').load('resources/modals/achievement.toast.html', function () {});
 
-  $('#portfolio').load('resources/modals/portfolio.modal.html', function () {});
-
   $('#painting-lightbox').load('resources/modals/painting.lightbox.html', function () {});
   
   // Load project lightbox modal

@@ -2026,7 +2026,6 @@ body {
   margin-left: 285px;
 }
 
-
 .tentInterior {
   width: 416px;
   height: 188px;
@@ -2510,7 +2509,6 @@ body {
   z-index: 11;
   filter: drop-shadow(0 2px 0px rgba(0, 0, 0, 0.1));
 }
-
 
 .yellow-flowers::after, .pink-tulips::after {
   content: "";
@@ -4105,25 +4103,6 @@ body {
     pointer !important;
 }
 
-.status-menu-toggle {
-  padding: 0.45rem;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.status-menu-icon {
-  width: 44px;
-  height: 44px;
-  /* Match the in‑map backpack icon (no square tile) */
-  background-image: url("../images/misc/backpack2.png");
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 .game-menu-icon {
   display: inline-block;
   width: 18px;
@@ -4144,49 +4123,7 @@ body {
 .game-menu-icon span:nth-child(2) { top: 5px; }
 .game-menu-icon span:nth-child(3) { top: 10px; }
 
-.game-menu-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  transform: translateX(100%);
-  transition: transform 0.25s ease-out;
-  padding: 0.75rem;
-  background: #102d2a;
-  /* Subtle lighter right border to give an elevated edge */
-  border: none;
-  border-right: 4px solid #18403c;
-  box-shadow: 0 8px 0 #000;
-  width: 320px;
-  z-index: 10000035;
-  display: flex;
-  flex-direction: column;
-}
-
 /* Slide-in when menu is open */
-body.game-menu-open .game-menu-panel {
-  transform: translateX(0);
-}
-
-.status-menu-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  transform: translateX(-100%);
-  transition: transform 0.25s ease-out;
-  padding: 0.75rem;
-  background: #102d2a;
-  box-shadow: 0 8px 0 #000;
-  width: 260px;
-  z-index: 10000035;
-  display: none !important; /* Hidden - not used in current implementation */
-  flex-direction: column;
-}
-
-body.status-menu-open .status-menu-panel {
-  transform: translateX(0);
-}
 
 .game-menu-title {
   font-family: "Press Start 2P", monospace;
@@ -4194,134 +4131,9 @@ body.status-menu-open .status-menu-panel {
   margin-bottom: 0.5rem;
 }
 
-.game-menu-item {
-  display: block;
-  width: 100%;
-  margin-bottom: 0.4rem;
-  font-size: 0.6rem;
-  position: relative;
-  padding-left: 1.8rem;
-}
-
 /* Icon sprites for menu items */
-.game-menu-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-.game-menu-item[data-menu-action="portfolio"]::before {
-  background-image: url("../images/logo icon/dl-logo.png");
-}
-
-.game-menu-item[data-menu-action="map"]::before {
-  background-image: url("../images/misc/map-icon.png");
-}
-
-.game-menu-item[data-menu-action="resume"]::before {
-  background-image: url("../images/misc/resume-icon-found.png");
-}
-
-.game-menu-item[data-menu-action="inventory"]::before {
-  /* Use same backpack art as the in‑map icon */
-  background-image: url("../images/misc/backpack2.png");
-}
-
-.game-menu-item[data-menu-action="fishbook"]::before {
-  background-image: url("../images/misc/fishbook-icon-found.png");
-}
-
-.game-menu-item[data-menu-action="tutorial"]::before {
-  background-image: url("../images/misc/paper.png");
-}
-
-.game-menu-awwwards {
-  display: inline-block;
-  margin-top: 0.4rem;
-  font-size: 0.5rem;
-  color: #9bd4d7;
-  text-decoration: none;
-  opacity: 0.8;
-}
-
-.game-menu-awwwards:hover {
-  text-decoration: underline;
-  opacity: 1;
-}
 
 /* New menu layout pieces */
-.game-menu-header {
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 0.75rem;
-}
-
-.game-menu-name {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.75rem;
-  margin: 0;
-  color: #ffffff;
-}
-
-.game-menu-role {
-  font-size: 0.55rem;
-  margin: 0.2rem 0 0;
-  color: #9bd4d7;
-}
-
-.game-menu-section {
-  margin-bottom: 0.9rem;
-}
-
-.game-menu-section-title {
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 0.4rem;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.game-menu-footer {
-  margin-top: auto;
-  padding-top: 0.5rem;
-  border-top: 2px solid rgba(255, 255, 255, 0.15);
-}
-
-.game-menu-footer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.game-menu-social-icons {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.game-menu-social-link {
-  display: inline-block;
-  opacity: 0.8;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  text-decoration: none;
-}
-
-.game-menu-social-link:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.game-menu-social-link .nes-icon {
-  font-size: 1.5rem;
-}
 
 /* Status / backpack panel */
 .status-menu-header {
@@ -4349,104 +4161,15 @@ body.status-menu-open .status-menu-panel {
   margin: 0;
 }
 
-.status-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 0.6rem;
-  margin-bottom: 0.35rem;
-  color: rgba(255, 255, 255, 0.85);
-  position: relative;
-  padding-left: 1.6rem;
-}
-
 .status-item-name {
   flex: 1;
 }
 
-.status-item-state {
-  font-size: 0.55rem;
-  margin-left: 0.5rem;
-}
-
-.status-item.owned .status-item-state {
-  color: #f7d51d;
-}
-
-.status-item.missing .status-item-state {
-  color: rgba(255, 255, 255, 0.6);
-}
-
 /* Icon sprites for status items */
-.status-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.9;
-}
-
-.status-item.status-minimap::before {
-  background-image: url("../images/misc/map-icon.png");
-}
-
-.status-item.status-axe::before {
-  background-image: url("../images/misc/axe-icon-found.png");
-}
-
-.status-item.status-wood::before {
-  background-image: url("../images/misc/wood-icon-found.png");
-}
-
-.status-item.status-matches::before {
-  background-image: url("../images/misc/matchbox-icon-found.png");
-}
-
-.status-item.status-resume::before {
-  background-image: url("../images/misc/resume-icon-found.png");
-}
-
-.status-item.status-fishingRod::before {
-  background-image: url("../images/misc/fishing-rod-found.png");
-}
-
-.status-item.status-fishbook::before {
-  background-image: url("../images/misc/fishbook-icon-found.png");
-}
 
 /* Dim & desaturate icons when missing */
-.status-item.missing::before {
-  opacity: 0.4;
-  filter: grayscale(1);
-}
 
 /* Backdrop behind side menu */
-.game-menu-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease-out;
-  z-index: 10000030;
-}
-
-body.game-menu-open .game-menu-backdrop,
-body.status-menu-open .game-menu-backdrop {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (max-width: 600px) {
-  .game-menu-panel {
-    width: 90vw;
-  }
-}
 
 .nes-container.key {
   width: 64px;
@@ -4659,137 +4382,6 @@ i {
 
 /* Elements for Portfolio */
 /* Center website */
-.portfolio-container {
-  position: fixed;
-  inset: 0;
-  display: none;
-  max-width: 1000px;
-  margin: auto;
-  background-color: #c49a6c;
-  z-index: 111111;
-  overflow-y: scroll;
-  padding: 20px;
-  box-shadow: 10px 0px black, -10px 0px black;
-}
-
-.portfolio-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.portfolio-header h1 {
-  font-family: 'Press Start 2P', cursive;
-  color: #fff;
-  margin-bottom: 10px;
-}
-
-.portfolio-header h3 {
-  font-family: 'Press Start 2P', cursive;
-  color: #ffde89;
-  font-size: 0.8rem;
-}
-
-.portfolio-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.portfolio-tab {
-  padding: 10px 20px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 2px solid #fff;
-  color: #fff;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.6rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.portfolio-tab:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.portfolio-tab.active {
-  background-color: #fff;
-  color: #c49a6c;
-}
-
-.portfolio-content {
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border: 2px solid #fff;
-}
-
-.portfolio-tab-content {
-  display: none;
-}
-
-.portfolio-tab-content.active {
-  display: block;
-}
-
-.portfolio-tab-content h2 {
-  font-family: 'Press Start 2P', cursive;
-  color: #fff;
-  font-size: 1rem;
-  margin-bottom: 15px;
-}
-
-.portfolio-tab-content p {
-  font-family: 'Press Start 2P', cursive;
-  color: #fff;
-  font-size: 0.5rem;
-  line-height: 1.6;
-  margin-bottom: 10px;
-}
-
-.portfolio-category-filters {
-  display: flex;
-  gap: 10px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.portfolio-filter-btn {
-  font-size: 0.5rem !important;
-}
-
-.portfolio-filter-btn.active {
-  background-color: #fff !important;
-  color: #c49a6c !important;
-}
-
-.portfolio-projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.portfolio-project-card {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.portfolio-project-card:hover {
-  transform: scale(1.05);
-}
-
-.portfolio-legacy-section {
-  margin-top: 40px;
-}
-
-.portfolio-legacy-section h3 {
-  font-family: 'Press Start 2P', cursive;
-  color: #fff;
-  font-size: 0.8rem;
-  margin-bottom: 15px;
-  margin-top: 30px;
-}
 
 .grid-container {
   margin: 10px -16px;
@@ -4884,13 +4476,6 @@ a,
     pointer !important;
 }
 
-.nes-container.portfolio-elem {
-  display: inline-block;
-  width: 30%;
-  margin-top: 30px;
-  background-color: antiquewhite;
-}
-
 .logo {
   display: inline-block;
 }
@@ -4905,23 +4490,6 @@ a,
 
 .nes-container > :last-child {
   margin-bottom: auto;
-}
-
-.nes-icon.portfolio-elem {
-  position: fixed;
-  inset: 0;
-  margin: auto;
-  margin-top: 32px;
-  right: 32px;
-}
-
-@media only screen and (max-width: 650px) {
-  .nes-container.portfolio-elem {
-    display: block;
-    width: 90%;
-    margin-top: 30px;
-    background-color: antiquewhite;
-  }
 }
 
 #dialog-rounded {
@@ -4996,7 +4564,6 @@ a,
   text-align: center;
   display: block;
 }
-
 
 #dialog-rounded .dialog-menu {
   list-style: none;
@@ -6635,7 +6202,6 @@ body.dusk {
     text-align: center;
   }
 }
-
 
 /* Achievements Tab */
 .achievements-content {

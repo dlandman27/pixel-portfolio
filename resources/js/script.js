@@ -1077,9 +1077,6 @@ function moveWood() {
 
 
 
-function openResume(){
-  $("#resume").css("display","block")
-}
 // The park follows the visitor's local time. Force a state with ?time=dawn|day|dusk|night
 var DAY_CYCLE_TEST_MODE = (function () {
   var match = /[?&]time=(dawn|day|dusk|night)\b/.exec(window.location.search);
@@ -1962,12 +1959,6 @@ function leaveTent1(dir){
   }
 }
 
-function openSettings(){
-  if($(".settings_bar").hasClass("open"))
-    $(".settings_bar").removeClass("open");
-  else
-    $(".settings_bar").addClass("open");
-}
 // function toggleMusic(){
 //   if($(".settings-icon.music").hasClass("on")){
 //     $(".settings-icon.music").removeClass("on").addClass("off");
@@ -1998,19 +1989,6 @@ function openSettings(){
 //     SFXOn = true;
 //   }
 // }
-
-function toggleSocialMedia(){
-  if($(".socialMedia-icon").hasClass("on")){
-    $(".iphone-screen").css("display","none");
-    $(".socialMedia-icon").removeClass("on").addClass("off");
-   
-  }
-  else{
-    $(".iphone-screen").css("display","block");
-    $(".socialMedia-icon").removeClass("off").addClass("on");
-    
-  }
-}
 
 function openTVScreen(){
   $(".socialMedia-icon").css("display","none");
@@ -2073,91 +2051,10 @@ function sitOnCouch(){
   
 }
 
-function openPortfolio(){
-  // Allow opening portfolio from anywhere (including global menu)
-    $(".portfolio-container").css("display","block");
-    eventOccurence = true;
-    $(".minimap-icon").css("display","none");
-    $(".mobile-controller").css("display","none");
-    
-    // Initialize portfolio tabs and load projects
-    initPortfolioTabs();
-    loadPortfolioProjects();
-}
-
-function openPortfolioWithLogoFilter(){
-  // Open portfolio and filter to show only logos
-  openPortfolio();
-  // Small delay to ensure portfolio modal is loaded
-  setTimeout(function() {
-    if (typeof filterSelection === "function") {
-      filterSelection('.logo');
-    }
-  }, 100);
-}
-
-function closePortfolio(){
-  $(".portfolio-container").css("display","none");
-  eventOccurence = false;
-  if(inventory.minimap)
-    $(".minimap-icon").css("display","block");
-  if(window.innerWidth <= 600)
-    $(".mobile-controller").css("display","flex");
-}
-
-// Portfolio tab management
-function initPortfolioTabs() {
-  $(".portfolio-tab").on("click", function() {
-    var tabName = $(this).data("tab");
-    switchPortfolioTab(tabName);
-  });
-}
-
-function switchPortfolioTab(tabName) {
-  // Remove active class from all tabs and content
-  $(".portfolio-tab").removeClass("active");
-  $(".portfolio-tab-content").removeClass("active");
-  
-  // Add active class to selected tab and content
-  $(".portfolio-tab[data-tab='" + tabName + "']").addClass("active");
-  $("#portfolio-tab-" + tabName).addClass("active");
-}
-
-// Load portfolio projects from config
-function loadPortfolioProjects() {
-  if (typeof PORTFOLIO_PROJECTS === "undefined") {
-    console.error("PORTFOLIO_PROJECTS not defined");
-    return;
-  }
-  
-  var $grid = $("#portfolio-projects-grid");
-  if (!$grid.length) return;
-  
-  $grid.empty();
-  
-  PORTFOLIO_PROJECTS.forEach(function(project) {
-    var $project = $('<div class="portfolio-project-card nes-container with-title is-centered" data-category="' + project.category + '" onclick="openProjectLightbox(\'' + project.id + '\')">');
-    $project.append('<p class="title">' + (project.title || "") + '</p>');
-    if (project.image) {
-      $project.append('<img src="' + project.image + '" alt="' + (project.title || "") + '" style="width:100%; max-height:200px; object-fit:contain;">');
-    }
-    $project.append('<p>' + (project.description || "").substring(0, 100) + '...</p>');
-    $grid.append($project);
-  });
-}
-
-// Filter portfolio projects by category
-function filterPortfolioProjects(category) {
-  // Update filter buttons
-  $(".portfolio-filter-btn").removeClass("active");
-  $(".portfolio-filter-btn[data-category='" + category + "']").addClass("active");
-  
-  // Filter project cards
-  if (category === "all") {
-    $(".portfolio-project-card").show();
-  } else {
-    $(".portfolio-project-card").hide();
-    $(".portfolio-project-card[data-category='" + category + "']").show();
+// In-world portfolio signs open the Work tab (optionally pre-filtered, e.g. "logo").
+function openPortfolio(filter){
+  if (typeof UnifiedPanel !== "undefined") {
+    UnifiedPanel.openWork(filter);
   }
 }
 
@@ -2502,19 +2399,6 @@ function turnOffTV(){
     $(".mobile-controller").css("display","flex");
 }
 
-function toggleJoycon(e){
-  // const event = new CustomEvent('build', { keyCode: e });
-  // let element = document.querySelector('.joycon.arrow');
-  // element.dispatchEvent(new KeyboardEvent("keydown", {
-  //   key: "e",
-  //   keyCode: 37, // example values.
-  //   code: "KeyE", // put everything you need in this object.
-  //   which: 69
-  // }));
-  // move(e);
-}
-
-
 //handler for joycon on mobile
 var setint  = '';
 $(document).ready(function() {
@@ -2730,7 +2614,7 @@ $(document).ready(function() {
   // Logo Gallery Click Handlers
   $('.logo-item').bind('click', function(e) {
     e.stopPropagation();
-    openPortfolioWithLogoFilter();
+    openPortfolio("logo");
   });
 
   // $('.joycon.arrow.right').live("mouseleave mouseup", function () {
@@ -2743,56 +2627,6 @@ $(document).ready(function() {
 
 });
 
-function showContent(id){
-  // y = "#JS"
-  //  $(y).css("display","block");
-
-  contents = ["#HTML","#JS","#Java","#Python"];
-  contents.map(x => x==id? $(x).css("display","block") : $(x).css("display","none"));
-}
-
-function openMenu(type){
-
-}
-
-//Handler for Filtering elements in the portfolio
-function filterSelection(category){
-  var classes = [".logo",".graphic",".video"];
-
-  classes.map(x => (x==category || category==".all")?$(x).css("display","inline-block"):$(x).css("display","none"));
-
-  classes.push(".all");
-  classes.map(x => (x==category)?$(x+"Button").addClass("is-primary"):$(x+"Button").removeClass("is-primary"));
-}
-
-
-
-function openMinimap(){
-  // Get the element
-  var elem = document.querySelector('#map');
-
-  // Create a copy of it
-  var clone = elem.cloneNode(true);
-
-  // Update the ID and add a class
-  clone.id = 'minimap';
-
-  // Inject it into the DOM
-  elem.after(clone);
-
-  clone.style.removeProperty('left');
-  clone.style.removeProperty('top');
-  clone.style.removeProperty('margin-left');
-  clone.style.removeProperty('margin-top');
-  eventOccurence = true;
-}
-
-$("#minimap").live('click', function () {
-  $("#minimap").remove();
-  if(!inSoccer && !inFishing){
-    eventOccurence = false;
-  }
-});
 
 // ----------------------
 // Minimap Widget System
@@ -3471,22 +3305,6 @@ function calculateNewValue(oldValue, keyCode1, keyCode2, elem) {
   return newValue;
 }
 
-//Collision Handler for Tent1
-function calculateNewValueTent1(oldValue, keyCode1, keyCode2, elem) {
-  // Use collision engine only
-  if (typeof CollisionEngine !== "undefined" && typeof COLLISION_CONFIG !== "undefined" && COLLISION_CONFIG.tent1) {
-    return CollisionEngine.checkCollisions(COLLISION_CONFIG.tent1, elem, keyCode1, keyCode2, oldValue);
-  }
-  
-  // Fallback if engine/config not available (shouldn't happen, but safety net)
-  console.warn("Collision engine not available, using basic fallback");
-  var ks = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.keysPressed : (typeof keysPressed !== "undefined" ? keysPressed : {});
-  var dist = (typeof WORLD !== "undefined" && WORLD.movement) ? WORLD.movement.distancePerIteration : (typeof distancePerIteration !== "undefined" ? distancePerIteration : 4);
-  var newValue = parseInt(oldValue, 10)
-    - (ks[keyCode1] ? dist : 0)
-    + (ks[keyCode2] ? dist : 0);
-  return newValue;
-}
 //Collision Handler for Tent1
 function calculateNewValueTent1(oldValue, keyCode1, keyCode2, elem) {
   // Use collision engine only

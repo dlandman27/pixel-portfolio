@@ -346,6 +346,14 @@ var UnifiedPanel = (function () {
   // Set when a project is opened from the Work tab so closing the lightbox
   // brings the visitor back to the list instead of dropping them in the world.
   var returnToWorkTab = false;
+  // Filter to apply the next time the Work tab renders (set by openWork).
+  var pendingWorkFilter = null;
+
+  function openWork(filter) {
+    pendingWorkFilter = WORK_FILTERS[filter] ? filter : null;
+    if (isOpen) switchTab("work");
+    else open("work");
+  }
 
   function buildWorkCard(project) {
     var card = document.createElement("button");
@@ -410,7 +418,12 @@ var UnifiedPanel = (function () {
       });
     });
 
-    render("all");
+    var initial = pendingWorkFilter || "all";
+    pendingWorkFilter = null;
+    Array.prototype.forEach.call(buttons, function (b) {
+      b.classList.toggle("active", b.getAttribute("data-filter") === initial);
+    });
+    render(initial);
   }
 
   // Wrap the global lightbox close so the Work tab reopens after viewing a project.
@@ -894,6 +907,7 @@ var UnifiedPanel = (function () {
     open: open,
     close: close,
     switchTab: switchTab,
+    openWork: openWork,
     isOpen: function () {
       return isOpen;
     },

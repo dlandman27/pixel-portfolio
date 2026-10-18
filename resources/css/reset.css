@@ -1,0 +1,58 @@
+/* reset.css
+   The handful of base styles the site relied on from Bootstrap's reboot,
+   kept so layouts render the same without loading all of Bootstrap. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+p,
+ul,
+ol {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+ul,
+ol {
+  padding-left: 2rem;
+}
+
+img,
+svg {
+  vertical-align: middle;
+}
+
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+progress {
+  vertical-align: baseline;
+}
+
+/* Hide the focus ring after mouse clicks but keep it for keyboard users. */
+button:focus:not(:focus-visible) {
+  outline: 0;
+}
