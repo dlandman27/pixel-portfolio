@@ -226,12 +226,16 @@
       // Initial sync of Dylan to physics position (do not auto-center; preserve manual offset)
       this.syncToDom();
 
-      // Play intro drop only the first time we enter the main map
+      // Play intro drop only the first time we enter the main map.
+      // When intro.js runs the opening, it triggers the drop itself as the
+      // loader opens; until then Dylan stays hidden and input stays off.
       if (!this._introPlayed && this.sceneName === "mainMap") {
         if (global.playerController) {
           global.playerController.disableInput = true;
         }
-        this._playIntroDrop();
+        if (!global.INTRO_SEQUENCE) {
+          this._playIntroDrop();
+        }
         this._introPlayed = true;
       } else {
         // Ensure input is enabled for all other scenes

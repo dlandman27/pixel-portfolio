@@ -30,61 +30,40 @@ body {
   background: #111827;
 }
 
-.loader-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 3.5rem);
-  grid-auto-rows: 3.5rem;
-  gap: 0.75rem;
+.loading-screen {
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+/* DYLAN / LANDMAN: letters fall in one by one (--i set per letter in index.html) */
+.loader-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   font-family: "Press Start 2P", monospace;
   color: #fff;
-  text-align: center;
+  user-select: none;
 }
 
-.loader-grid span {
+.loader-word {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.4rem; /* add or increase this */
+  gap: 0.35em;
+  font-size: clamp(1.6rem, 6vw, 3.2rem);
+  line-height: 1;
+}
+
+.loader-word:last-child {
+  color: #3eb489;
+}
+
+.loader-name span {
+  display: inline-block;
   opacity: 0;
   transform: translateY(-150%);
+  text-shadow: 0 0.12em 0 #000;
   animation: letterFall 0.5s ease-out forwards;
-}
-
-.loader-grid span:nth-child(1) {
-  animation-delay: 0s;
-}
-.loader-grid span:nth-child(2) {
-  animation-delay: 0.05s;
-}
-.loader-grid span:nth-child(3) {
-  animation-delay: 0.1s;
-}
-.loader-grid span:nth-child(4) {
-  animation-delay: 0.15s;
-}
-.loader-grid span:nth-child(5) {
-  animation-delay: 0.2s;
-}
-.loader-grid span:nth-child(6) {
-  animation-delay: 0.25s;
-}
-.loader-grid span:nth-child(7) {
-  animation-delay: 0.3s;
-}
-.loader-grid span:nth-child(8) {
-  animation-delay: 0.35s;
-}
-.loader-grid span:nth-child(9) {
-  animation-delay: 0.4s;
-}
-.loader-grid span:nth-child(10) {
-  animation-delay: 0.45s;
-}
-.loader-grid span:nth-child(11) {
-  animation-delay: 0.5s;
-}
-.loader-grid span:nth-child(12) {
-  animation-delay: 0.55s;
+  animation-delay: calc(var(--i) * 0.05s);
 }
 
 @keyframes letterFall {
@@ -102,16 +81,70 @@ body {
   }
 }
 
-/* Thick static border under letters, aligned to bottom-right */
-.loader-grid::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: -0.4rem;
-  width: 65%;
-  height: 0.45rem;
-  background: #fff;
-  box-shadow: 0 0 0 2px #000;
+/* Exit: letters tumble down off the screen, staggered */
+.loading-screen.is-leaving .loader-name span {
+  opacity: 1;
+  transform: translateY(0);
+  animation: letterLeave 0.38s ease-in forwards;
+  animation-delay: calc(var(--i) * 0.018s);
+}
+
+@keyframes letterLeave {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(-18%) rotate(calc((var(--i) - 6) * 2deg));
+  }
+  100% {
+    transform: translateY(260%) rotate(calc((var(--i) - 6) * 6deg));
+    opacity: 0;
+  }
+}
+
+.loader-bar {
+  width: min(320px, 60vw);
+  height: 12px;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 0 #000;
+  padding: 2px;
+}
+
+.loader-bar-fill {
+  height: 100%;
+  width: 0;
+  background: #3eb489;
+  animation: loaderFill 1.1s steps(10) forwards;
+}
+
+.loading-screen.is-ready .loader-bar-fill {
+  width: 100%;
+  animation: none;
+}
+
+@keyframes loaderFill {
+  to { width: 85%; }
+}
+
+.loader-skip {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  color: #9ca3af;
+  opacity: 0;
+  animation: loaderSkipBlink 1s steps(2) 0.9s infinite;
+}
+
+.loading-screen.is-leaving .loader-bar,
+.loading-screen.is-leaving .loader-skip,
+.loading-screen.is-skipping .loader-skip {
+  visibility: hidden;
+}
+
+@keyframes loaderSkipBlink {
+  0% { opacity: 0; }
+  50%, 100% { opacity: 1; }
 }
 
 /* Creates the flashing dots under the fireplace */
@@ -1528,25 +1561,32 @@ body {
 }
 
 .intro-drop {
-  animation: introDrop 0.3s ease-out forwards;
-  will-change: transform, opacity;
+  animation: introDrop 0.5s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+  will-change: translate, scale;
 }
 
 @keyframes introDrop {
   0% {
     opacity: 0;
-    scale: 0.5;
-    translate: 0 -24px;
+    translate: 0 -160px;
+    scale: 0.9 1.1;
   }
-  80% {
-    opacity: 0.5;
-    scale: 1.2;
-    translate: 0 4px;
+  15% {
+    opacity: 1;
+  }
+  78% {
+    translate: 0 0;
+    scale: 0.9 1.1;
+    animation-timing-function: ease-out;
+  }
+  88% {
+    translate: 0 2px;
+    scale: 1.2 0.8;
   }
   100% {
     opacity: 1;
-    scale: 1;
     translate: 0 0;
+    scale: 1 1;
   }
 }
 
@@ -4071,7 +4111,7 @@ body {
 /* Global tutorial speech bubble overlay */
 .tutorial-bubble {
   position: fixed;
-  top: 32px;
+  bottom: 32px; /* kept off the "Welcome to Dylan Landman" sign at the top */
   left: 50%;
   transform: translateX(-50%);
   z-index: 10000030; /* above the world, below menu buttons, panel and lightboxes */
@@ -5064,10 +5104,6 @@ body.night {
   background-color: #0a0a14;
 }
 
-body.dawn,
-body.dusk {
-  background-color: #2a1a3d;
-}
 
 /* Unified Panel System */
 .unified-panel {
@@ -7190,8 +7226,14 @@ body.is-grabbing .recenter-btn {
 }
 
 /* Lantern: a soft hole in the night overlay around Dylan */
-body.night #day-night-overlay,
+/* Dawn/dusk read as a warm sunset glow rather than darkness */
+body.dawn #day-night-overlay,
 body.dusk #day-night-overlay {
+  background: linear-gradient(to bottom, #ff8a3d 0%, #d9466f 100%);
+  mix-blend-mode: soft-light;
+}
+
+body.night #day-night-overlay {
   -webkit-mask-image: radial-gradient(circle at var(--lantern-x, 50%) var(--lantern-y, 50%), transparent 0, transparent 70px, #000 240px);
   mask-image: radial-gradient(circle at var(--lantern-x, 50%) var(--lantern-y, 50%), transparent 0, transparent 70px, #000 240px);
 }

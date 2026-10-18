@@ -118,10 +118,7 @@ $(window).load(function () {
   lazyLoad();
 
   
-  //Waits 1.4s then removes the loading screen
-  setTimeout(function () {
-     $('.loading-screen').fadeOut();  
-  }, 2500);
+  // The loading screen and startGame() are sequenced by resources/js/intro.js.
 
   // Legacy: center the map after the loader finishes.
   // With the new physics/camera system, GameWorld now owns camera placement,
@@ -135,8 +132,6 @@ $(window).load(function () {
       WORLD.centerMap();
     }
   },2400);//CHANGE IN ZOOM MUST CHANGE VALUE (CURR 1.2)(VALUE = 1+(1-ZOOMLEVEL))
-  //Starts the game
-  setTimeout(startGame, 2800);
 
   //Function to handle weather
   dayCycle();
@@ -200,7 +195,8 @@ function startGame() {
 
   // Disable original walk-out entrance animation; start with movement enabled
   eventOccurence = false;
-  $("#dylan").css("visibility", "visible");
+  // intro.js reveals Dylan with the landing drop
+  if (!window.INTRO_SEQUENCE) $("#dylan").css("visibility", "visible");
   // Ensure a reasonable idle sprite
   if (typeof SpriteManager !== "undefined") {
     SpriteManager.setSpriteFrame("front", 2);
@@ -210,8 +206,8 @@ function startGame() {
       "url(resources/images/characters/dylan/dylan-front-2.png)"
     );
   }
-  // Show tutorial if it hasn't been shown before
-  if (getCookie("title-screen") != "true") {
+  // Show tutorial if it hasn't been shown before (intro.js does this after landing)
+  if (!window.INTRO_SEQUENCE && getCookie("title-screen") != "true") {
     openTutorial();
   }
 
@@ -1123,16 +1119,16 @@ function dayCycle() {
   // Set visual properties based on time state
   switch(timeState) {
     case 'dawn':
-      brightness = 0.85;
-      overlayOpacity = 0.15;
+      brightness = 0.95;
+      overlayOpacity = 0.35;
       break;
     case 'day':
       brightness = 1;
       overlayOpacity = 0;
       break;
     case 'dusk':
-      brightness = 0.8;
-      overlayOpacity = 0.25;
+      brightness = 0.9;
+      overlayOpacity = 0.5;
       break;
     case 'night':
       // Kept readable: a lantern glow around Dylan (ambient-life.js) does the mood work.

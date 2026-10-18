@@ -174,7 +174,7 @@
       if (tod === "day" || tod === "dawn") butterflies.forEach(function (b) { stepButterfly(b, now); });
       else fireflies.forEach(function (f) { stepFirefly(f, now); });
     }
-    if (tod === "night" || tod === "dusk") updateLantern();
+    if (tod === "night") updateLantern();
     stepDust(now);
     requestAnimationFrame(tick);
   }

@@ -62,6 +62,7 @@
     <script type="text/javascript" src="resources/js/helpers.js"></script>
     <script type="text/javascript" src="resources/js/menu.js"></script>
     <script type="text/javascript" src="resources/js/unified-panel.js"></script>
+    <script type="text/javascript" src="resources/js/intro.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
   </head>
 
@@ -314,22 +315,14 @@
       id="lottie-confetti"
       style="position: fixed; inset: 0; pointer-events: none; z-index: 10000005; display: none;"
     ></div>
-    <!-- Loading Screen -->
-    <div class="loading-screen">
-      <div class="loader-grid">
-        <span>D</span>
-        <span>Y</span>
-        <span>L</span>
-        <span>A</span>
-        <span>N</span>
-        <span>L</span>
-        <span>A</span>
-        <span>N</span>
-        <span>D</span>
-        <span>M</span>
-        <span>A</span>
-        <span>N</span>
+    <!-- Loading Screen (sequenced by resources/js/intro.js) -->
+    <div class="loading-screen" aria-label="Loading Dylan Landman's portfolio">
+      <div class="loader-name" aria-hidden="true">
+        <div class="loader-word"><span style="--i:0">D</span><span style="--i:1">Y</span><span style="--i:2">L</span><span style="--i:3">A</span><span style="--i:4">N</span></div>
+        <div class="loader-word"><span style="--i:5">L</span><span style="--i:6">A</span><span style="--i:7">N</span><span style="--i:8">D</span><span style="--i:9">M</span><span style="--i:10">A</span><span style="--i:11">N</span></div>
       </div>
+      <div class="loader-bar" aria-hidden="true"><div class="loader-bar-fill"></div></div>
+      <p class="loader-skip">Press any key to start</p>
     </div>
   </body>
 </html>
