@@ -7554,3 +7554,107 @@ body.is-grabbing .recenter-btn {
     display: none;
   }
 }
+
+/* ===== 2.5D prototype (view-3d.js, ?view=3d) ===== */
+html.view-3d body {
+  /* seen past the far edge of the tilted world */
+  background: linear-gradient(to bottom, #7cc4e8 0%, #bde7f7 55%, #3eb489 100%);
+}
+
+/* A filter on #map would flatten the 3D scene; the night overlay does the tint. */
+html.view-3d #map,
+html.view-3d #tent1,
+html.view-3d #cave {
+  filter: none !important;
+  transform-style: preserve-3d;
+}
+
+html.view-3d #map div,
+html.view-3d #tent1 div,
+html.view-3d #cave div {
+  transform-style: preserve-3d;
+}
+
+/* Clipping (overflow: hidden) would flatten everything inside back onto the ground */
+html.view-3d #wrapper {
+  overflow: visible;
+}
+
+/* Inline link wrappers would break the shared 3D space */
+html.view-3d #map a,
+html.view-3d #tent1 a,
+html.view-3d #cave a {
+  display: contents;
+}
+
+/* Cards stand vertical on the ground and are stretched so they keep their
+   original on-screen height (--v3d-stretch = 1 / sin(tilt)). */
+html.view-3d .v3d-upright {
+  transform-origin: 50% 100%;
+  transform: rotateX(-90deg) scaleY(var(--v3d-stretch)) var(--v3d-base,);
+}
+
+/* Cliff strips: vertical, lifted to their row's height on the shared cliff wall */
+html.view-3d .v3d-cliff {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  transform: translateZ(var(--v3d-lift)) rotateX(-90deg) var(--v3d-base,);
+}
+
+html.view-3d .v3d-part {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Box tops lie flat, lifted to the height of their front wall */
+html.view-3d .v3d-top {
+  transform: translateZ(var(--v3d-lift));
+}
+
+/* Box walls stand truly vertical so the lifted top sits right on them;
+   a touch darker than the top, like a lit roof over a shaded face */
+html.view-3d .v3d-wall {
+  transform-origin: 50% 100%;
+  transform: rotateX(-90deg);
+  filter: brightness(0.82);
+}
+
+/* Thickness layers behind cards (see DEPTH in view-3d.js) */
+html.view-3d .v3d-depth {
+  transform-origin: 50% 100%;
+  transform: rotateX(-90deg) scaleY(var(--v3d-stretch)) var(--v3d-base,) translateZ(var(--v3d-depth-z));
+  filter: brightness(0.62);
+}
+
+/* Originals stay (invisible) so clicks and z-index logic keep working */
+html.view-3d .v3d-sliced {
+  opacity: 0;
+}
+
+html.view-3d .v3d-shadow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  filter: brightness(0);
+  opacity: 0.26;
+  transform-origin: 50% 100%;
+  transform: translateZ(0.5px) skewX(var(--v3d-shadow-skew)) scaleY(var(--v3d-shadow-length));
+}
+
+/* The silhouette shadow replaces Dylan's blob shadow */
+html.view-3d #dylan::after {
+  display: none;
+}
+
+/* Ground cover: flat, lifted a hair, with a soft shadow */
+html.view-3d .v3d-flat-decor {
+  transform: translateZ(1.5px);
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.18));
+}
+
+/* Standing pieces between the camera and Dylan fade so he stays visible */
+html.view-3d .v3d-see-through {
+  opacity: 0.35;
+  transition: opacity 0.15s ease-out;
+}

@@ -57,6 +57,8 @@
   function clientToWorld(clientX, clientY) {
     var el = sceneEl();
     if (!el) return null;
+    // In the 2.5D view the ground is tilted, so invert the perspective exactly.
+    if (global.View3D && el.id === "map") return global.View3D.clientToWorld(clientX, clientY);
     var rect = el.getBoundingClientRect();
     var scale = el.offsetWidth ? rect.width / el.offsetWidth : 3;
     return { x: (clientX - rect.left) / scale, y: (clientY - rect.top) / scale };
