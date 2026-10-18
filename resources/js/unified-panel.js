@@ -12,6 +12,7 @@ var UnifiedPanel = (function () {
   var tabTemplatePaths = {
     home: "resources/components/unified-panel-home.html",
     work: "resources/components/unified-panel-work.html",
+    contact: "resources/components/unified-panel-contact.html",
     wardrobe: "resources/components/unified-panel-wardrobe.html",
     backpack: "resources/components/unified-panel-backpack.html",
     fishbook: "resources/components/unified-panel-fishbook.html",
@@ -20,11 +21,13 @@ var UnifiedPanel = (function () {
     settings: "resources/components/unified-panel-settings.html",
   };
 
+  // Page titles (shown in the panel header and the start menu).
   var tabs = {
-    home: { name: "Home" },
+    home: { name: "About" },
     work: { name: "Work" },
+    contact: { name: "Contact" },
     wardrobe: { name: "Wardrobe" },
-    backpack: { name: "Backpack" },
+    backpack: { name: "Bag" },
     fishbook: { name: "Fishbook" },
     achievements: { name: "Achievements" },
     games: { name: "Games" },
@@ -95,6 +98,15 @@ var UnifiedPanel = (function () {
     if (eventsBound) return;
     eventsBound = true;
 
+    // Back: return to the start menu
+    $(".unified-panel-back").live("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+      if (typeof StartMenu !== "undefined") StartMenu.open(currentTab);
+      return false;
+    });
+
     // Close button - use .live for older jQuery support
     $(".unified-panel-close").live("click", function (e) {
       e.preventDefault();
@@ -146,6 +158,7 @@ var UnifiedPanel = (function () {
       }
 
       var targetTab = tabKey || "home";
+      if (typeof StartMenu !== "undefined") StartMenu.close();
       switchTab(targetTab);
 
       $panel.addClass("active").attr("aria-hidden", "false");
@@ -187,6 +200,7 @@ var UnifiedPanel = (function () {
     }
 
     currentTab = tabKey;
+    $("#unified-panel-title").text(tabs[tabKey].name);
     updateActiveTab(tabKey);
     loadTabContent(tabKey);
   }
@@ -1007,3 +1021,116 @@ $(function () {
 });
 
 
+
+// ---------------------------------------------------------------------------
+// Start menu: an RPG-style list that pops out from the side rail. Each item
+// opens a page in the unified panel. Arrow keys / Enter / Esc work, and while
+// it (or a page) is open the arrow keys don't walk Dylan around.
+// ---------------------------------------------------------------------------
+var StartMenu = (function () {
+  var SECTIONS = [
+    ["home", "work", "contact"],
+    ["wardrobe", "backpack", "fishbook", "achievements", "games"],
+    ["settings"],
+  ];
+  var LABELS = {
+    home: "About", work: "Work", contact: "Contact", wardrobe: "Wardrobe", backpack: "Bag",
+    fishbook: "Fishbook", achievements: "Achievements", games: "Games", settings: "Settings",
+  };
+
+  var el = null;
+  var isOpen = false;
+
+  function build() {
+    el = document.createElement("nav");
+    el.id = "start-menu";
+    el.className = "start-menu";
+    el.setAttribute("aria-label", "Menu");
+    el.setAttribute("aria-hidden", "true");
+    SECTIONS.forEach(function (keys, i) {
+      if (i > 0) {
+        var hr = document.createElement("div");
+        hr.className = "start-menu-divider";
+        el.appendChild(hr);
+      }
+      keys.forEach(function (key) {
+        var item = document.createElement("button");
+        item.type = "button";
+        item.className = "start-menu-item";
+        item.setAttribute("data-tab", key);
+        item.textContent = LABELS[key];
+        item.addEventListener("click", function (e) {
+          e.stopPropagation();
+          UnifiedPanel.open(key);
+        });
+        item.addEventListener("mouseenter", function () { item.focus(); });
+        el.appendChild(item);
+      });
+    });
+    el.addEventListener("click", function (e) { e.stopPropagation(); });
+    document.body.appendChild(el);
+  }
+
+  function items() {
+    return Array.prototype.slice.call(el.querySelectorAll(".start-menu-item"));
+  }
+
+  function open(focusTab) {
+    if (!el) build();
+    isOpen = true;
+    el.classList.add("is-open");
+    el.setAttribute("aria-hidden", "false");
+    document.body.classList.add("start-menu-open");
+    var target = el.querySelector('[data-tab="' + (focusTab || "home") + '"]') || items()[0];
+    target.focus();
+  }
+
+  function close() {
+    if (!el || !isOpen) return;
+    isOpen = false;
+    el.classList.remove("is-open");
+    el.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("start-menu-open");
+  }
+
+  function toggle() {
+    if (isOpen) close();
+    else open();
+  }
+
+  var MOVE_KEYS = { 37: 1, 38: 1, 39: 1, 40: 1, 65: 1, 68: 1, 83: 1, 87: 1 };
+
+  // Capture phase, so it runs before the player controller sees the key.
+  window.addEventListener(
+    "keydown",
+    function (e) {
+      var typing = e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+      if (isOpen) {
+        if (e.keyCode === 27) {
+          e.preventDefault();
+          close();
+          return;
+        }
+        if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 87 || e.keyCode === 83) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          var list = items();
+          var i = list.indexOf(document.activeElement);
+          var step = e.keyCode === 38 || e.keyCode === 87 ? -1 : 1;
+          list[(i + step + list.length) % list.length].focus();
+          return;
+        }
+      }
+      // Don't walk Dylan around behind an open menu or page.
+      if ((isOpen || UnifiedPanel.isOpen()) && MOVE_KEYS[e.keyCode] && !typing) {
+        e.stopImmediatePropagation();
+      }
+    },
+    true
+  );
+
+  // Clicking the world closes the menu.
+  document.addEventListener("click", function () { close(); });
+
+  return { open: open, close: close, toggle: toggle, isOpen: function () { return isOpen; } };
+})();

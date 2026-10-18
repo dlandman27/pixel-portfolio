@@ -5105,7 +5105,6 @@ body.night {
   background-color: #0a0a14;
 }
 
-
 /* Unified Panel System */
 .unified-panel {
   position: fixed;
@@ -5137,22 +5136,6 @@ body.night {
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(4px);
   z-index: 1;
-}
-
-.unified-panel-tabs-row {
-  position: absolute;
-  inset: 0 auto auto 50%;
-  transform: translateX(-50%);
-  top: -56px;
-  width: 90vw;
-  max-width: 1200px;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  flex-wrap: nowrap;
-  background: transparent;
 }
 
 .unified-panel-container {
@@ -5242,172 +5225,9 @@ body.night {
   animation: unifiedPanelOut 0.15s ease-in forwards;
 }
 
-.unified-panel-close {
-  padding: 0;
-  width: 40px;
-  height: 50px;
-  display: flex;
-  line-height: 1;
-  flex-shrink: 0;
-  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAzElEQVRYR+2X0Q6AIAhF5f8/2jYXZkwEjNSVvVUjDpcrGgT7FUkI2D9xRfQETwNIiWO85wfINfQUEyxBG2ArsLwC0jioGt5zFcwF4OYDPi/mBYKm4t0U8ATgRm3ThFoAqkhNgWkA0jJLvaOVSs7j3qMnSgXWBMiWPXe94QqMBMBc1VZIvaTu5u5pQewq0EqNZvIEMCmxAawK0DNkay9QmfFNAJUXfgGgUkLaE7j/h8fnASkxHTz0DGIBMCnBeeM7AArpUd3mz2x3C7wADglA8BcWMZhZAAAAAElFTkSuQmCC)
-      14 0,
-    pointer !important;
-  font-size: 1.5rem;
-  z-index: 10000060;
-  position: relative;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 0 #000;
-  color: #fecaca !important; /* red-tinted X */
-}
-
-.unified-panel-close:hover {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%)!important;
-  border-bottom-width: 4px!important;
-}
-
-.unified-panel-tabs {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: nowrap;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-}
-
-.unified-panel-close {
-  margin-left: 0.5rem;
-  border: 2px solid #f97373!important;
-  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%)!important;
-}
-
-.unified-panel-tab {
-  padding: 0;
-  width: 47px;
-  color: #fef3c7;
-  height: 50px;
-  display: flex;
-  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAzElEQVRYR+2X0Q6AIAhF5f8/2jYXZkwEjNSVvVUjDpcrGgT7FUkI2D9xRfQETwNIiWO85wfINfQUEyxBG2ArsLwC0jioGt5zFcwF4OYDPi/mBYKm4t0U8ATgRm3ThFoAqkhNgWkA0jJLvaOVSs7j3qMnSgXWBMiWPXe94QqMBMBc1VZIvaTu5u5pQewq0EqNZvIEMCmxAawK0DNkay9QmfFNAJUXfgGgUkLaE7j/h8fnASkxHTz0DGIBMCnBeeM7AArpUd3mz2x3C7wADglA8BcWMZhZAAAAAElFTkSuQmCC)
-      14 0,
-    pointer !important;
-  margin-bottom: 2;
-  box-shadow: none;
-  position: relative;
-  align-items: center;
-  background: #8b5a2b;
-  transition: borderWidth 0.2s;
-  justify-content: center;
-  border: 2px solid #f5d6a1;
-  /* border-bottom-width: 0; */
-  font-family: "Press Start 2P", monospace;
-}
-
-.unified-panel-tab::after {
-  content: '';
-  position: absolute;
-  right: -2px;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  /* background: linear-gradient(to bottom, transparent, rgba(255, 165, 0, 0.3), rgba(147, 51, 234, 0.3), transparent); */
-  pointer-events: none;
-}
-
-.unified-panel-tab:last-of-type::after {
-  display: none;
-}
-
-.unified-panel-tab:hover:not(.active) {
-  background: #a0642f;
-  /* transform: translateY(-2px); */
-  border-bottom-width: 4px;
-}
-
-.unified-panel-tab.active {
-  background: #f5d6a1;
-  color: #1f2933;
-  border-color: #f5d6a1; /* keep same border color as idle state */
-  border-width: 2px;
-  border-bottom-width: 0;
-  box-shadow: inset 0 1px 0 #a0642f;
-}
-
 /* Per-tab active colors for easier differentiation */
-#unified-panel-tab-home.unified-panel-tab.active {
-  background: #fbbf24; /* warm amber */
-}
-
-#unified-panel-tab-backpack.unified-panel-tab.active {
-  background: #34d399; /* soft green */
-}
-
-#unified-panel-tab-fishbook.unified-panel-tab.active {
-  background: #60a5fa; /* blue */
-}
-
-#unified-panel-tab-achievements.unified-panel-tab.active {
-  background: #f97316; /* orange */
-}
-
-#unified-panel-tab-games.unified-panel-tab.active {
-  background: #a855f7; /* purple */
-}
-
-#unified-panel-tab-settings.unified-panel-tab.active {
-  background: #9ca3af; /* muted gray */
-}
 
 /* Tab tooltips under each icon */
-.unified-panel-tab::after {
-  content: attr(data-label);
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 4px;
-  padding: 12px 64px;
-  display: inline-block;
-  box-sizing: border-box;
-  text-align: center;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.2;
-  white-space: nowrap;
-  color: #fef3c7;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid #f5d6a1;
-  box-shadow: 0 2px 0 #000;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.12s ease-out, transform 0.12s ease-out;
-  z-index: 4;
-}
-
-.unified-panel-tab:hover::after {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-.unified-panel-tab .tab-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.unified-panel-tab svg {
-  width: 22px;
-  height: 22px;
-  fill: currentColor;
-}
-
-.unified-panel-tab .tab-icon i {
-  font-size: 18px;
-  line-height: 1;
-}
 
 .unified-panel-content {
   flex: 1;
@@ -5427,10 +5247,7 @@ body.night {
 }
 
 @media (max-width: 640px) {
-  .unified-panel-tabs-row {
-    top: 8px;
-    transform: translateX(-50%) scale(0.85);
-  }
+  
 
   .unified-panel-container {
     top: 54%;
@@ -6699,9 +6516,6 @@ body.unified-panel-open {
 }
 
 /* ===== Work tab ===== */
-#unified-panel-tab-work.unified-panel-tab.active {
-  background: #fb7185; /* rose */
-}
 
 .work-filters {
   display: flex;
@@ -7206,9 +7020,6 @@ body.night #day-night-overlay {
 }
 
 /* ===== Wardrobe tab ===== */
-#unified-panel-tab-wardrobe.unified-panel-tab.active {
-  background: #22d3ee; /* cyan */
-}
 
 .wardrobe-layout {
   display: flex;
@@ -7540,4 +7351,380 @@ body.is-grabbing .recenter-btn {
   .rail-btn::after {
     display: none;
   }
+}
+
+/* ===== New menu: RPG start menu + framed pages (matches the side rail) ===== */
+:root {
+  --ui-bg: rgba(31, 22, 38, 0.94);
+  --ui-bg-raised: rgba(255, 255, 255, 0.05);
+  --ui-frame: rgba(254, 243, 199, 0.75);
+  --ui-text: #ffffff;
+  --ui-muted: #cbbfd6;
+  --ui-accent: #facc15;
+}
+
+.start-menu {
+  position: fixed;
+  top: 12px;
+  right: 64px; /* just left of the rail */
+  z-index: 10000045;
+  min-width: 220px;
+  padding: 14px 10px;
+  display: none;
+  flex-direction: column;
+  background: var(--ui-bg);
+  box-shadow:
+    inset 0 0 0 4px var(--ui-bg),
+    inset 0 0 0 5px var(--ui-frame),
+    0 6px 0 rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.start-menu.is-open {
+  display: flex;
+  animation: startMenuIn 0.14s steps(3) both;
+}
+
+@keyframes startMenuIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.start-menu-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 10px 14px 10px 30px;
+  text-align: left;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ui-text);
+  background: transparent;
+  border: 0;
+}
+
+/* the ▸ cursor */
+.start-menu-item::before {
+  content: "\25B8";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ui-accent);
+  opacity: 0;
+}
+
+.start-menu-item:hover,
+.start-menu-item:focus,
+.start-menu-item:focus-visible {
+  outline: none;
+  background: var(--ui-bg-raised);
+}
+
+.start-menu-item:hover::before,
+.start-menu-item:focus::before {
+  opacity: 1;
+  animation: cursorBlink 0.8s steps(2) infinite;
+}
+
+@keyframes cursorBlink {
+  50% { opacity: 0.2; }
+}
+
+.start-menu-divider {
+  height: 1px;
+  margin: 8px 12px;
+  background: rgba(254, 243, 199, 0.25);
+}
+
+body.unified-panel-open .start-menu {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .start-menu {
+    right: 52px;
+    top: 8px;
+    min-width: 0;
+    width: calc(100vw - 68px);
+    max-width: 260px;
+  }
+}
+
+/* --- Pages (the unified panel), restyled --- */
+#unified-panel .unified-panel-overlay {
+  background: rgba(10, 6, 14, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+#unified-panel .unified-panel-container {
+  width: min(1100px, 92vw);
+  max-width: none;
+  height: min(82vh, 820px);
+  max-height: none;
+  padding: 0;
+  background: var(--ui-bg);
+  border: 0;
+  box-shadow:
+    inset 0 0 0 5px var(--ui-bg),
+    inset 0 0 0 6px var(--ui-frame),
+    0 8px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* no more hanging-sign ropes */
+#unified-panel .unified-panel-container::before,
+#unified-panel .unified-panel-container::after {
+  content: none;
+}
+
+.unified-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 16px 20px 14px;
+  margin: 6px 6px 0;
+  border-bottom: 1px solid rgba(254, 243, 199, 0.2);
+}
+
+.unified-panel-title {
+  flex: 1;
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  color: var(--ui-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.unified-panel-back,
+#unified-panel .unified-panel-close {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  color: var(--ui-text);
+  background: var(--ui-bg-raised);
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.5);
+  padding: 10px 12px;
+  width: auto;
+  height: auto;
+}
+
+#unified-panel .unified-panel-close {
+  order: 3;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
+
+.unified-panel-back:hover,
+#unified-panel .unified-panel-close:hover,
+.unified-panel-back:focus-visible,
+#unified-panel .unified-panel-close:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+#unified-panel .unified-panel-content {
+  margin: 0 6px 6px;
+  padding: 1.5rem 1.75rem 2rem;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* The header shows the page title now */
+#unified-panel .tab-content-title {
+  display: none;
+}
+
+#unified-panel .tab-subtitle {
+  color: var(--ui-muted);
+}
+
+/* Cards inside pages pick up the same framed look */
+#unified-panel .work-card,
+#unified-panel .wardrobe-item,
+#unified-panel .game-card,
+#unified-panel .work-filter {
+  background: var(--ui-bg-raised);
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.45), 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .work-card:hover,
+#unified-panel .wardrobe-item:hover:not(.is-locked),
+#unified-panel .game-card:hover {
+  box-shadow: inset 0 0 0 2px var(--ui-accent), 0 6px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .work-card-thumb {
+  border-bottom: 0;
+}
+
+#unified-panel .work-filter.active {
+  background: var(--ui-accent);
+  color: #1f1a2e;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .wardrobe-item.is-current {
+  box-shadow: inset 0 0 0 2px #22d3ee, 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .wardrobe-preview,
+#unified-panel .home-detail-image {
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.45), 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Contact page */
+.contact-list {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 560px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  color: var(--ui-text);
+  background: var(--ui-bg-raised);
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.45), 0 4px 0 rgba(0, 0, 0, 0.35);
+  text-decoration: none;
+}
+
+.contact-item:hover {
+  color: var(--ui-text);
+  text-decoration: none;
+  box-shadow: inset 0 0 0 2px var(--ui-accent), 0 6px 0 rgba(0, 0, 0, 0.35);
+}
+
+.contact-item i {
+  font-size: 1.6rem;
+  width: 2rem;
+  text-align: center;
+}
+
+.contact-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.contact-item-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+}
+
+.contact-item-value {
+  font-size: 0.9rem;
+  color: var(--ui-muted);
+}
+
+@media (max-width: 640px) {
+  #unified-panel .unified-panel-container {
+    width: 96vw;
+    height: 88vh;
+  }
+  .unified-panel-header {
+    padding: 12px 12px 10px;
+    gap: 0.5rem;
+  }
+  .unified-panel-title {
+    font-size: 0.75rem;
+  }
+  #unified-panel .unified-panel-content {
+    padding: 1rem;
+  }
+}
+
+/* --- nes.css pieces inside pages, restyled to the menu's own look --- */
+#unified-panel .nes-btn {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  line-height: 1.4;
+  padding: 0.75rem 1rem;
+  color: var(--ui-text);
+  background: var(--ui-bg-raised);
+  border: 0;
+  border-image: none;
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.5), 0 4px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+#unified-panel .nes-btn::after {
+  display: none; /* nes.css draws its bevel here */
+}
+
+#unified-panel .nes-btn:hover,
+#unified-panel .nes-btn:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 2px var(--ui-accent), 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .nes-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 0 0 2px var(--ui-accent), 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* primary / warning = the accent button */
+#unified-panel .nes-btn.is-primary,
+#unified-panel .nes-btn.is-warning {
+  color: #1f1a2e;
+  background: var(--ui-accent);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .nes-btn.is-primary:hover,
+#unified-panel .nes-btn.is-warning:hover {
+  background: #fde047;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(250, 204, 21, 0.35);
+}
+
+#unified-panel .nes-btn.is-error {
+  color: #fff;
+  background: #b91c1c;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+#unified-panel .nes-btn.is-error:hover {
+  background: #dc2626;
+}
+
+/* Progress bars: flat track + stepped fill */
+#unified-panel .nes-progress {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 14px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-image: none;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(254, 243, 199, 0.35);
+}
+
+#unified-panel .nes-progress::-webkit-progress-bar {
+  background: transparent;
+}
+
+#unified-panel .nes-progress::-webkit-progress-value {
+  background: var(--ui-accent);
+}
+
+#unified-panel .nes-progress::-moz-progress-bar {
+  background: var(--ui-accent);
+}
+
+#unified-panel .nes-progress.is-success::-webkit-progress-value {
+  background: #22c55e;
+}
+
+#unified-panel .nes-progress.is-success::-moz-progress-bar {
+  background: #22c55e;
 }

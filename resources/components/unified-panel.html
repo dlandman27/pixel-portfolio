@@ -1,140 +1,28 @@
 <div
   id="unified-panel"
   class="unified-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="unified-panel-title"
   aria-hidden="true"
 >
   <div class="unified-panel-overlay"></div>
 
-  
   <div class="unified-panel-container">
-    <div class="unified-panel-tabs-row" role="tablist" aria-label="Pixel portfolio panel tabs">
-    <div class="unified-panel-tabs">
-        <button
-          id="unified-panel-tab-home"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="home"
-          data-label="Home"
-          role="tab"
-          aria-selected="true"
-          aria-controls="unified-panel-tabpanel"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M3 11.5L12 3l9 8.5v8.5h-6v-6H9v6H3z" />
-            </svg>
-          </span>
-        </button>
-
-        <button
-          id="unified-panel-tab-work"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="work"
-          data-label="Work"
-          role="tab"
-          aria-selected="false"
-          aria-controls="unified-panel-tabpanel"
-          aria-label="My work"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fas fa-folder-open"></i>
-          </span>
-        </button>
-
-        <button
-          id="unified-panel-tab-wardrobe"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="wardrobe"
-          data-label="Wardrobe"
-          role="tab"
-          aria-selected="false"
-          aria-controls="unified-panel-tabpanel"
-          aria-label="Wardrobe"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fas fa-tshirt"></i>
-          </span>
-        </button>
-
-        <button
-          id="unified-panel-tab-backpack"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="backpack"
-          data-label="Backpack"
-          role="tab"
-          aria-selected="false"
-          aria-controls="unified-panel-tabpanel"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fas fa-briefcase"></i>
-          </span>
-        </button>
-  
-        <button
-          id="unified-panel-tab-achievements"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="achievements"
-          data-label="Achievements"
-          role="tab"
-          aria-selected="false"
-          aria-controls="unified-panel-tabpanel"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fas fa-trophy"></i>
-          </span>
-        </button>
-  
-        <button
-          id="unified-panel-tab-games"
-          class="unified-panel-tab"
-          type="button"
-          data-tab="games"
-          data-label="Games"
-          role="tab"
-          aria-selected="false"
-          aria-controls="unified-panel-tabpanel"
-        >
-          <span class="tab-icon" aria-hidden="true">
-            <i class="fas fa-gamepad"></i>
-          </span>
-        </button>
-  
-      <button
-        id="unified-panel-tab-settings"
-        class="unified-panel-tab"
-        type="button"
-        data-tab="settings"
-          data-label="Settings"
-        role="tab"
-        aria-selected="false"
-        aria-controls="unified-panel-tabpanel"
-      >
-        <span class="tab-icon" aria-hidden="true">
-          <i class="fas fa-cog"></i>
-        </span>
+    <header class="unified-panel-header">
+      <button type="button" class="unified-panel-back" aria-label="Back to menu">
+        <span aria-hidden="true">◂</span> Menu
       </button>
-
-      <button
-        class="unified-panel-tab unified-panel-close"
-        type="button"
-        aria-label="Close panel"
-        data-label="Close"
-      >
-        <span class="tab-icon" aria-hidden="true">×</span>
+      <h2 class="unified-panel-title" id="unified-panel-title"></h2>
+      <button type="button" class="unified-panel-close" aria-label="Close">
+        <span aria-hidden="true">✕</span>
       </button>
-    </div>
-    </div>
+    </header>
     <div
       class="unified-panel-content"
       id="unified-panel-tabpanel"
-      role="tabpanel"
-      aria-labelledby="unified-panel-tab-home"
+      role="region"
+      aria-labelledby="unified-panel-title"
     ></div>
   </div>
 </div>
-
-

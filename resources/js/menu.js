@@ -1,4 +1,4 @@
-// Top-right menu button: opens/closes the unified panel (resources/js/unified-panel.js).
+// Menu button: toggles the start menu (resources/js/unified-panel.js), or closes an open page.
 
 $(function () {
   $("#game-menu-toggle").click(function (e) {
@@ -6,6 +6,8 @@ $(function () {
     if (typeof UnifiedPanel === "undefined") return;
     if (UnifiedPanel.isOpen()) {
       UnifiedPanel.close();
+    } else if (typeof StartMenu !== "undefined") {
+      StartMenu.toggle();
     } else {
       UnifiedPanel.open("home");
     }
