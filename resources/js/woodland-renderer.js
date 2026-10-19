@@ -123,7 +123,8 @@
       }
     }
     const water=canvas(world.WIDTH/2,world.HEIGHT/2),w=water.getContext('2d');water.setAttribute('aria-hidden','true');water.className='world-water';scene.append(water);let previous=-1;
-    return {updateDepth(player){for(const item of standing)item.element.classList.toggle('is-obscuring',depth.obscures(item.object,player));},update(now){const frame=reducedMotion?0:Math.floor(now/140);if(previous===frame)return;previous=frame;
+    const sectionEffects=WoodlandEffects.mount(scene,depth,reducedMotion);
+    return {playSection(id,x,y){sectionEffects.play(id,x,y);},updateDepth(player){for(const item of standing)item.element.classList.toggle('is-obscuring',depth.obscures(item.object,player));},update(now){sectionEffects.update(now);const frame=reducedMotion?0:Math.floor(now/140);if(previous===frame)return;previous=frame;
       for(const flow of flowingWater){
         for(const i of flow.pixels){
           const x=(i/4)%flow.width,y=Math.floor(i/4/flow.width);

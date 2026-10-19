@@ -2,13 +2,15 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dylan's woodland park · map preview</title><link rel="stylesheet" href="resources/css/world-preview.css"></head>
 <body>
 <main id="viewport" aria-label="Explore the woodland park">
- <div id="scene"><div id="destinations"></div><div id="traveler" aria-label="Dylan"><span id="sprite"></span></div></div>
+ <div id="scene"><div id="destinations"></div><div id="traveler" aria-label="Dylan"><canvas id="sprite" width="32" height="48" aria-hidden="true"></canvas></div></div>
 </main>
-<header><div><span class="eyebrow">A LITTLE WORLD BY</span><h1>Dylan Landman</h1></div><nav aria-label="Map controls"><button id="overview" aria-pressed="true">Explore on foot</button><button id="entrance-view">Entrance</button><button id="places-toggle" aria-expanded="false">Places</button><a href="index.html?time=day">Original map</a></nav></header>
+<header class="identity-plaque"><img src="resources/images/about-me/dylan-avatar.png" alt="" width="40" height="40"><div><h1>Dylan Landman</h1><span>Software engineer · Woodland park</span></div></header>
+<nav class="hud-tools" aria-label="Park controls"><button id="work-shortcut" data-symbol="✦">My work</button><button id="overview" aria-pressed="false" data-symbol="▧">Whole map</button><button id="places-toggle" aria-expanded="false" data-symbol="⌖">Places</button><button id="entrance-view" data-symbol="⌂">Entrance</button><a href="index.html?time=day" data-symbol="↗">Original site</a></nav>
 <aside id="places" hidden><h2>Take the scenic route</h2><p>Choose a place to walk there.</p><div id="place-list"></div></aside>
 <div id="arrival" role="status">New map preview · Choose a place, or explore with WASD / arrow keys</div>
 <button id="interact" hidden><kbd>E</kbd><span></span></button>
 <div id="movement" aria-label="Touch movement"><button data-key="ArrowUp" aria-label="Move up">↑</button><button data-key="ArrowLeft" aria-label="Move left">←</button><button data-key="ArrowDown" aria-label="Move down">↓</button><button data-key="ArrowRight" aria-label="Move right">→</button></div>
+<div id="character-actions" aria-label="Character actions"><button id="run-toggle" aria-pressed="false">Run <kbd>Shift</kbd></button><button id="jump-action">Jump <kbd>Space</kbd></button><button id="wave-action">Wave <kbd>F</kbd></button></div>
 <dialog id="panel"><button id="close-panel" aria-label="Close">×</button><span id="panel-kicker" class="eyebrow"></span><h2 id="panel-title"></h2><div id="panel-content"></div></dialog>
-<script src="resources/js/config/portfolio.config.js"></script><script src="resources/js/world-preview-navigation.js"></script><script src="resources/js/woodland-world.js"></script><script src="resources/js/woodland-depth.js"></script><script src="resources/js/woodland-renderer.js"></script><script src="resources/js/world-preview.js"></script>
+<script src="resources/js/config/portfolio.config.js"></script><script src="resources/js/world-preview-navigation.js"></script><script src="resources/js/woodland-world.js"></script><script src="resources/js/woodland-depth.js"></script><script src="resources/js/woodland-effects.js"></script><script src="resources/js/woodland-renderer.js"></script><script src="resources/js/woodland-character.js"></script><script src="resources/js/world-preview.js"></script>
 </body></html>
