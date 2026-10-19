@@ -1,7 +1,7 @@
 /* Each terrain pixel and prop is rendered from the authored world, never a map painting. */
 (function(root){
   'use strict';
-  const world=root.WoodlandWorld;
+  const world=root.WoodlandWorld,depth=root.WoodlandDepth;
   function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
   function load(url){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Could not load '+url));image.src='resources/images/'+url;});}
   async function mount(scene){
@@ -15,6 +15,8 @@
       for(let i=0;i<data.length;i+=4){const rgb=base.map((v,c)=>Math.round(v*(1-weight)+data[i+c]*weight));textures[name].push(`rgb(${rgb.join(',')})`);}
     }
     const images=Object.fromEntries(entries),terrain=canvas(world.WIDTH/2,world.HEIGHT/2),ctx=terrain.getContext('2d');
+    scene.style.height=depth.groundY(world.HEIGHT)+'px';
+    scene.style.setProperty('--ground-scale',depth.GROUND_SCALE);
     terrain.className='world-terrain';terrain.setAttribute('aria-label','Woodland terrain');
     const colors={grass:['#719440','#7b9d46','#658737','#8baa4e'],path:['#c5a773','#c9ac79','#bfa16e','#ceaf7b'],water:['#087b91','#09869a','#138c9e','#0a7188'],cliff:['#626b58','#69715e','#737966','#586450'],bridge:['#baa177'],dock:['#896039','#987044']};
     for(let y=0;y<terrain.height;y++)for(let x=0;x<terrain.width;x++){
@@ -37,7 +39,7 @@
     for(let x=0;x<terrain.width;x++){
       const wx=x*2;
       if(!world.terrainAt(wx,world.riverBottom(wx)).includes('bridge')){
-        const bottom=Math.floor(world.riverBottom(wx)/2);ctx.fillStyle='#405d3c';ctx.fillRect(x,bottom,1,3);ctx.fillStyle='#a0ae63';ctx.fillRect(x,bottom+3,1,1);
+        const bottom=Math.floor(world.riverBottom(wx)/2);ctx.fillStyle='#344e39';ctx.fillRect(x,bottom-1,1,5);ctx.fillStyle='#688049';ctx.fillRect(x,bottom+3,1,1);ctx.fillStyle='#b1bf76';ctx.fillRect(x,bottom-1,1,1);
       }
       const lake=Math.floor(world.lakeTop(wx)/2);
       if(world.terrainAt(wx,lake*2)!=='dock'){ctx.fillStyle='#536342';ctx.fillRect(x,lake-2,1,3);ctx.fillStyle='#a1b175';ctx.fillRect(x,lake-3,1,1);}
@@ -68,7 +70,7 @@
     scene.prepend(terrain);
     // Normalize source art onto the same two-world-unit pixel grid. Alpha testing
     // prevents soft generated edge haze from becoming a halo around every prop.
-    const flowingWater=[];
+    const flowingWater=[],standing=[];
     const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
     for(const object of world.objects){
       const c=canvas(Math.round(object.w/2),Math.round(object.h/2)),p=c.getContext('2d',{willReadFrequently:true});p.imageSmoothingEnabled=false;if(object.source)p.drawImage(images[object.asset],...object.source,0,0,c.width,c.height);else p.drawImage(images[object.asset],0,0,c.width,c.height);
@@ -81,7 +83,21 @@
         }
         flowingWater.push({context:p,base:new Uint8ClampedArray(data.data),data,pixels,width:c.width});
       }
-      c.setAttribute('aria-hidden','true');c.className='world-prop';c.dataset.object=object.id;c.style.cssText=`left:${Math.round(object.x)}px;top:${Math.round(object.y)}px;width:${object.w}px;height:${object.h}px;z-index:${object.ground?2:100+Math.round(object.foot)}`;scene.append(c);
+      // All standing art shares one light direction: upper-left sun, southeast
+      // cast shadows. Work on the ground canvas so shadows never stand upright.
+      if(['pine','cliff','rock','workshop','library','picnic','tackle','tent','bench'].includes(object.asset)){
+        const silhouette=canvas(c.width,c.height),shadow=silhouette.getContext('2d');
+        shadow.drawImage(c,0,0);shadow.globalCompositeOperation='source-in';
+        shadow.fillStyle='#183c36';shadow.fillRect(0,0,c.width,c.height);
+        const anchor=(object.foot-object.y)/2;
+        ctx.save();ctx.globalAlpha=.18;
+        ctx.translate((object.x+object.w*.5)/2,object.foot/2);
+        ctx.transform(1,0,-.52,-.28,0,0);
+        ctx.drawImage(silhouette,-c.width/2,-anchor);ctx.restore();
+      }
+      const box=depth.bounds(object);
+      standing.push({object,element:c});
+      c.setAttribute('aria-hidden','true');c.className='world-prop';c.dataset.object=object.id;c.style.cssText=`left:${Math.round(object.x)}px;top:${Math.round(box.y)}px;width:${box.w}px;height:${box.h}px;z-index:${object.ground?2:100+Math.round(object.foot)}`;scene.append(c);
       if(object.id==='bridge'){
         // Parapets are foreground geometry; the deck remains below the traveler.
         const rails=canvas(c.width,c.height),r=rails.getContext('2d');r.drawImage(c,0,0);r.clearRect(28,0,34,c.height);
@@ -89,7 +105,7 @@
       }
     }
     const water=canvas(world.WIDTH/2,world.HEIGHT/2),w=water.getContext('2d');water.setAttribute('aria-hidden','true');water.className='world-water';scene.append(water);let previous=-1;
-    return {update(now){const frame=reducedMotion?0:Math.floor(now/140);if(previous===frame)return;previous=frame;
+    return {updateDepth(player){for(const item of standing)item.element.classList.toggle('is-obscuring',depth.obscures(item.object,player));},update(now){const frame=reducedMotion?0:Math.floor(now/140);if(previous===frame)return;previous=frame;
       for(const flow of flowingWater){
         for(const i of flow.pixels){
           const x=(i/4)%flow.width,y=Math.floor(i/4/flow.width);

@@ -3,3 +3,10 @@
 .world-terrain,.world-water{position:absolute;inset:0;width:1536px;height:1024px;image-rendering:pixelated;pointer-events:none}.world-terrain{z-index:0}.world-water{z-index:3}.world-prop{position:absolute;image-rendering:pixelated;pointer-events:none}.destination{z-index:3000}
 
 header{padding:12px 14px;background:linear-gradient(180deg,#122b26eb,#122b2680);border:1px solid #a3a57a38;border-radius:6px;top:14px;left:16px;right:16px}header h1{font-size:19px}nav button,nav a{box-shadow:none;padding:8px 11px}.destination{opacity:0;transition:opacity .15s}.destination:hover,.destination:focus-visible{opacity:1}#scene:hover .destination{opacity:.8}@media(max-width:600px){header{padding:9px;left:10px;right:10px}header>div .eyebrow{display:none}header h1{font-size:16px}nav{max-width:170px}nav button{padding:6px 8px;font-size:10px}}
+
+/* Orthographic 2.5D: ground compresses into the distance; individual props
+   retain their authored height and are grounded by woodland-depth.js. */
+.world-terrain,.world-water{transform-origin:0 0;transform:scaleY(var(--ground-scale,1))}
+.world-prop{transition:opacity 160ms ease-out}
+.world-prop.is-obscuring{opacity:.32}
+@media(prefers-reduced-motion:reduce){.world-prop{transition:none}}
