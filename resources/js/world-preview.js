@@ -12,7 +12,7 @@
     {id:'dock',title:'The fishing dock',action:'Cast a line',node:'dock',x:801,y:927}
   ];
   let player={x:770,y:421},keys=new Set(),overview=false,route=[],destination=null,nearest=null,last=0,step=0,facing='front',frame=2,lastSprite='',page=0,fishAnimation=0;
-  let entranceView=true;
+  let entranceView=false;
   let renderer=null;
   let camera={x:0,y:0,scale:1},cameraReady=false;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,7 +53,7 @@
     }
     let moved=0;const length=Math.hypot(dx,dy);if(length&&!panel.open){dx=dx/length*104*dt;dy=dy/length*104*dt;const before={...player};if(WoodlandWorld.canWalk(player.x+dx,player.y))player.x+=dx;if(WoodlandWorld.canWalk(player.x,player.y+dy))player.y+=dy;moved=Math.hypot(player.x-before.x,player.y-before.y);if(moved>.01){facing=Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'back':'front');step+=moved;frame=2+Math.floor(step/11)%6;}}
     if(moved<.01){frame=2;step=0;}const src=`${facing}-${frame}`;if(src!==lastSprite){sprite.style.backgroundImage=`url("resources/images/characters/dylan/dylan-${src}.png")`;lastSprite=src;}traveler.style.zIndex=100+Math.round(player.y);traveler.style.left=Math.round(player.x)+'px';traveler.style.top=Math.round(depth.groundY(player.y))+'px';renderer.updateDepth(player);
-    const fit=Math.min(innerWidth/1536,innerHeight/depth.groundY(1024));const entranceScale=Math.min(innerWidth/544,innerHeight/408);const scale=entranceView?entranceScale:overview?fit:Math.max(1.5,Math.min(3,innerWidth/416));const tx=entranceView?innerWidth/2-768*scale:overview?(innerWidth-1536*scale)/2:Math.min(0,Math.max(innerWidth-1536*scale,innerWidth/2-player.x*scale));const ty=entranceView?0:overview?(innerHeight-depth.groundY(1024)*scale)/2:Math.min(0,Math.max(innerHeight-depth.groundY(1024)*scale,innerHeight/2-depth.groundY(player.y)*scale));const ease=reduced||!cameraReady?1:1-Math.exp(-dt*12);camera.x+=(tx-camera.x)*ease;camera.y+=(ty-camera.y)*ease;camera.scale+=(scale-camera.scale)*ease;cameraReady=true;scene.style.transform=`translate(${Math.round(camera.x)}px,${Math.round(camera.y)}px) scale(${camera.scale})`;
+    const fit=Math.min(innerWidth/1536,innerHeight/depth.groundY(1024));const entranceScale=Math.max(2.5,Math.min(5,innerWidth/280));const scale=entranceView?entranceScale:overview?fit:Math.max(2.5,Math.min(5,innerWidth/280));const tx=entranceView?innerWidth/2-768*scale:overview?(innerWidth-1536*scale)/2:Math.min(0,Math.max(innerWidth-1536*scale,innerWidth/2-player.x*scale));const ty=entranceView?innerHeight*.5-depth.groundY(180)*scale:overview?(innerHeight-depth.groundY(1024)*scale)/2:Math.min(0,Math.max(innerHeight-depth.groundY(1024)*scale,innerHeight/2-depth.groundY(player.y)*scale));const ease=reduced||!cameraReady?1:1-Math.exp(-dt*12);camera.x+=(tx-camera.x)*ease;camera.y+=(ty-camera.y)*ease;camera.scale+=(scale-camera.scale)*ease;cameraReady=true;scene.style.transform=`translate(${Math.round(camera.x)}px,${Math.round(camera.y)}px) scale(${camera.scale})`;
     for(const marker of markers)marker.element.hidden=!overview&&Math.hypot(player.x-marker.place.x,player.y-marker.place.y)<55;
     nearest=places.find(p=>Math.hypot(player.x-p.x,player.y-p.y)<55);$('interact').hidden=!nearest||panel.open||overview||route.length>0;if(nearest)$('interact').querySelector('span').textContent=nearest.action;if(!route.length&&!panel.open)$('arrival').textContent=overview?'Choose a marker to visit · Or explore on foot':'WASD / arrows to walk · E to interact';requestAnimationFrame(tick);
   }
