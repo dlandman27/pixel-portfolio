@@ -27,3 +27,5 @@ dialog{color:var(--ink);background:var(--paper);border:4px solid var(--wood-dark
 #character-actions [aria-pressed="true"]{background:var(--moss);color:var(--paper-light)}
 @media(max-width:900px){#character-actions{bottom:62px;left:12px}#character-actions kbd{display:none}}
 @media(pointer:coarse){#character-actions{left:auto;right:12px;bottom:74px;flex-direction:column}#interact{bottom:144px}}
+
+#character-actions button:disabled{opacity:.5;cursor:default}
