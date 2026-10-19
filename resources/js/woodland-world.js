@@ -7,7 +7,7 @@
     cliff:{url:'world-v2/cliff-terrace.png'},reeds:{url:'world-v2/river-reeds.png'},foliage:{url:'world-v2/fern-daisies.png'},pine:{url:'world-v2/pine-tree.png'},rock:{url:'world-v2/moss-rocks.png'},grotto:{url:'world-v2/stone-grotto.png'},
     waterfall:{url:'world-v2/waterfall-cliff.png'},bridge:{url:'world-v2/stone-bridge.png'},bench:{url:'world-v2/wooden-bench.png'},
     workshop:{url:'park/art-pavilion-v2.png'},library:{url:'park/woodland-library.png'},tackle:{url:'park/tackle-hut.png'},picnic:{url:'park/picnic-shelter-v2.png'},
-    tent:{url:'buildings/tent1.png'},fire:{url:'world-v2/stone-fire-ring.png'},flower:{url:'nature/pink-tulips.png'},mushroom:{url:'nature/mushroom-purple.png'},
+    tent:{url:'world-v2/woodland-tent.png'},fire:{url:'world-v2/stone-fire-ring.png'},flower:{url:'nature/pink-tulips.png'},mushroom:{url:'nature/mushroom-purple.png'},
     fern:{url:'nature/bush.png'},log:{url:'nature/moss-log.png'},cat:{url:'park/park-cat.png'}
   };
   function hash(x,y){let n=Math.imul(x+137,374761393)^Math.imul(y+71,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;}
