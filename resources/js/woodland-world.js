@@ -60,6 +60,12 @@
     prop('south-reeds-'+x,'reeds',x+20,riverBottom(x+20)-26,30,44);
   }
   for(const x of [220,416,584,950,1142,1372])prop('lake-reeds-'+x,'reeds',x,lakeTop(x)-38,38,54);
+  // Small river islands sit clear of the bridge and waterfall's open channel.
+  for(const [i,x,y,w,h] of [[0,130,278,48,32],[1,320,302,58,38],[2,550,264,42,28],[3,1170,288,54,36],[4,1390,258,64,42]]){
+    prop('river-rock-'+i,'rock',x,y,w,h);
+    if(i!==2)prop('river-island-reeds-'+i,'reeds',x+w*.45,y-18,24,34);
+  }
+  const riverPads=[{x:225,y:265},{x:265,y:274},{x:440,y:300},{x:490,y:291},{x:610,y:315},{x:900,y:285},{x:1140,y:315},{x:1280,y:270},{x:1335,y:309},{x:1450,y:300}];
   const landmarks=objects.slice();
   function overlapsReserved(x,y,w,h){return landmarks.some(o=>!o.ground&&x<o.x+o.w+10&&x+w>o.x-10&&y<o.y+o.h+10&&y+h>o.y-10);}
   // Overlapping crowns form woodland masses; trunks keep generous trail clearance.
@@ -82,5 +88,5 @@
   for(let y=350;y<835;y+=24)for(let x=40;x<1490;x+=26){const n=hash(x,y);if(n>.55||terrainAt(x,y)!=='grass'||pathDistance(x,y)>65||overlapsReserved(x-10,y-18,20,20))continue;prop('detail-'+detail++,n<.2?'foliage':n<.24?'mushroom':'fern',x-14,y-22,n<.2?38:20,n<.2?26:20);}
   const collisionBoxes=additionalSolids.concat(objects.filter(o=>o.solid).map(o=>o.solid));
   function canWalk(x,y,r=6){for(const [dx,dy]of [[0,0],[-r,0],[r,0],[0,-r],[0,r]]){const t=terrainAt(x+dx,y+dy);if(t==='water'||t==='cliff'||t==='void')return false;}for(const box of collisionBoxes){const [bx,by,bw,bh]=box;if(x+r>bx&&x-r<bx+bw&&y+r>by&&y-r<by+bh)return false;}return true;}
-  root.WoodlandWorld={WIDTH,HEIGHT,PIXEL,assets,objects,hash,terrainAt,inWater,riverTop,riverBottom,lakeTop,pathDistance,canWalk,additionalSolids};
+  root.WoodlandWorld={WIDTH,HEIGHT,PIXEL,assets,objects,riverPads,hash,terrainAt,inWater,riverTop,riverBottom,lakeTop,pathDistance,canWalk,additionalSolids};
 })(typeof window==='undefined'?globalThis:window);

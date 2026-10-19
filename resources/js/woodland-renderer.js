@@ -56,6 +56,15 @@
         }
       }
     }
+    // Lily pads use the terrain's logical pixel grid and stay below all props.
+    for(const [i,pad] of world.riverPads.entries()){
+      const x=Math.round(pad.x/2),y=Math.round(pad.y/2);
+      ctx.fillStyle='#164e4299';ctx.fillRect(x-4,y,10,4);
+      ctx.fillStyle='#2e7145';ctx.fillRect(x-4,y-2,8,4);ctx.fillRect(x-3,y-3,6,6);
+      ctx.fillStyle='#83ad54';ctx.fillRect(x-3,y-2,5,1);ctx.fillRect(x-3,y-1,2,1);
+      ctx.fillStyle='#13899a';ctx.fillRect(x,y,4,1);ctx.fillRect(x+2,y+1,2,1);
+      if(i%3===0){ctx.fillStyle='#e3a5bd';ctx.fillRect(x-1,y-3,3,2);ctx.fillStyle='#fff0c6';ctx.fillRect(x,y-4,1,2);}
+    }
     scene.prepend(terrain);
     // Normalize source art onto the same two-world-unit pixel grid. Alpha testing
     // prevents soft generated edge haze from becoming a halo around every prop.
@@ -92,7 +101,18 @@
         }
         flow.context.putImageData(flow.data,0,0);
       }
-      w.clearRect(0,0,water.width,water.height);for(let y=120;y<512;y+=9)for(let x=3;x<768;x+=17){const px=x+Math.floor(Math.sin(frame*.25+y)*3),py=y+Math.floor(world.hash(x,y)*5);if(world.terrainAt(px*2,py*2)!=='water')continue;w.fillStyle=world.hash(x,y)>.65?'#78c4bb88':'#3ba5ac66';w.fillRect(px,py,2+Math.floor(world.hash(y,x)*4),1);}}};
+      w.clearRect(0,0,water.width,water.height);
+      // Broken rings spread from the waterfall's foot, rather than a solid white disc.
+      for(let ring=0;ring<4;ring++){
+        const age=((frame+ring*5)%24)/24,rx=10+age*24,ry=3+age*9;
+        w.fillStyle=`rgba(195,239,218,${(1-age)*.65})`;
+        for(let step=0;step<28;step++){
+          if((step+ring)%4===0)continue;
+          const a=step/28*Math.PI*2,x=Math.round(514+Math.cos(a)*rx),y=Math.round(132+Math.sin(a)*ry);
+          if(world.terrainAt(x*2,y*2)==='water')w.fillRect(x,y,2,1);
+        }
+      }
+for(let y=120;y<512;y+=9)for(let x=3;x<768;x+=17){const px=x+Math.floor(Math.sin(frame*.25+y)*3),py=y+Math.floor(world.hash(x,y)*5);if(world.terrainAt(px*2,py*2)!=='water')continue;w.fillStyle=world.hash(x,y)>.65?'#78c4bb88':'#3ba5ac66';w.fillRect(px,py,2+Math.floor(world.hash(y,x)*4),1);}}};
   }
   root.WoodlandRenderer={mount};
 })(window);
