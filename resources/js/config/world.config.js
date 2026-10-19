@@ -20,9 +20,14 @@ var WORLD_COLLIDERS = {
       { x: 926, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
       { x: 1036, y: 368, width: 36, height: 84, tag: "bridgeTopRightBlock" },
       
-      // Games section (top right) - block access (reduced to allow gallery access at y:708+)
-      // Gallery starts at y:708, so games block ends at y:700 to leave clear path
-      { x: 1440, y: 358, width: 400, height: 342, tag: "gamesSectionBlock" },
+      // Recreation terrace: solid cliff edges with a clear stair entrance.
+      { x: 1440, y: 386, width: 32, height: 380, tag: "terraceLeftCliff" },
+      { x: 1440, y: 742, width: 164, height: 24, tag: "terraceBottomLeft" },
+      { x: 1670, y: 742, width: 164, height: 24, tag: "terraceBottomRight" },
+      { x: 1834, y: 386, width: 16, height: 388, tag: "terraceRightEdge" },
+      { x: 1440, y: 358, width: 410, height: 44, tag: "terraceTopFence" },
+      // Feet-sized solids keep new landmarks physical without blocking their approaches.
+      { x: 792, y: 456, width: 36, height: 12, tag: "gardenFountain" },
       
       // Block stairs with WIP barrier
       // { x: 752, y: 866, width: 38, height: 66, tag: "stairsBlocked" },

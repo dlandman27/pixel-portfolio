@@ -93,12 +93,12 @@ var SpriteManager = (function() {
     
     // Use the preloaded image if available, otherwise use URL
     // Setting background-image with the same URL pattern helps browser cache
-    // Match original CSS: background-size: 32px (maintains aspect ratio)
+    // Frames have different source widths. Keep height and the foot baseline fixed.
     $dylan.css({
       "background-image": "url(" + imageUrl + ")",
-      "background-size": sheet.width + "px",
+      "background-size": "auto 54px",
       "background-repeat": "no-repeat",
-      "background-position": "center"
+      "background-position": "center bottom 7px"
     });
   }
 

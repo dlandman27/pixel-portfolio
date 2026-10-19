@@ -1,0 +1,91 @@
+/* World props retain a single pixel grid and the park's existing asset palette. */
+.yellow-flowers.y8 { width:160px; }
+.pink-tulips.p3 { left:680px; top:470px; }
+.rose-bush.r1,.rose-bush.r2 { display:none; }
+.park-walkway { position:absolute; z-index:7; background:url('../images/tiles/stone-path.png') round; background-size:16px; filter:brightness(1.2); opacity:.5; pointer-events:none; }
+.park-place-sign { position:absolute; z-index:48; background:#725139; border:2px solid #b78e59; box-shadow:0 2px #443728; color:#f4e6bb; font:6px/1.4 'Press Start 2P',monospace; padding:5px 6px; pointer-events:none; }
+.park-place-sign::after { content:''; position:absolute; top:100%; left:50%; width:4px; height:9px; background:#725139; border-left:2px solid #b78e59; }
+.park-landmark::after { display:none; }
+.park-prop { position:absolute; background-size:contain; background-position:center bottom; background-repeat:no-repeat; image-rendering:pixelated; pointer-events:none; }
+button.park-interactive { border:0; padding:0; margin:0; border-radius:0; background-color:transparent; cursor:pointer; pointer-events:auto; overflow:visible; touch-action:manipulation; }
+.park-interactive::after { content:''; position:absolute; width:4px; height:4px; right:-3px; top:0; background:#f7d876; box-shadow:0 0 0 1px #684a31; }
+.park-interactive.is-discovered::after { background:#abd5b2; }
+.park-interactive:hover,.park-interactive.is-near,.park-interactive:focus-visible { filter:drop-shadow(1px 0 #ffe4a0) drop-shadow(-1px 0 #ffe4a0); outline:none; }
+.park-object-label { display:none; position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%); padding:5px 6px; background:#292e2a; color:#fff1d4; font:5px/1.6 'Press Start 2P',monospace; white-space:nowrap; box-shadow:0 1px #e9d6a7; pointer-events:none; }
+.park-interactive:hover .park-object-label,.park-interactive:focus-visible .park-object-label { display:block; }
+.park-clearing { position:absolute; z-index:6; pointer-events:none; background:url('../images/tiles/dirt.png') repeat; background-size:32px; opacity:.5; clip-path:polygon(8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px),0 8px,8px 8px); }
+.park-book-icon { display:block; width:20px; height:23px; background:#cfad72; border:2px solid #fff1d4; border-left:5px solid #806142; box-shadow:2px 2px #171d20; position:relative; }
+.park-book-icon::after { content:''; position:absolute; left:3px; top:6px; width:7px; height:2px; background:#705536; box-shadow:0 5px #705536; }
+.park-journal-button { position:relative; }
+.park-count { position:absolute; bottom:-4px; right:-4px; background:#26362e; color:#ffebb4; font:8px/1.5 'Press Start 2P',monospace; padding:1px 3px; }
+.park-prompt { position:fixed; z-index:100005; bottom:24px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; border:2px solid #c9ba94; background:#27312b; color:#fff1d4; box-shadow:3px 3px #15221e; padding:10px 16px; font:10px/1.6 'Press Start 2P',monospace; cursor:pointer; max-width:calc(100% - 32px); }
+.park-prompt kbd { background:#fff1d4; color:#27312b; padding:3px 6px; font:inherit; box-shadow:0 3px #ad9c78; }
+.park-prompt:focus-visible,.park-note button:focus-visible { outline:3px solid #efc86b; outline-offset:4px; }
+.park-note { position:fixed; z-index:100006; bottom:86px; left:50%; transform:translateX(-50%); width:min(510px,calc(100vw - 32px)); display:flex; align-items:center; gap:18px; background:#fbefd1; color:#343c30; border:3px solid #6e7556; box-shadow:4px 4px #26352bb3; padding:22px 30px 22px 18px; }
+.park-note img { width:54px; height:64px; object-fit:contain; image-rendering:pixelated; flex-shrink:0; }
+.park-note strong { display:block; font:11px/1.7 'Press Start 2P',monospace; }
+.park-note p { margin:8px 0; font:15px/1.5 system-ui,sans-serif; }
+.park-note-progress { font:11px/1.5 system-ui,sans-serif; color:#536846; }
+.park-note button { position:absolute; right:4px; top:2px; border:0; background:transparent; color:#343c30; cursor:pointer; font:25px/1 system-ui; padding:4px; }
+.park-prompt[hidden],.park-note[hidden],.park-completion[hidden] { display:none; }
+.park-journal-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.park-journal-heading p { margin:12px 0 0; font:15px/1.5 system-ui,sans-serif; color:#c6d1c6; }
+.park-journal-total { padding:12px; border:2px solid #69785c; color:#f1d98d; white-space:nowrap; font-size:12px; }
+.park-journal-intro { margin:20px 0 24px; font:15px/1.6 system-ui,sans-serif; max-width:62ch; color:#c6d1c6; }
+.park-entries { display:grid; gap:0; }
+.park-entry { display:flex; align-items:center; gap:24px; padding:24px 0; border-top:1px solid #ffffff20; }
+.park-entry img { width:64px; height:64px; object-fit:contain; image-rendering:pixelated; flex-shrink:0; filter:saturate(.4); opacity:.7; }
+.park-entry.is-found img { filter:none; opacity:1; }
+.park-entry h3 { font:12px/1.8 'Press Start 2P',monospace; color:#efe4c5; margin:0; }
+.park-entry p { font:15px/1.5 system-ui,sans-serif; color:#c6d1c6; margin:8px 0; }
+.park-entry-status { font:11px/1.5 system-ui,sans-serif; color:#c2bfae; }
+.park-entry.is-found .park-entry-status { color:#b3dca1; }
+.park-completion { margin:20px 0; padding:20px; color:#f2d78e; background:#42614333; border:2px solid #7c9665; line-height:1.8; font-size:13px; }
+.park-completion span { font:15px/1.5 system-ui,sans-serif; color:#dce3ce; }
+.park-effect { position:absolute; z-index:102; pointer-events:none; }
+.park-effect i { position:absolute; width:3px; height:3px; background:#f8df89; --dx:calc((var(--i) - 3) * 7px); animation:park-float 1.8s steps(12) both; animation-delay:calc(var(--i) * 45ms); }
+.park-effect-heart i { background:#ec9590; width:6px; height:6px; clip-path:polygon(0 0,40% 0,50% 20%,60% 0,100% 0,100% 50%,50% 100%,0 50%); }
+.park-effect-smoke i { background:#e4dbbb; width:5px; height:5px; }
+.park-effect-breeze i { background:#e0efcb; width:9px; height:1px; }
+.park-effect-ripple i { border:1px solid #d1f7ec; background:none; width:9px; height:4px; }
+.park-interactive.is-reacting { animation:park-nod .4s steps(3) 2; }
+@keyframes park-float { 0% { transform:translate(0,0); opacity:0; } 15% { opacity:1; } 100% { transform:translate(var(--dx),-35px); opacity:0; } }
+@keyframes park-nod { 50% { translate:0 -2px; } }
+@media(max-width:600px) {
+  .park-prompt { bottom:160px; padding:9px 12px; font-size:9px; width:max-content; }
+  .park-prompt kbd { display:none; }
+  .park-note { bottom:212px; padding:15px 24px 15px 12px; gap:10px; }
+  .park-note img { width:38px; height:44px; }
+  .park-note strong { font-size:9px; }
+  .park-note p { font-size:13px; }
+  .park-entry { gap:14px; }
+  .park-entry img { width:42px; height:50px; }
+  .park-entry h3 { font-size:10px; }
+  .park-journal-heading { align-items:flex-start; }
+}
+@media(prefers-reduced-motion:reduce) { .park-effect { display:none; } .park-interactive.is-reacting { animation:none; } }
+
+/* Flat packed-earth paths: one surface across the original map and new gardens. */
+.path, .park-walkway, .portfolio-gallery-floor {
+  background: #bfae82;
+  filter: none;
+  opacity: 1;
+}
+.park-clearing { background: #bfae82; opacity: 1; }
+
+/* Arrival: the same timber, green roofs and restrained pixels as the village. */
+#outerbrick_top, #map > .rocks_top { background: #78806c url('../images/park/cliff-flat.svg') repeat; background-size:128px 64px; box-shadow:none; }
+#topbushes { background-image:url('../images/nature/bush.png'); background-size:28px 24px; height:24px; margin-top:-16px; }
+#topbushes-border { background:#52694d; height:6px; filter:none; box-shadow:0 3px #8a9971; }
+#cliff { background:#52694d; filter:none; }
+#topdoor { left:944px; top:104px; margin:0; width:112px; height:94px; background:transparent url('../images/park/park-gateway.png') center bottom / contain no-repeat; box-shadow:none; border-radius:0; z-index:48; pointer-events:none; }
+#arch { display:none; }
+.cave-name-sign { top:64px; width:176px; height:auto; padding:6px 8px; background:#725139; border:3px solid #b78e59; box-shadow:0 3px #443728; border-radius:0; color:#f4e6bb; text-shadow:none; font-size:7px; line-height:1.4; }
+.cave-name-sign small { display:block; font-size:3px; letter-spacing:1px; margin-bottom:4px; color:#dbc7a0; }
+.cave-name-sign span { display:block; margin-top:4px; font-size:3px; color:#dbc7a0; }
+.sign-interact[data-sign-id="cave-sign"] { display:none; }
+.park-entry-directions { position:absolute; left:1074px; top:378px; z-index:48; padding:6px 8px; color:#f4e6bb; background:#725139; border:2px solid #b78e59; box-shadow:0 2px #443728; font:5px/2 'Press Start 2P',monospace; pointer-events:none; }
+.park-entry-directions::after { content:''; position:absolute; top:100%; left:50%; width:4px; height:12px; background:#725139; }
+
+/* Keep planting away from the gateway threshold. */
+#topbushes { clip-path:polygon(0 0,48% 0,48% 100%,52% 100%,52% 0,100% 0,100% 100%,0 100%); }

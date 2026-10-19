@@ -18,6 +18,7 @@ var UnifiedPanel = (function () {
     fishbook: "resources/components/unified-panel-fishbook.html",
     achievements: "resources/components/unified-panel-achievements.html",
     games: "resources/components/unified-panel-games.html",
+    journal: "resources/components/unified-panel-journal.html",
     settings: "resources/components/unified-panel-settings.html",
   };
 
@@ -31,6 +32,7 @@ var UnifiedPanel = (function () {
     fishbook: { name: "Fishbook" },
     achievements: { name: "Achievements" },
     games: { name: "Games" },
+    journal: { name: "Journal" },
     settings: { name: "Settings" },
   };
 
@@ -314,6 +316,9 @@ var UnifiedPanel = (function () {
         break;
       case "achievements":
         hydrateAchievementsTab(rootEl);
+        break;
+      case "journal":
+        if (window.Park) Park.hydrate(rootEl);
         break;
       case "games":
         hydrateGamesTab(rootEl);
@@ -1030,12 +1035,12 @@ $(function () {
 var StartMenu = (function () {
   var SECTIONS = [
     ["home", "work", "contact"],
-    ["wardrobe", "backpack", "fishbook", "achievements", "games"],
+    ["journal", "wardrobe", "backpack", "fishbook", "achievements", "games"],
     ["settings"],
   ];
   var LABELS = {
     home: "About", work: "Work", contact: "Contact", wardrobe: "Wardrobe", backpack: "Bag",
-    fishbook: "Fishbook", achievements: "Achievements", games: "Games", settings: "Settings",
+    fishbook: "Fishbook", achievements: "Achievements", games: "Games", journal: "Journal", settings: "Settings",
   };
 
   var el = null;

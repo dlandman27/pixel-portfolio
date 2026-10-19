@@ -1,5 +1,7 @@
 $(function () {
-  $('#map').load('resources/components/map.html', function () {});
+  $('#map').load('resources/components/map.html?v=park-8', function () {
+    if (window.Park) Park.start();
+  });
 
   $('#fishbook').load('resources/modals/fishbook.modal.html', function () {});
 

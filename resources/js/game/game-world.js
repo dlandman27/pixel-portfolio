@@ -1367,17 +1367,18 @@
 
       if (isMoving) {
         this._animAccum += deltaMs;
-        var frameDuration = 90; // ms per frame (slightly snappier)
-        if (this._animAccum >= frameDuration) {
-          this._animAccum = 0;
+        var frameDuration = 110; // A readable six-pose stride, without rapid flicker.
+        while (this._animAccum >= frameDuration) {
+          this._animAccum -= frameDuration;
           this._animFrame++;
           if (this._animFrame > 7) {
             this._animFrame = 2; // cycle frames 2..7
           }
         }
       } else {
-        // Idle pose: stand on frame 2
+        // Idle pose: stand on frame 2 and restart the stride on the next movement.
         this._animFrame = 2;
+        this._animAccum = 0;
       }
 
       // Apply sprite frame if SpriteManager is available
