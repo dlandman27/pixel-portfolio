@@ -67,6 +67,24 @@
       ctx.fillStyle='#13899a';ctx.fillRect(x,y,4,1);ctx.fillRect(x+2,y+1,2,1);
       if(i%3===0){ctx.fillStyle='#e3a5bd';ctx.fillRect(x-1,y-3,3,2);ctx.fillStyle='#fff0c6';ctx.fillRect(x,y-4,1,2);}
     }
+    // The dock's south face and corner piles stand above the water plane.
+    // Its plank surface remains on the ground layer and stays walkable.
+    const dockFace=canvas(49,6),dockFaceContext=dockFace.getContext('2d');
+    dockFaceContext.fillStyle='#573d2b';dockFaceContext.fillRect(0,0,49,6);
+    dockFaceContext.fillStyle='#9b7546';dockFaceContext.fillRect(0,0,49,1);
+    dockFaceContext.fillStyle='#342f29';for(let x=0;x<49;x+=12)dockFaceContext.fillRect(x,1,1,5);
+    dockFace.className='world-prop';dockFace.dataset.object='dock-face';dockFace.setAttribute('aria-hidden','true');
+    dockFace.style.cssText=`left:752px;top:${depth.groundY(958)}px;width:98px;height:8px;z-index:4`;
+    scene.append(dockFace);
+    for(const x of [754,844]){
+      const post=canvas(4,13),postContext=post.getContext('2d');
+      postContext.fillStyle='#4e3828';postContext.fillRect(0,2,4,11);
+      postContext.fillStyle='#a78050';postContext.fillRect(1,2,2,10);
+      postContext.fillStyle='#d2ae70';postContext.fillRect(0,0,4,3);
+      post.className='world-prop';post.dataset.object='dock-post-'+x;post.setAttribute('aria-hidden','true');
+      post.style.cssText=`left:${x}px;top:${depth.groundY(951)-20}px;width:8px;height:26px;z-index:1058`;
+      scene.append(post);
+    }
     scene.prepend(terrain);
     // Normalize source art onto the same two-world-unit pixel grid. Alpha testing
     // prevents soft generated edge haze from becoming a halo around every prop.

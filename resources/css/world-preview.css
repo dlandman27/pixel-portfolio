@@ -10,3 +10,5 @@ header{padding:12px 14px;background:linear-gradient(180deg,#122b26eb,#122b2680);
 .world-prop{transition:opacity 160ms ease-out}
 .world-prop.is-obscuring{opacity:.32}
 @media(prefers-reduced-motion:reduce){.world-prop{transition:none}}
+
+.destination[hidden]{display:none}
