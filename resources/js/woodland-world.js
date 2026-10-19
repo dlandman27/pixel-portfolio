@@ -7,7 +7,7 @@
     cliff:{url:'world-v2/cliff-terrace.png'},reeds:{url:'world-v2/river-reeds.png'},foliage:{url:'world-v2/fern-daisies.png'},pine:{url:'world-v2/pine-tree.png'},rock:{url:'world-v2/moss-rocks.png'},grotto:{url:'world-v2/stone-grotto.png'},
     waterfall:{url:'world-v2/waterfall-cliff.png'},bridge:{url:'world-v2/stone-bridge.png'},bench:{url:'world-v2/wooden-bench.png'},
     workshop:{url:'park/art-pavilion-v2.png'},library:{url:'park/woodland-library.png'},tackle:{url:'park/tackle-hut.png'},picnic:{url:'park/picnic-shelter-v2.png'},
-    tent:{url:'buildings/tent1.png'},fire:{url:'bonfire/bonfire1.png'},flower:{url:'nature/pink-tulips.png'},mushroom:{url:'nature/mushroom-purple.png'},
+    tent:{url:'buildings/tent1.png'},fire:{url:'world-v2/stone-fire-ring.png'},flower:{url:'nature/pink-tulips.png'},mushroom:{url:'nature/mushroom-purple.png'},
     fern:{url:'nature/bush.png'},log:{url:'nature/moss-log.png'},cat:{url:'park/park-cat.png'}
   };
   function hash(x,y){let n=Math.imul(x+137,374761393)^Math.imul(y+71,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;}
@@ -31,12 +31,12 @@
   prop('picnic','picnic',1350,552,180,156,[1378,650,126,43]);
   prop('tackle','tackle',666,730,160,140,[688,810,114,52]);
   prop('tent','tent',128,286,160,140,[151,351,106,64]);
-  prop('campfire','fire',741,518,68,64,[744,539,60,40]);
+  prop('campfire','fire',741,518,68,64,[744,539,60,40],{source:[240,220,920,700]});
   prop('reading-bench','bench',404,565,76,48,[408,597,68,10]);
   prop('arrival-bench','bench',570,385,90,58,[574,425,82,12]);
   prop('picnic-bench','bench',1198,651,76,48,[1202,683,68,10]);
-  prop('camp-log-n','log',740,476,68,34,[744,497,60,10]);
-  prop('camp-log-s','log',744,590,68,34,[748,611,60,10]);
+  prop('camp-bench-n','bench',740,470,68,40,[744,497,60,10]);
+  prop('camp-bench-s','bench',736,570,84,48,[740,602,76,10]);
   prop('cat','cat',458,646,30,28);
   // Terraced rock shoulders join the grotto to the river instead of leaving a
   // flat empty lawn behind the entrance. The central approach stays clear.
